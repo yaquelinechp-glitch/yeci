@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: yeci
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: |-
+      cd ../frontend && npm install && npm run build:prod && cd ../backend && pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: AI_PROVIDER
+        value: demo
