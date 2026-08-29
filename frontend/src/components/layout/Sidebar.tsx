@@ -8,7 +8,12 @@ import ProfileModal from '../ProfileModal';
 
 type NavLink = { to: string; label: string; icon: string; badge?: number };
 
-export default function Sidebar() {
+type Props = {
+  mobileOpen: boolean;
+  onClose: () => void;
+};
+
+export default function Sidebar({ mobileOpen, onClose }: Props) {
   const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const location = useLocation();
@@ -69,7 +74,13 @@ export default function Sidebar() {
       ];
 
   return (
-    <aside className="w-64 bg-dark-800 text-white min-h-screen fixed left-0 top-16 bottom-0 overflow-y-auto scrollbar-thin">
+    <>
+      {mobileOpen && (
+        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/50 z-40 md:hidden" onClick={onClose} />
+      )}
+      <aside className={`w-64 bg-dark-800 text-white min-h-screen fixed left-0 top-16 bottom-0 overflow-y-auto scrollbar-thin z-50 transition-transform duration-300 ${
+        mobileOpen ? 'translate-x-0' : '-translate-x-full'
+      } md:translate-x-0`}>
       <div className="p-6 text-center border-b border-white/10">
         <button onClick={() => setProfileOpen(true)} className="group mx-auto block" title={t('profile.title')}>
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-xl font-bold mx-auto mb-3 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
@@ -94,6 +105,7 @@ export default function Sidebar() {
             <Link
               key={link.to}
               to={link.to}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg mb-1 transition-all duration-200 ${
                 isActive
                   ? 'bg-accent-500/15 text-accent-400 border-l-3 border-accent-500'
@@ -110,12 +122,13 @@ export default function Sidebar() {
         })}
       </nav>
       <div className="absolute bottom-0 w-full border-t border-white/10 px-3">
-        <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-4 text-sm text-dark-200 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all duration-200 mt-2">
+        <button onClick={() => { logout(); onClose(); }} className="w-full flex items-center gap-3 px-4 py-4 text-sm text-dark-200 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all duration-200 mt-2">
           <span className="text-lg">🚪</span>
           {t('nav.logout')}
         </button>
       </div>
       <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
     </aside>
+    </>
   );
 }

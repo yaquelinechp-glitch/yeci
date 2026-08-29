@@ -36,6 +36,8 @@
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
+  --breakpoint-xs: 480px;
+
   --radius-card: 20px;
   --radius-button: 11px;
   --radius-badge: 9999px;

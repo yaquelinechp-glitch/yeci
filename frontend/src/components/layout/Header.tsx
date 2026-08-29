@@ -6,7 +6,7 @@ import { notificationsApi } from '../../services/api';
 import type { Notification } from '../../types';
 import ProfileModal from '../ProfileModal';
 
-export default function Header() {
+export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
@@ -106,12 +106,25 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 shadow-sm">
-      <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-        <span className="text-aconso-500">aconso</span>
-        <span className="font-normal text-gray-500">Partner Academy</span>
-      </Link>
-      <div className="flex items-center gap-4">
+    <header className="h-16 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 sm:px-6 shadow-sm gap-2">
+      <div className="flex items-center gap-2 min-w-0">
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="md:hidden text-gray-600 hover:text-aconso-500 p-1.5 rounded-lg hover:bg-gray-50"
+            aria-label="menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        )}
+        <Link to="/" className="flex items-center gap-2 font-bold text-base sm:text-lg min-w-0">
+          <span className="text-aconso-500">aconso</span>
+          <span className="font-normal text-gray-500 hidden xs:inline sm:inline">Partner Academy</span>
+        </Link>
+      </div>
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         <select
           onChange={(e) => changeLang(e.target.value)}
           value={i18n.language}
@@ -122,10 +135,10 @@ export default function Header() {
           <option value="de">DE</option>
         </select>
         {user ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to={isAdmin ? '/admin' : '/partner'}
-              className="text-sm text-gray-600 hover:text-aconso-500 transition-colors"
+              className="hidden sm:block text-sm text-gray-600 hover:text-aconso-500 transition-colors"
             >
               {t('nav.dashboard')}
             </Link>
@@ -210,19 +223,19 @@ export default function Header() {
             </button>
             <button
               onClick={logout}
-              className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+              className="hidden sm:block text-sm text-gray-400 hover:text-red-500 transition-colors"
             >
               {t('nav.logout')}
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link to="/login" className="text-sm text-gray-600 hover:text-aconso-500 transition-colors">
               {t('nav.login')}
             </Link>
             <Link
               to="/register"
-              className="btn-primary text-sm !py-2 !px-5"
+              className="btn-primary text-sm !py-2 !px-3 sm:!px-5"
             >
               {t('nav.register')}
             </Link>

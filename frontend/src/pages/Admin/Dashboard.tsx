@@ -60,12 +60,12 @@ export default function AdminDashboard() {
     <div className="animate-fade-in space-y-6">
 
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-aconso-800 via-aconso-700 to-aconso-500 p-8 text-white">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-aconso-800 via-aconso-700 to-aconso-500 p-5 sm:p-8 text-white">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold mb-2">{t('admin.welcomeBack')}, {user?.first_name || user?.username || user?.company_name || ''}</h1>
-          <p className="text-aconso-200 text-lg">{t('admin.welcomeDashboardDesc')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">{t('admin.welcomeBack')}, {user?.first_name || user?.username || user?.company_name || ''}</h1>
+          <p className="text-aconso-200 text-base sm:text-lg">{t('admin.welcomeDashboardDesc')}</p>
           <div className="flex gap-6 mt-6 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold">{stats.total_partners}</span>
@@ -118,20 +118,22 @@ export default function AdminDashboard() {
             <span className="text-gray-500">{t('admin.activeOpportunities')}: <strong className="text-gray-900">{stats.active_opportunities}</strong></span>
             <span className="text-gray-500">{t('admin.weightedPipeline')}: <strong className="text-gray-900">{fmt(stats.weighted_pipeline_value)}</strong></span>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Object.entries(stats.pipeline_by_stage || {}).map(([stage, data]) => (
-              <div key={stage} className="flex items-center gap-3">
-                <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${STAGE_COLORS[stage] || 'bg-gray-400'}`} />
-                <div className="flex-1 flex items-center justify-between text-sm">
-                  <span className="text-gray-700 w-36">{pipelineStages[stage] || stage}</span>
-                  <div className="flex-1 mx-3">
+              <div key={stage} className="flex items-start gap-2">
+                <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1.5 ${STAGE_COLORS[stage] || 'bg-gray-400'}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center justify-between text-sm gap-x-3 gap-y-1">
+                    <span className="text-gray-700 flex-1 min-w-[8rem]">{pipelineStages[stage] || stage}</span>
+                    <span className="text-gray-900 font-semibold shrink-0">{data.count || 0}</span>
+                    <span className="text-gray-500 shrink-0">{fmt(data.value || 0)}</span>
+                  </div>
+                  <div className="mt-1.5">
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div className={`h-full rounded-full ${STAGE_COLORS[stage] || 'bg-gray-400'}`}
                         style={{ width: `${stats.active_opportunities > 0 ? ((data.count || 0) / stats.active_opportunities) * 100 : 0}%` }} />
                     </div>
                   </div>
-                  <span className="text-gray-900 font-semibold w-16 text-right">{data.count || 0}</span>
-                  <span className="text-gray-500 w-24 text-right">{fmt(data.value || 0)}</span>
                 </div>
               </div>
             ))}
