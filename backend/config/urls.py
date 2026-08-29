@@ -17,7 +17,7 @@ def spa_serve(request, *args, **kwargs):
 def spa_assets(request, path, *args, **kwargs):
     dist = settings.FRONTEND_DIST
     file = (dist / path).resolve()
-    if not str(file).startswith(str(dist.resolve())) or not file.exists():
+    if not str(file).startswith(str(dist.resolve())) or not file.is_file():
         return JsonResponse({"detail": "Not found"}, status=404)
     return FileResponse(open(file, "rb"))
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("prm.urls")),
     re_path(r"^assets/(?P<path>.*)$", spa_assets, name="spa-assets"),
+    re_path(r"^favicon\.svg$", spa_assets, {"path": "favicon.svg"}, name="favicon"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [

@@ -90,12 +90,13 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
-# Frontend build (React) servido por Django
+# Frontend build (React) servido por Django a traves de spa_serve/spa_assets
 FRONTEND_DIST = Path(BASE_DIR).parent / "frontend" / "dist"
-if FRONTEND_DIST.exists():
-    STATICFILES_DIRS = [str(FRONTEND_DIST)]
+
+# Whitenoise sirve el build de Vite (assets, favicon, etc.) desde la raiz
+WHITENOISE_ROOT = str(FRONTEND_DIST)
 
 MEDIA_URL = "/uploads/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
