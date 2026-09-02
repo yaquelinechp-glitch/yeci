@@ -4,6 +4,7 @@
   email: string;
   phone: string;
   tax_id: string;
+  country?: string;
   contact_name: string;
   first_name?: string;
   last_name?: string;

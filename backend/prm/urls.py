@@ -106,4 +106,7 @@ urlpatterns = [
     path("admin/blacklisted-tokens", views.admin_blacklisted_tokens),
     path("admin/blacklisted-tokens/<str:jti>", views.admin_blacklisted_tokens),
     path("admin/register-admin", views.admin_register_admin),
+
+    path("calculator/settings", views.calculator_settings),
+    path("calculator/export", views.calculator_export),
 ]

@@ -192,12 +192,12 @@ export default function PartnerCourses() {
             <div className="flex flex-wrap items-center gap-3 mb-6">
               {selected.deadline && (
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-amber-100 text-amber-700">
-                  ⏰ {t('courses.deadline')}: {selected.deadline.slice(0, 10)}
+                  {t('courses.deadline')}: {selected.deadline.slice(0, 10)}
                 </span>
               )}
               {selected.exam_questions_count > 0 && (
                 <button onClick={openExam} className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full bg-aconso-600 text-white hover:bg-aconso-700 transition-colors">
-                  🎓 {t('courses.takeExam')} ({selected.exam_questions_count})
+                  {t('courses.takeExam')} ({selected.exam_questions_count})
                 </button>
               )}
               {(selected.rating_count || 0) > 0 && (
@@ -235,7 +235,7 @@ export default function PartnerCourses() {
                       'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
-                    {done ? '✓' : !unlocked ? '🔒' : ''} {t('courses.phase')} {p.phase}
+                    {t('courses.phase')} {p.phase}
                   </button>
                 );
               })}
@@ -275,7 +275,7 @@ export default function PartnerCourses() {
                           <div className="flex items-center gap-2 shrink-0">
                             {done && <span className="text-xs text-emerald-600 font-medium">✓ {t('quiz.passed')}</span>}
                             <button onClick={() => loadQuiz(v.id)} className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${isQuizOpen ? 'bg-aconso-100 text-aconso-700' : 'text-aconso-600 hover:text-aconso-700 hover:bg-aconso-50'}`}>
-                              📝 {t('quiz.title')}
+                              {t('quiz.title')}
                             </button>
                           </div>
                         </div>
@@ -288,14 +288,13 @@ export default function PartnerCourses() {
                               </div>
                             ) : quizQuestions.length === 0 ? (
                               <div className="text-center py-8">
-                                <div className="text-3xl mb-2">📋</div>
                                 <p className="text-sm text-gray-400">{t('quiz.noQuestions')}</p>
                               </div>
                             ) : !quizResult ? (
                               <>
                                 <div className="flex items-center justify-between">
                                   <div className="font-semibold text-sm text-gray-800">{t('quiz.title')}</div>
-                                  {selected.pass_mark != null && <span className="text-xs font-medium text-gray-500">🎯 {t('lms.passMark')}: {selected.pass_mark}%</span>}
+                                  {selected.pass_mark != null && <span className="text-xs font-medium text-gray-500">{t('lms.passMark')}: {selected.pass_mark}%</span>}
                                 </div>
                                 {quizQuestions.map((q, qi) => {
                                   const qText = getLocalized(q.question);
@@ -353,7 +352,6 @@ export default function PartnerCourses() {
               </div>
             ) : (
               <div className="text-center py-12 text-gray-400">
-                <div className="text-4xl mb-3">🎬</div>
                 <p>{t('courses.noContentYet')}</p>
               </div>
             )}
@@ -361,12 +359,12 @@ export default function PartnerCourses() {
             {selected.materials?.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
                 <div className="p-4 bg-gray-50 rounded-xl">
-                    <h4 className="font-semibold text-sm text-gray-800 mb-3 flex items-center gap-2">📎 {t('courses.materials')}</h4>
+                    <h4 className="font-semibold text-sm text-gray-800 mb-3 flex items-center gap-2">{t('courses.materials')}</h4>
                     <ul className="space-y-1.5">
                       {selected.materials.map((m: any, mi: number) => (
                         <li key={m.id || mi}>
                           <a href={m.url} target="_blank" rel="noreferrer" className="text-sm text-aconso-600 hover:text-aconso-700 hover:underline flex items-center gap-1.5">
-                            📄 {typeof m === 'string' ? m : (m.name || m.url)}
+                            {typeof m === 'string' ? m : (m.name || m.url)}
                           </a>
                         </li>
                       ))}
@@ -378,7 +376,7 @@ export default function PartnerCourses() {
             {/* Rating */}
             <div className="mt-8 border-t border-gray-100 pt-6">
               <h4 className="font-semibold text-sm text-gray-800 mb-3 flex items-center gap-2">
-                ⭐ {t('courses.rating')}
+                {t('courses.rating')}
                 {(ratingInfo?.rating_count || 0) > 0 && <span className="text-xs font-normal text-gray-400">({ratingInfo.rating_avg} · {ratingInfo.rating_count})</span>}
               </h4>
               <div className="flex items-center gap-1 mb-3">
@@ -436,7 +434,7 @@ export default function PartnerCourses() {
             <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 animate-fade-in" onClick={() => setExamOpen(false)}>
               <div className="bg-white rounded-2xl overflow-hidden max-w-2xl w-full shadow-2xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2">🎓 {t('courses.exam')}</h3>
+                  <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2">{t('courses.exam')}</h3>
                   <button onClick={() => setExamOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
@@ -449,7 +447,6 @@ export default function PartnerCourses() {
                     </div>
                   ) : examQuestions.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="text-3xl mb-2">🎓</div>
                       <p className="text-sm text-gray-400">{t('quiz.noQuestions')}</p>
                     </div>
                   ) : !examResult ? (
@@ -483,7 +480,7 @@ export default function PartnerCourses() {
                                   const active = examAnswers[q.id] === oi;
                                   return (
                                     <button key={oi} onClick={() => setExamAnswers((prev) => ({ ...prev, [q.id]: oi }))} className={`text-left text-sm px-4 py-2.5 rounded-lg border-2 transition-all ${active ? 'border-aconso-500 bg-aconso-50 text-aconso-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
-                                      {q.question_type === 'true_false' ? (oi === 0 ? '✅ ' + t('quiz.true') : '❌ ' + t('quiz.false')) : getLocalized(opt)}
+                                      {q.question_type === 'true_false' ? (oi === 0 ? t('quiz.true') : t('quiz.false')) : getLocalized(opt)}
                                     </button>
                                   );
                                 })}
@@ -514,12 +511,11 @@ export default function PartnerCourses() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t('courses.libraryTitle')}</h1>
-        <p className="text-gray-500 mt-1">{t('courses.phaseDescription')}</p>
+        <h1 className="text-2xl font-bold text-white">{t('courses.libraryTitle')}</h1>
+        <p className="text-white/70 mt-1">{t('courses.phaseDescription')}</p>
       </div>
       {courses.length === 0 ? (
         <div className="card p-16 text-center">
-          <div className="text-5xl mb-4">📚</div>
           <p className="text-gray-500 text-lg">{t('courses.noCoursesYet')}</p>
         </div>
       ) : (
@@ -571,16 +567,15 @@ export default function PartnerCourses() {
                         <div className="p-5">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className={`font-semibold text-gray-900 ${locked ? 'line-through' : ''}`}>{getLocalized(c.title)}</h3>
-                            {locked && <span className="text-lg" title={t('lms.prerequisitesNotMet')}>🔒</span>}
                           </div>
                           <p className="text-sm text-gray-500 line-clamp-2 mb-3">{getLocalized(c.description) || t('courses.noDescription')}</p>
                           {locked && c.prerequisite && (
                             <p className="text-xs text-amber-600 font-medium mb-3">
-                              🔒 {t('courses.prerequisite')}: {getLocalized(c.prerequisite.title)}
+                              {t('courses.prerequisite')}: {getLocalized(c.prerequisite.title)}
                             </p>
                           )}
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-400 flex items-center gap-1">🎬 {c.video_count} {t('courses.videos')}</span>
+                            <span className="text-gray-400 flex items-center gap-1">{c.video_count} {t('courses.videos')}</span>
                             {c.completed ? (
                               <span className="text-emerald-600 font-medium">✓ {t('courses.completed')}</span>
                             ) : (
@@ -588,9 +583,9 @@ export default function PartnerCourses() {
                             )}
                           </div>
                           <div className="flex items-center gap-3 mt-2">
-                            {c.deadline && <span className="text-[11px] text-amber-600 font-medium">⏰ {c.deadline.slice(0, 10)}</span>}
-                            {(c.rating_count || 0) > 0 && <span className="text-[11px] text-gray-400">⭐ {c.rating_avg} ({c.rating_count})</span>}
-                            {c.exam_questions_count > 0 && <span className="text-[11px] text-gray-400">🎓 {c.exam_questions_count}</span>}
+                            {c.deadline && <span className="text-[11px] text-amber-600 font-medium">{c.deadline.slice(0, 10)}</span>}
+                            {(c.rating_count || 0) > 0 && <span className="text-[11px] text-gray-400">{c.rating_avg} ({c.rating_count})</span>}
+                            {c.exam_questions_count > 0 && <span className="text-[11px] text-gray-400">{c.exam_questions_count}</span>}
                           </div>
                         </div>
                       </div>

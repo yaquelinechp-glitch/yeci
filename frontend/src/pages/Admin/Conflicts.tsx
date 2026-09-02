@@ -93,7 +93,7 @@ export default function AdminConflicts() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="animate-spin w-8 h-8 border-2 border-aconso-500 border-t-transparent rounded-full"></div>
-        <span className="ml-3 text-gray-400">{t('common.loading')}</span>
+        <span className="ml-3 text-white/60">{t('common.loading')}</span>
       </div>
     );
   }
@@ -114,8 +114,8 @@ export default function AdminConflicts() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">⚔️ {t('conflicts.adminTitle')}</h1>
-        <p className="text-gray-500 mt-1">{t('conflicts.adminSubtitle')}</p>
+        <h1 className="text-2xl font-bold text-white">{t('conflicts.adminTitle')}</h1>
+        <p className="text-white/70 mt-1">{t('conflicts.adminSubtitle')}</p>
       </div>
 
       {msg && (
@@ -205,24 +205,24 @@ export default function AdminConflicts() {
                 <div className="flex flex-wrap items-start gap-4">
                   <div className="flex-1 min-w-[220px]">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-gray-900 text-sm">⚠️ {c.company_name}</span>
+                      <span className="font-medium text-gray-900 text-sm">{c.company_name}</span>
                       <span className={statusBadge(c.status)}>{t(`conflicts.statuses.${c.status}`)}</span>
                     </div>
                     <div className="text-xs text-gray-500 mt-2 space-y-1">
                       {c.opportunity && (
-                        <div>🔵 <span className="font-semibold text-gray-700">{c.opportunity.partner_name}</span> — {c.opportunity.name} ({t(`pipeline.${stageKey(c.opportunity.stage)}`)})</div>
+                        <div><span className="font-semibold text-gray-700">{c.opportunity.partner_name}</span> — {c.opportunity.name} ({t(`pipeline.${stageKey(c.opportunity.stage)}`)})</div>
                       )}
                       {c.conflicting_opportunity && (
-                        <div>🔴 <span className="font-semibold text-gray-700">{c.conflicting_opportunity.partner_name}</span> — {c.conflicting_opportunity.name} ({t(`pipeline.${stageKey(c.conflicting_opportunity.stage)}`)})</div>
+                        <div><span className="font-semibold text-gray-700">{c.conflicting_opportunity.partner_name}</span> — {c.conflicting_opportunity.name} ({t(`pipeline.${stageKey(c.conflicting_opportunity.stage)}`)})</div>
                       )}
                       {!c.opportunity && !c.conflicting_opportunity && (
                         <div className="text-gray-400">{t('conflicts.noOpps')}</div>
                       )}
                     </div>
-                    {c.notes && <p className="text-xs text-gray-600 mt-2">📝 {c.notes}</p>}
+                    {c.notes && <p className="text-xs text-gray-600 mt-2">{c.notes}</p>}
                     {c.status === 'resuelto' && (
                       <div className="mt-2 text-xs px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-100">
-                        ✅ {t('conflicts.winner')}: <span className="font-bold">{c.winner_partner_name}</span>
+                        {t('conflicts.winner')}: <span className="font-bold">{c.winner_partner_name}</span>
                         {c.resolution && <div className="mt-1 text-emerald-700">{c.resolution}</div>}
                       </div>
                     )}
@@ -239,18 +239,18 @@ export default function AdminConflicts() {
                     </div>
                     <div className="flex flex-wrap gap-1.5 justify-end">
                       {c.status === 'abierto' && (
-                        <button onClick={() => act(c, 'review')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs">👀 {t('conflicts.review')}</button>
+                        <button onClick={() => act(c, 'review')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs">{t('conflicts.review')}</button>
                       )}
                       {(c.status === 'abierto' || c.status === 'en_resolucion') && (
                         <>
-                          <button onClick={() => act(c, 'resolve')} disabled={acting === c.id} className="btn-primary !py-1.5 !px-3 text-xs">✅ {t('conflicts.resolve')}</button>
-                          <button onClick={() => act(c, 'close')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs hover:!border-red-400 hover:!text-red-600">✗ {t('conflicts.close')}</button>
+                          <button onClick={() => act(c, 'resolve')} disabled={acting === c.id} className="btn-primary !py-1.5 !px-3 text-xs">{t('conflicts.resolve')}</button>
+                          <button onClick={() => act(c, 'close')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs hover:!border-red-400 hover:!text-red-600">{t('conflicts.close')}</button>
                         </>
                       )}
                       {(c.status === 'resuelto' || c.status === 'cerrado') && (
-                        <button onClick={() => act(c, 'open')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs">↩ {t('conflicts.reopen')}</button>
+                        <button onClick={() => act(c, 'open')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs">{t('conflicts.reopen')}</button>
                       )}
-                      <button onClick={() => remove(c)} disabled={acting === c.id} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('common.delete')}>🗑</button>
+                      <button onClick={() => remove(c)} disabled={acting === c.id} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('common.delete')}>{t('common.delete')}</button>
                     </div>
                   </div>
                 </div>

@@ -72,8 +72,8 @@ export default function PartnersList() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.allPartners')}</h1>
-        <p className="text-gray-500 mt-1">{t('admin.partnersSubtitle')}</p>
+        <h1 className="text-2xl font-bold text-white">{t('admin.allPartners')}</h1>
+        <p className="text-white/70 mt-1">{t('admin.partnersSubtitle')}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -98,16 +98,15 @@ export default function PartnersList() {
           ))}
         </div>
         <div className="flex-1"></div>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder={t('common.search')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 w-64"
-          />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-        </div>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder={t('common.search')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-white pl-4 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 w-64"
+            />
+          </div>
       </div>
 
       <div className="table-container">
@@ -179,7 +178,7 @@ export default function PartnersList() {
                 </div>
               ) : partnerProgress.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="text-4xl mb-3">📚</div>
+                  <div className="text-4xl mb-3"></div>
                   <p className="text-gray-400">{t('courses.noCourses')}</p>
                 </div>
               ) : (() => {

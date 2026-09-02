@@ -1,16 +1,17 @@
 ﻿import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { pipelineApi, productsApi } from '../../services/api';
+import { pipelineApi, productsApi, calculatorApi } from '../../services/api';
 import type { Opportunity, PipelineStats, Product } from '../../types';
 import { useAuthStore } from '../../store/auth';
 import {
   STAGES, STAGE_PROB, STAGE_COLORS, STAGE_BORDERS,
   OPPORTUNITY_TYPES, FORECAST_CATEGORIES,
   LOSS_REASONS,
-  CURRENCIES, fmtMoney,
+  CURRENCIES, fmtMoney, currencyForCountry,
 } from '../../constants';
 
 function fmt(n: number) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n); }
+function round2(n: number) { return Math.round((Number(n) || 0) * 100) / 100; }
 function isOverdue(dateStr: string) { return new Date(dateStr) < new Date(); }
 function parseWorkers(v: string): number {
   const m = v.match(/[\d.,]+/);
@@ -35,10 +36,20 @@ const EMPTY_FORM = {
 
 const EMPTY_QFORM = { name: '', description: '', priceUsd: '', priceEur: '', priceChf: '', priceOtro: '', customCurrency: '' };
 
-const priceFor = (p: Product | undefined, cur: string): number => {
-  if (!p) return 0;
-  const v = cur === 'eur' ? p.price_eur : cur === 'chf' ? p.price_chf : cur === 'otro' ? p.price_otro : p.price_usd;
-  return parseFloat(String(v ?? '')) || 0;
+const priceForWithCurrency = (p: Product | undefined, cur: string): { value: number; currency: string } => {
+  if (!p) return { value: 0, currency: cur };
+  const pick = (c: string): number => {
+    const v = c === 'eur' ? p.price_eur : c === 'chf' ? p.price_chf : c === 'otro' ? p.price_otro : p.price_usd;
+    return parseFloat(String(v ?? '')) || 0;
+  };
+  const first = pick(cur);
+  if (first > 0) return { value: first, currency: cur };
+  const fallbacks = cur === 'usd' ? ['eur', 'chf', 'otro'] : cur === 'eur' ? ['usd', 'chf', 'otro'] : cur === 'chf' ? ['usd', 'eur', 'otro'] : ['usd', 'eur', 'chf'];
+  for (const c of fallbacks) {
+    const v = pick(c);
+    if (v > 0) return { value: v, currency: c };
+  }
+  return { value: 0, currency: cur };
 };
 
 const productPricesLabel = (p: Product): string => {
@@ -77,8 +88,6 @@ export default function Pipeline() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [detailOpp, setDetailOpp] = useState<Opportunity | null>(null);
 
-  const [prodPick, setProdPick] = useState('');
-
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [qformKey, setQformKey] = useState<string | null>(null);
   const [qform, setQform] = useState({ ...EMPTY_QFORM });
@@ -112,24 +121,25 @@ export default function Pipeline() {
     return p ? productName(p) : tOpt(`pipeline.productChoices.${key}`, key);
   };
   const activeCatalog = catalog.filter((p) => p.active);
-  const prodOptions = activeCatalog.filter((p) => !form.products.includes(p.key));
 
   const docCount = parseWorkers(form.company_size);
   const nowYear = new Date().getFullYear();
   const quarters = Array.from({ length: 8 }, (_, i) => `T${(i % 4) + 1}/${nowYear + Math.floor(i / 4)}`);
   const arrRows = form.products.map((key) => {
     const p = activeCatalog.find((x) => x.key === key);
-    const price = priceFor(p, form.currency);
-    return { key, name: p ? productName(p) : productLabel(key), price, m12: docCount * price * 12, m24: docCount * price * 24, m36: docCount * price * 36 };
+    const { value: price, currency: cur } = priceForWithCurrency(p, form.currency);
+    const docCountN = docCount;
+    return { key, name: p ? productName(p) : productLabel(key), price, currency: cur, m12: round2(docCountN * price * 12), m24: round2(docCountN * price * 24), m36: round2(docCountN * price * 36) };
   });
   const arrTotal = arrRows.reduce((s, r) => s + r.m12, 0);
   const total24 = arrRows.reduce((s, r) => s + r.m24, 0);
   const total36 = arrRows.reduce((s, r) => s + r.m36, 0);
+  const arrTotalR = round2(arrTotal);
 
   const openCreate = (stage?: string) => {
     setEditOpp(null);
     setWizardStep(1);
-    setForm({ ...EMPTY_FORM, stage: stage || 'registrada', probability: String(STAGE_PROB[stage || 'registrada'] || 10), deal_owner: user?.contact_name || '' });
+    setForm({ ...EMPTY_FORM, stage: stage || 'registrada', probability: String(STAGE_PROB[stage || 'registrada'] || 10), deal_owner: user?.contact_name || '', currency: isAdmin ? 'usd' : currencyForCountry(user?.country) });
     setFormError('');
     productsApi.list().then((r) => setCatalog(r.data)).catch(() => { });
     setShowForm(true);
@@ -147,7 +157,7 @@ export default function Pipeline() {
       probability: String(opp.probability),
       amount: String(opp.amount || ''),
       scan_one_time_fee: String(opp.scan_one_time_fee || '0'),
-      currency: opp.currency || 'usd',
+      currency: isAdmin ? (opp.currency || 'usd') : currencyForCountry(user?.country),
       customCurrency: opp.custom_currency || '',
       delivery_quarter: opp.delivery_quarter || '',
       close_date: opp.close_date || '',
@@ -177,7 +187,7 @@ export default function Pipeline() {
         operation_mode: form.operation_mode,
         stage: form.stage,
         probability: parseInt(form.probability) || STAGE_PROB[form.stage],
-        amount: arrTotal || parseFloat(form.amount) || 0,
+        amount: arrTotalR || parseFloat(form.amount) || 0,
         scan_one_time_fee: parseFloat(form.scan_one_time_fee) || 0,
         currency: form.currency,
         custom_currency: form.currency === 'otro' ? form.customCurrency.trim() : '',
@@ -212,6 +222,42 @@ export default function Pipeline() {
     await pipelineApi.delete(deleteId);
     setDeleteId(null);
     load();
+  };
+
+  const handleExportExcel = async () => {
+    if (arrRows.length === 0) { setFormError(t('pipeline.selectProduct')); return; }
+    const cur = isAdmin ? form.currency : currencyForCountry(user?.country);
+    try {
+      const payload = {
+        company_name: form.company_name.trim() || user?.company_name || '',
+        company_size: form.company_size,
+        currency: cur,
+        total12: arrTotalR,
+        total24,
+        total36,
+        products: arrRows.map((r) => ({
+          key: r.key,
+          name: r.name,
+          price: r.price,
+          currency: r.currency,
+          m12: r.m12,
+          m24: r.m24,
+          m36: r.m36,
+        })),
+      };
+      const res = await calculatorApi.exportExcel(payload);
+      const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cost_indication_${form.company_name.trim() || 'cliente'}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err?.response?.data?.detail || t('common.error'));
+    }
   };
 
   const moveStage = async (opp: Opportunity, direction: 'left' | 'right') => {
@@ -316,20 +362,20 @@ export default function Pipeline() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('pipeline.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('pipeline.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-white">{t('pipeline.title')}</h1>
+          <p className="text-white/70 mt-1">{t('pipeline.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button onClick={() => setView('board')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'board' ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500'}`}>{t('pipeline.board')}</button>
             <button onClick={() => setView('list')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'list' ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500'}`}>{t('pipeline.list')}</button>
           </div>
-          {isAdmin && <button onClick={() => { setShowQuickAdd(true); setQformKey(null); setQform({ ...EMPTY_QFORM }); setQformError(''); }} className="btn-primary text-sm">➕ {t('pipeline.manageQuickAdd')}</button>}
+          {isAdmin && <button onClick={() => { setShowQuickAdd(true); setQformKey(null); setQform({ ...EMPTY_QFORM }); setQformError(''); }} className="btn-primary text-sm">{t('pipeline.manageQuickAdd')}</button>}
           {!isAdmin && <button onClick={() => openCreate()} className="btn-primary">{t('pipeline.newOpportunity')}</button>}
         </div>
       </div>
 
-      {quickMsg && <div className="mb-6 p-3 rounded-lg bg-emerald-50 text-emerald-700 text-sm border border-emerald-200">✅ {quickMsg}</div>}
+      {quickMsg && <div className="mb-6 p-3 rounded-lg bg-emerald-50 text-emerald-700 text-sm border border-emerald-200">{quickMsg}</div>}
 
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -351,11 +397,10 @@ export default function Pipeline() {
       <div className="flex items-center gap-3 mb-6">
         <div className="relative flex-1 max-w-xs">
           <input type="text" placeholder={t('pipeline.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            className="bg-white w-full pl-4 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
         </div>
         <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-aconso-500">
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-aconso-500">
           <option value="">{t('pipeline.allStages')}</option>
           {STAGES.map((s) => <option key={s} value={s}>{stageI18n(s)}</option>)}
         </select>
@@ -400,15 +445,15 @@ export default function Pipeline() {
                         </span>
                         <span className="text-[10px] text-gray-400">{opp.probability}%</span>
                       </div>
-                      {opp.conflict && <div className="text-[10px] text-red-500 font-medium mt-0.5">⚠ {t('pipeline.conflict')}</div>}
+                      {opp.conflict && <div className="text-[10px] text-red-500 font-medium mt-0.5">{t('pipeline.conflict')}</div>}
                       {opp.close_date && (
                         <div className="text-[10px] text-gray-400 mt-0.5">
-                          {new Date(opp.close_date).toLocaleDateString()} {isOverdue(opp.close_date) && <span className="text-red-500 font-medium">⚠</span>}
+                          {new Date(opp.close_date).toLocaleDateString()} {isOverdue(opp.close_date) && <span className="text-red-500 font-medium">!</span>}
                         </div>
                       )}
                       {!isAdmin && <div className="flex items-center gap-1 mt-1.5 pt-1.5 border-t border-gray-100">
-                        <button onClick={(e) => { e.stopPropagation(); openEdit(opp); }} className="text-[10px] text-gray-400 hover:text-aconso-600 transition-colors">✏️</button>
-                        <button onClick={(e) => { e.stopPropagation(); setDeleteId(opp.id); }} className="text-[10px] text-gray-400 hover:text-red-500 transition-colors">🗑</button>
+                        <button onClick={(e) => { e.stopPropagation(); openEdit(opp); }} className="text-[10px] text-gray-400 hover:text-aconso-600 transition-colors">{t('common.edit')}</button>
+                        <button onClick={(e) => { e.stopPropagation(); setDeleteId(opp.id); }} className="text-[10px] text-gray-400 hover:text-red-500 transition-colors">{t('common.delete')}</button>
                       </div>}
                     </div>
                   ))}
@@ -436,7 +481,7 @@ export default function Pipeline() {
               {opps.map((opp) => (
                 <tr key={opp.id} className="hover:bg-aconso-50/50 transition-colors">
                   <td className="font-medium text-gray-900">
-                    <span className="flex items-center gap-1.5">{opp.company_name} {opp.conflict && <span title={t('pipeline.conflict')}>⚠️</span>}</span>
+                    <span className="flex items-center gap-1.5">{opp.company_name}</span>
                   </td>
                   <td>
                     <span className={`badge text-white ${STAGE_COLORS[opp.stage]}`}>{stageI18n(opp.stage)}</span>
@@ -448,15 +493,15 @@ export default function Pipeline() {
                   {isAdmin && <td className="text-gray-500 text-sm">{opp.partner_name}</td>}
                   {isAdmin ? (
                     <td>
-                      <button onClick={() => openDetail(opp)} className="text-xs text-aconso-600 hover:text-aconso-800">👁️</button>
+                      <button onClick={() => openDetail(opp)} className="text-xs text-aconso-600 hover:text-aconso-800">Ver</button>
                     </td>
                   ) : (
                     <td>
                       <div className="flex gap-1">
-                        <button onClick={() => moveStage(opp, 'left')} className="text-xs text-gray-400 hover:text-aconso-600">◀</button>
-                        <button onClick={() => openEdit(opp)} className="text-xs text-gray-400 hover:text-aconso-600">✏️</button>
-                        <button onClick={() => moveStage(opp, 'right')} className="text-xs text-gray-400 hover:text-aconso-600">▶</button>
-                        <button onClick={() => setDeleteId(opp.id)} className="text-xs text-gray-400 hover:text-red-500">🗑</button>
+                        <button onClick={() => moveStage(opp, 'left')} className="text-xs text-gray-400 hover:text-aconso-600">{'<'}</button>
+                        <button onClick={() => openEdit(opp)} className="text-xs text-gray-400 hover:text-aconso-600">{t('common.edit')}</button>
+                        <button onClick={() => moveStage(opp, 'right')} className="text-xs text-gray-400 hover:text-aconso-600">{'>'}</button>
+                        <button onClick={() => setDeleteId(opp.id)} className="text-xs text-gray-400 hover:text-red-500">{t('common.delete')}</button>
                       </div>
                     </td>
                   )}
@@ -464,7 +509,6 @@ export default function Pipeline() {
               ))}
               {opps.length === 0 && (
                 <tr><td colSpan={isAdmin ? 8 : 7} className="text-center py-12 text-gray-400">
-                  <div className="text-4xl mb-3">📊</div>
                   <p>{t('pipeline.noOpportunities')}</p>
                   <p className="text-sm mt-1">{t('pipeline.noOpportunitiesHint')}</p>
                 </td></tr>
@@ -532,15 +576,19 @@ export default function Pipeline() {
                 <>
                   <div>
                     <label className="block text-sm font-medium mb-1">{t('pipeline.products')} *</label>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <select value={prodPick} onChange={(e) => setProdPick(e.target.value)}
-                        className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none bg-white">
-                        <option value="">{t('pipeline.selectProduct')}</option>
-                        {prodOptions.map((p) => <option key={p.key} value={p.key}>{productName(p)}</option>)}
-                      </select>
-                      <button type="button" disabled={!prodPick}
-                        onClick={() => { if (prodPick) { setForm({ ...form, products: [...form.products, prodPick] }); setProdPick(''); } }}
-                        className="btn-secondary whitespace-nowrap disabled:opacity-40">+ {t('common.add')}</button>
+                    <div className="flex flex-wrap gap-2">
+                      {activeCatalog.map((p) => {
+                        const checked = form.products.includes(p.key);
+                        return (
+                          <button type="button" key={p.key}
+                            onClick={() => setForm((prev) => ({ ...prev, products: checked ? prev.products.filter((x) => x !== p.key) : [...prev.products, p.key] }))}
+                            className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition-colors ${
+                              checked ? 'bg-aconso-600 text-white border-aconso-600' : 'bg-white text-gray-700 border-gray-200 hover:border-aconso-400'
+                            }`}>
+                            {checked ? '✓ ' : ''}{productName(p)}
+                          </button>
+                        );
+                      })}
                     </div>
                     {form.products.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -559,10 +607,16 @@ export default function Pipeline() {
               <div className="rounded-xl border-2 border-aconso-100 bg-aconso-50/40 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900">🧮 {t('pipeline.arrCalcTitle')}</h3>
+                    <h3 className="text-sm font-bold text-gray-900">{t('pipeline.arrCalcTitle')}</h3>
                     <p className="text-xs text-gray-500 mt-0.5">{t('pipeline.arrCalcSubtitle')}</p>
                   </div>
-                  <span className="text-[10px] text-gray-400 max-w-[180px] text-right">{t('pipeline.arrAutoCalc')}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-400 max-w-[180px] text-right hidden sm:block">{t('pipeline.arrAutoCalc')}</span>
+                    <button type="button" onClick={handleExportExcel} disabled={arrRows.length === 0}
+                      className="btn-primary text-xs whitespace-nowrap disabled:opacity-40">
+                      {t('pipeline.exportExcel')}
+                    </button>
+                  </div>
                 </div>
                 {arrRows.length > 0 ? (
                   <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
@@ -580,10 +634,10 @@ export default function Pipeline() {
                           {arrRows.map((r) => (
                             <tr key={r.key} className="border-t border-gray-50">
                               <td className="px-3 py-2 font-medium text-gray-900">{r.name}</td>
-                              <td className="px-3 py-2 text-right text-gray-500">{fmtMoney(r.price, form.currency, form.customCurrency)}</td>
-                            <td className="px-3 py-2 text-right font-semibold text-gray-900">{fmt(r.m12)}</td>
-                            <td className="px-3 py-2 text-right font-semibold text-gray-900">{fmt(r.m24)}</td>
-                            <td className="px-3 py-2 text-right font-semibold text-gray-900">{fmt(r.m36)}</td>
+                              <td className="px-3 py-2 text-right text-gray-500">{fmtMoney(r.price, r.currency, form.customCurrency)}</td>
+                            <td className="px-3 py-2 text-right font-semibold text-gray-900">{fmtMoney(r.m12, r.currency, form.customCurrency)}</td>
+                            <td className="px-3 py-2 text-right font-semibold text-gray-900">{fmtMoney(r.m24, r.currency, form.customCurrency)}</td>
+                            <td className="px-3 py-2 text-right font-semibold text-gray-900">{fmtMoney(r.m36, r.currency, form.customCurrency)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -598,14 +652,14 @@ export default function Pipeline() {
                     </table>
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-500 italic">+ {t('pipeline.selectProduct')} → {t('pipeline.arrCalcSubtitle')}</p>
+                  <p className="text-xs text-gray-500 italic">+ {t('pipeline.selectProduct')} {t('pipeline.arrCalcSubtitle')}</p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('pipeline.amountArr')}</label>
-                  <input type="number" value={arrTotal ? String(arrTotal) : form.amount} readOnly
+                  <input type="number" value={arrTotalR ? String(arrTotalR) : form.amount} readOnly
                     className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none bg-gray-50 cursor-not-allowed" />
                   {!arrTotal && <p className="text-[11px] text-gray-400 mt-1">{t('pipeline.arrAutoCalc')}</p>}
                 </div>
@@ -616,10 +670,15 @@ export default function Pipeline() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('pipeline.currency')}</label>
-                  <select value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })}
-                    className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none">
-                    {CURRENCIES.map((c) => <option key={c} value={c}>{curOptLabel(c, t)}</option>)}
-                  </select>
+                  {isAdmin ? (
+                    <select value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })}
+                      className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none">
+                      {CURRENCIES.map((c) => <option key={c} value={c}>{curOptLabel(c, t)}</option>)}
+                    </select>
+                  ) : (
+                    <input type="text" readOnly value={curOptLabel(form.currency, t)}
+                      className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 cursor-not-allowed" />
+                  )}
                 </div>
                 {form.currency === 'otro' && (
                   <div>
@@ -747,7 +806,6 @@ export default function Pipeline() {
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDeleteId(null)}>
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="text-4xl mb-4">⚠️</div>
             <h2 className="text-lg font-bold text-gray-900 mb-2">{t('pipeline.deleteOpportunity')}</h2>
             <p className="text-gray-500 text-sm mb-6">{t('pipeline.deleteConfirm')}</p>
             <div className="flex gap-3">
@@ -846,7 +904,7 @@ export default function Pipeline() {
               )}
             </div>
             {detailOpp.conflict && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-200">⚠ {t('pipeline.conflict')}</div>
+              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-200">{t('pipeline.conflict')}</div>
             )}
             {detailOpp.loss_reason && (
               <div className="mb-4 p-3 rounded-lg bg-gray-50 text-gray-700 text-sm">{t('pipeline.lossReason')}: {t(`pipeline.lossReasons.${detailOpp.loss_reason}`)}</div>
@@ -870,7 +928,6 @@ export default function Pipeline() {
                   {events.map((ev, i) => (
                     <div key={i} className="text-xs text-gray-600">
                       <span className={`font-medium ${ev.from_stage ? 'text-gray-500' : 'text-aconso-600'}`}>{ev.from_stage ? stageI18n(ev.from_stage) : '—'}</span>
-                      <span className="mx-1.5 text-gray-300">→</span>
                       <span className={`font-medium ${ev.to_stage === 'perdida' ? 'text-red-500' : ev.to_stage === 'ganada' ? 'text-emerald-600' : 'text-aconso-600'}`}>{stageI18n(ev.to_stage)}</span>
                       <span className="ml-2 text-gray-400">{new Date(ev.created_at).toLocaleString()}</span>
                     </div>
@@ -886,7 +943,7 @@ export default function Pipeline() {
       {showQuickAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowQuickAdd(false)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">➕ {qformKey ? t('pipeline.manageEdit') : t('pipeline.manageQuickAdd')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">{qformKey ? t('pipeline.manageEdit') : t('pipeline.manageQuickAdd')}</h2>
             <p className="text-gray-500 text-sm mb-5">{t('pipeline.manageQuickAddHelp')}</p>
             <div className="rounded-xl border border-gray-200 p-4 mb-5">
               <div className="space-y-4">
@@ -940,7 +997,7 @@ export default function Pipeline() {
               </div>
               {qformError && <p className="text-sm text-red-500 mt-3">{qformError}</p>}
               <div className="flex gap-2 mt-4">
-                <button onClick={() => { setQformKey(null); setQform({ ...EMPTY_QFORM }); setQformError(''); }} className="btn-secondary text-sm">↺ {t('pipeline.manageNew')}</button>
+                <button onClick={() => { setQformKey(null); setQform({ ...EMPTY_QFORM }); setQformError(''); }} className="btn-secondary text-sm">{t('pipeline.manageNew')}</button>
                 <button onClick={saveProduct} disabled={qformLoading} className="btn-primary text-sm disabled:opacity-60">{qformLoading ? '...' : t('common.save')}</button>
               </div>
             </div>
@@ -956,8 +1013,8 @@ export default function Pipeline() {
                     <span className="text-sm font-medium text-gray-900">{productName(p)}</span>
                     {productPricesLabel(p) && <span className="text-xs font-semibold text-aconso-600 ml-2">{productPricesLabel(p)}</span>}
                   </span>
-                  <button onClick={() => openEditProduct(p)} className="text-xs text-gray-400 hover:text-aconso-600">✏️</button>
-                  <button onClick={() => setDelProductKey(p.key)} className="text-xs text-gray-400 hover:text-red-500">🗑</button>
+                  <button onClick={() => openEditProduct(p)} className="text-xs text-gray-400 hover:text-aconso-600">{t('common.edit')}</button>
+                  <button onClick={() => setDelProductKey(p.key)} className="text-xs text-gray-400 hover:text-red-500">{t('common.delete')}</button>
                 </div>
               ))}
             </div>
@@ -969,7 +1026,6 @@ export default function Pipeline() {
       {delProductKey && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDelProductKey(null)}>
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="text-4xl mb-4">🗑</div>
             <h2 className="text-lg font-bold text-gray-900 mb-2">{t('pipeline.manageDeleteTitle')}</h2>
             <p className="text-gray-500 text-sm mb-6">{t('pipeline.manageDeleteConfirm')}</p>
             <div className="flex gap-3">

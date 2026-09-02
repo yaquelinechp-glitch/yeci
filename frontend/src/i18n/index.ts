@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      nav: { home: 'Home', login: 'Login', register: 'Register', logout: 'Logout', dashboard: 'Dashboard', partners: 'Partners', courses: 'Courses', pipeline: 'Pipeline', deals: 'My Deals', reports: 'Reports', requests: 'Requests', security: 'Security', admin: 'Admin', training: 'Training', lmsReport: 'LMS Report', users: 'Team Members', conflicts: 'Conflicts', notifications: 'Notifications', brand: 'Partner Academy' },
+      nav: { home: 'Home', login: 'Login', register: 'Register', logout: 'Logout', dashboard: 'Dashboard', partners: 'Partners', courses: 'Courses', pipeline: 'Pipeline', deals: 'My Deals', reports: 'Reports', requests: 'Requests', security: 'Security', admin: 'Admin', training: 'Training', lmsReport: 'LMS Report', users: 'Team Members', conflicts: 'Conflicts', notifications: 'Notifications', brand: 'Partner Academy', costExport: 'Cost Indication Texts' },
       landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Work with aconso: deal registration, team training and rewards.',
         cta: 'Access the Portal →', ctaSecondary: 'What the portal includes', programTitle: 'Partner Portal',
@@ -46,6 +46,7 @@ const resources = {
         whyPartner: 'What do you want to achieve with the portal?', whyPartnerPlaceholder: 'Tell us about your goals and which aconso products your team works with...',
         salesApproach: 'Which aconso products does your company offer?', salesApproachPlaceholder: 'Describe the HR topics your team supports (payroll, HR documents, workforce management...).',
         taxId: 'Tax ID',
+        country: 'Country', countryAuto: 'Detect automatically', countryHint: 'Detected from your location. Used to set your deal currency.',
         register: 'Request Access', login: 'Sign In',
         errCompanyName: 'Only letters, numbers, spaces and hyphens',
         errContactName: 'Only letters, spaces, hyphens and apostrophes',
@@ -91,6 +92,18 @@ const resources = {
         winnerPrompt: 'Winning opportunity ID:', resolutionPrompt: 'Resolution notes:', closePrompt: 'Closing notes:', removeConfirm: 'Delete this conflict record?',
         chooseWinner: 'Choose the winning opportunity', chooseWinnerHint: 'The selected partner will be awarded the deal',
         statuses: { abierto: 'Open', en_resolucion: 'In resolution', resuelto: 'Resolved', cerrado: 'Closed without resolution' },
+      },
+      costExport: {
+        title: 'Cost Indication Texts',
+        subtitle: 'Fixed texts applied to the Excel exported by partners (cost indication for the client).',
+        blocksHeader: 'Document texts (English / Spanish / German)',
+        hint: 'These texts apply to all partners. Partners can only read them; you configure them here.',
+        fieldTitle: 'Document title (shown at the top of the Excel)',
+        fieldSubtitle: 'Introductory text under the title (explains what the document is about)',
+        fieldFooter: 'Footer note at the bottom (e.g. a non-binding disclaimer)',
+        productCol: 'Products column header',
+        annualCol: 'Annual license cost column header',
+        saved: 'Texts saved successfully',
       },
       security: {
         title: 'Security', subtitle: 'Manage authentication attempts, blacklisted tokens and admin accounts',
@@ -354,8 +367,7 @@ const resources = {
         currencyOtherPlaceholder: 'e.g. Bolívar, Peso, Real',
         totalValue: 'Total value (ARR + Scan)',
         arrCalcTitle: 'ARR Calculator',
-        arrCalcSubtitle: 'Number of employees × product price × 12 months',
-        docCount: 'Number of workers (company size)',
+        arrCalcSubtitle: 'Number of employees × product price × 12 months',        docCount: 'Number of workers (company size)',
         docCountHint: 'Enter the number of workers to auto-calculate',
         month12: 'ARR (12 months)',
         month24: '24 months',
@@ -364,6 +376,7 @@ const resources = {
         arrTotalLabel: 'Total ARR (year)',
         contractMonths: 'Contract value (36 months)',
         arrAutoCalc: 'Auto-calculated — the partner does not enter the price',
+        exportExcel: 'Export Excel',
         deliveryQuarter: 'Delivery / Close Quarter',
         quarterPlaceholder: 'e.g. T4/2026',
         stage: 'Stage',
@@ -472,7 +485,7 @@ const resources = {
   },
   es: {
     translation: {
-      nav: { home: 'Inicio', login: 'Iniciar Sesión', register: 'Registrarse', logout: 'Cerrar Sesión', dashboard: 'Panel', partners: 'Partners', courses: 'Cursos', pipeline: 'Pipeline', deals: 'Mis Deals', reports: 'Reportes', requests: 'Solicitudes', security: 'Seguridad', admin: 'Administrador', training: 'Formación', lmsReport: 'Informe LMS', users: 'Equipo', conflicts: 'Conflictos', notifications: 'Notificaciones', brand: 'Partner Academy' },
+      nav: { home: 'Inicio', login: 'Iniciar Sesión', register: 'Registrarse', logout: 'Cerrar Sesión', dashboard: 'Panel', partners: 'Partners', courses: 'Cursos', pipeline: 'Pipeline', deals: 'Mis Deals', reports: 'Reportes', requests: 'Solicitudes', security: 'Seguridad', admin: 'Administrador', training: 'Formación', lmsReport: 'Informe LMS', users: 'Equipo', conflicts: 'Conflictos', notifications: 'Notificaciones', brand: 'Partner Academy', costExport: 'Textos Indicador Costos' },
 landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Trabaja con aconso: registro de deals, formación de tu equipo y recompensas.',
         cta: 'Acceder al Portal →', ctaSecondary: 'Qué incluye el portal', programTitle: 'Portal de Partners',
@@ -513,6 +526,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         whyPartner: '¿Qué quieres lograr con el portal?', whyPartnerPlaceholder: 'Cuéntanos tus objetivos y con qué productos de aconso trabaja tu equipo...',
         salesApproach: '¿Qué productos de aconso ofrece tu empresa?', salesApproachPlaceholder: 'Describe los temas de RRHH que tu equipo soporta (nómina, documentos de RRHH, gestión laboral...).',
         taxId: 'NIF/CIF',
+        country: 'País', countryAuto: 'Detectar automáticamente', countryHint: 'Detectado según tu ubicación. Se usa para fijar la moneda de tus deals.',
         register: 'Solicitar Acceso', login: 'Iniciar Sesión',
         errCompanyName: 'Solo letras, números, espacios y guiones',
         errContactName: 'Solo letras, espacios, guiones y apóstrofes',
@@ -558,6 +572,18 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         winnerPrompt: 'ID de la oportunidad ganadora:', resolutionPrompt: 'Notas de resolución:', closePrompt: 'Notas de cierre:', removeConfirm: '¿Eliminar este registro de conflicto?',
         chooseWinner: 'Elige la oportunidad ganadora', chooseWinnerHint: 'El partner seleccionado recibirá el deal',
         statuses: { abierto: 'Abierto', en_resolucion: 'En resolución', resuelto: 'Resuelto', cerrado: 'Cerrado sin resolución' },
+      },
+      costExport: {
+        title: 'Textos Indicador de Costos',
+        subtitle: 'Textos fijos aplicados al Excel que exportan los partners (indicación de costos para el cliente).',
+        blocksHeader: 'Textos del documento (inglés / español / alemán)',
+        hint: 'Estos textos aplican a todos los partners. Ellos solo los leen; tú los configuras aquí.',
+        fieldTitle: 'Título del documento (aparece arriba del Excel)',
+        fieldSubtitle: 'Texto introductorio bajo el título (explica de qué trata el documento)',
+        fieldFooter: 'Nota al pie del documento (p. ej. un aviso de carácter no vinculante)',
+        productCol: 'Encabezado de columna Producto',
+        annualCol: 'Encabezado de columna Coste anual de licencia',
+        saved: 'Textos guardados correctamente',
       },
       security: {
         title: 'Seguridad', subtitle: 'Gestiona intentos de autenticación, tokens bloqueados y cuentas de administrador',
@@ -831,6 +857,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         arrTotalLabel: 'ARR total (anual)',
         contractMonths: 'Valor del contrato (36 meses)',
         arrAutoCalc: 'Calculado automáticamente — el partner no ingresa el precio',
+        exportExcel: 'Exportar Excel',
         deliveryQuarter: 'Trimestre de entrega/cierre',
         quarterPlaceholder: 'ej. T4/2026',
         stage: 'Etapa',
@@ -939,7 +966,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
   },
   de: {
     translation: {
-      nav: { home: 'Startseite', login: 'Anmelden', register: 'Registrieren', logout: 'Abmelden', dashboard: 'Dashboard', partners: 'Partner', courses: 'Kurse', pipeline: 'Pipeline', deals: 'Meine Deals', reports: 'Berichte', requests: 'Anfragen', security: 'Sicherheit', admin: 'Administrator', training: 'Schulung', lmsReport: 'LMS-Bericht', users: 'Team', conflicts: 'Konflikte', notifications: 'Benachrichtigungen', brand: 'Partner Academy' },
+      nav: { home: 'Startseite', login: 'Anmelden', register: 'Registrieren', logout: 'Abmelden', dashboard: 'Dashboard', partners: 'Partner', courses: 'Kurse', pipeline: 'Pipeline', deals: 'Meine Deals', reports: 'Berichte', requests: 'Anfragen', security: 'Sicherheit', admin: 'Administrator', training: 'Schulung', lmsReport: 'LMS-Bericht', users: 'Team', conflicts: 'Konflikte', notifications: 'Benachrichtigungen', brand: 'Partner Academy', costExport: 'Kostenindikation-Texte' },
       landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Arbeiten Sie mit aconso: Deal-Registrierung, Team-Schulung und Prämien.',
         cta: 'Zum Portal →', ctaSecondary: 'Was das Portal enthält', programTitle: 'Partner-Portal',
@@ -980,6 +1007,7 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         whyPartner: 'Was möchten Sie mit dem Portal erreichen?', whyPartnerPlaceholder: 'Erzählen Sie uns von Ihren Zielen und mit welchen aconso-Produkten Ihr Team arbeitet...',
         salesApproach: 'Welche aconso-Produkte bietet Ihr Unternehmen an?', salesApproachPlaceholder: 'Beschreiben Sie die HR-Themen Ihres Teams (z. B. Gehaltsabrechnung, HR-Dokumente, Arbeitszeitmanagement...).',
         taxId: 'Steuernummer',
+        country: 'Land', countryAuto: 'Automatisch erkennen', countryHint: 'Wird anhand Ihres Standorts erkannt. Bestimmt die Währung Ihrer Deals.',
         register: 'Zugang anfordern', login: 'Anmelden',
         errCompanyName: 'Nur Buchstaben, Zahlen, Leerzeichen und Bindestriche',
         errContactName: 'Nur Buchstaben, Leerzeichen, Bindestriche und Apostrophe',
@@ -1025,6 +1053,18 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         winnerPrompt: 'ID der Gewinner-Opportunity:', resolutionPrompt: 'Lösungsnotizen:', closePrompt: 'Abschlussnotizen:', removeConfirm: 'Diesen Konflikt löschen?',
         chooseWinner: 'Gewinner-Opportunity auswählen', chooseWinnerHint: 'Der ausgewählte Partner erhält den Deal',
         statuses: { abierto: 'Offen', en_resolucion: 'In Prüfung', resuelto: 'Gelöst', cerrado: 'Ohne Lösung geschlossen' },
+      },
+      costExport: {
+        title: 'Kostenindikation-Texte',
+        subtitle: 'Feste Texte, die auf das von Partnern exportierte Excel angewendet werden (Kostenindikation für den Kunden).',
+        blocksHeader: 'Dokumenttexte (Englisch / Spanisch / Deutsch)',
+        hint: 'Diese Texte gelten für alle Partner. Sie können sie nur lesen; Sie konfigurieren sie hier.',
+        fieldTitle: 'Titel des Dokuments (oben im Excel)',
+        fieldSubtitle: 'Einleitungstext unter dem Titel (erklärt, worum es im Dokument geht)',
+        fieldFooter: 'Fußnote am Ende des Dokuments (z. B. unverbindlicher Hinweis)',
+        productCol: 'Überschrift Spalte Produkt',
+        annualCol: 'Überschrift Spalte Jährliche Lizenzkosten',
+        saved: 'Texte erfolgreich gespeichert',
       },
       security: {
         title: 'Sicherheit', subtitle: 'Authentifizierungsversuche, gesperrte Tokens und Admin-Konten verwalten',
@@ -1298,6 +1338,7 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         arrTotalLabel: 'ARR gesamt (jährlich)',
         contractMonths: 'Vertragswert (36 Monate)',
         arrAutoCalc: 'Automatisch berechnet — der Partner gibt den Preis nicht ein',
+        exportExcel: 'Excel exportieren',
         deliveryQuarter: 'Liefer-/Abschlussquartal',
         quarterPlaceholder: 'z.B. Q4/2026',
         stage: 'Phase',

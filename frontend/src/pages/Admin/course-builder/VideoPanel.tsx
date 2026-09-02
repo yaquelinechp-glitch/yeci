@@ -50,7 +50,7 @@ export default function VideoPanel({ courseId, video, onRefresh, onClose }: Prop
           {(['info', 'quiz'] as const).map(t2 => (
             <button key={t2} onClick={() => setTab(t2)}
               className={`flex-1 py-2 rounded-md text-xs font-semibold transition-all ${tab === t2 ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-              {t2 === 'info' ? '📋 ' + t('courses.info') : '📝 Quiz' + (questions.length > 0 ? ` (${questions.length})` : '')}
+              {t2 === 'info' ? t('courses.info') : `Quiz` + (questions.length > 0 ? ` (${questions.length})` : '')}
             </button>
           ))}
         </div>

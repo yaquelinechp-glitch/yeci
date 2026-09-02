@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { profileApi } from '../services/api';
 import { useAuthStore } from '../store/auth';
+import { COUNTRIES } from '../constants';
 
 interface ProfileData {
   first_name: string;
@@ -11,6 +12,7 @@ interface ProfileData {
   contact_name: string;
   company_name: string;
   email: string;
+  country: string;
 }
 
 const AVATAR_SIZE = 256;
@@ -97,8 +99,9 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
         last_name: data.last_name,
         username: data.username,
         avatar: data.avatar,
+        country: data.country,
       });
-      const updated = { ...(user as any), first_name: data.first_name, last_name: data.last_name, username: data.username, avatar: data.avatar };
+      const updated = { ...(user as any), first_name: data.first_name, last_name: data.last_name, username: data.username, avatar: data.avatar, country: data.country };
       setAuth(updated, localStorage.getItem('token') || '');
       setMsg({ ok: true, text: t('profile.saved') });
       setTimeout(onClose, 800);
@@ -135,7 +138,6 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
                   initials()
                 )}
               </div>
-              <span className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-aconso-600 text-white flex items-center justify-center text-sm shadow group-hover:bg-aconso-700 transition-colors">📷</span>
             </button>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickFile} />
             <button type="button" onClick={() => fileRef.current?.click()} className="text-sm text-aconso-600 hover:text-aconso-800 font-medium">
@@ -160,6 +162,17 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.username')}</label>
             <input value={data?.username || ''} onChange={(e) => setData((d) => (d ? { ...d, username: e.target.value } : d))}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.country')}</label>
+            <select value={data?.country || ''} onChange={(e) => setData((d) => (d ? { ...d, country: e.target.value } : d))}
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 bg-white">
+              <option value="">{t('auth.countryAuto')}</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>{c.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className="pt-1 text-xs text-gray-400">

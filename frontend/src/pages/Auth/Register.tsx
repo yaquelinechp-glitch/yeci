@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { authApi, partnerUsersApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth';
 import Header from '../../components/layout/Header';
+import { COUNTRIES } from '../../constants';
 import type { InviteInfo } from '../../types';
 
 type Field = 'company_name' | 'contact_name' | 'email' | 'password' | 'phone' | 'tax_id';
@@ -27,7 +28,7 @@ function RegisterForm() {
   const [inviteError, setInviteError] = useState('');
   const [form, setForm] = useState({
     company_name: '', email: '', password: '', contact_name: '',
-    phone: '', tax_id: '', why_partner: '', sales_approach: '',
+    phone: '', tax_id: '', country: '', why_partner: '', sales_approach: '',
   });
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -44,6 +45,17 @@ function RegisterForm() {
       .then((r) => setInvite(r.data))
       .catch(() => setInviteError(t('auth.inviteInvalid')));
   }, [inviteToken, t]);
+
+  useEffect(() => {
+    fetch('https://ipwho.is/')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && data.country_code && COUNTRIES.some((c) => c.code === String(data.country_code).toLowerCase())) {
+          setForm((prev) => ({ ...prev, country: String(data.country_code).toLowerCase() }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleAuth = async (accessToken: string, userData: any) => {
     setAuth(userData, accessToken);
@@ -334,6 +346,17 @@ function RegisterForm() {
                   className={fieldClass('tax_id')} placeholder="B12345678" />
                 {fieldErrors.tax_id && <p className="text-xs text-red-500 mt-1">{fieldErrors.tax_id}</p>}
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('auth.country')}</label>
+              <select value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })}
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white">
+                <option value="">{t('auth.countryAuto')}</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>{c.name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 mt-1">{t('auth.countryHint')}</p>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('auth.whyPartner')}</label>

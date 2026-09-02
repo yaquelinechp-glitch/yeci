@@ -144,7 +144,7 @@ export default function QuestionBank({ courseVideos, courseId, onRefresh }: Prop
                 </select>
                 <button onClick={() => handleAssign(q.id)} disabled={!assignVideoId || assigning}
                   className="text-[11px] text-aconso-600 hover:text-aconso-700 font-medium px-2 py-1 rounded hover:bg-aconso-50 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50">
-                  → {t('courses.assignToVideo') || 'Asignar'}
+                  {t('courses.assignToVideo') || 'Asignar'}
                 </button>
               </div>
             </div>

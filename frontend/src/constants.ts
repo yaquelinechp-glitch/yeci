@@ -33,6 +33,39 @@ export const LEAD_SOURCES = ['generada_partner', 'asignada_aconso', 'recomendaci
 export const LOSS_REASONS = ['precio', 'competencia', 'sin_presupuesto', 'proyecto_aplazado', 'otro'] as const;
 export const CURRENCIES = ['usd', 'eur', 'chf', 'otro'] as const;
 
+const EURO_COUNTRIES = [
+  'at', 'be', 'bg', 'hr', 'cy', 'cz', 'dk', 'ee', 'fi', 'fr', 'de', 'gr',
+  'hu', 'ie', 'it', 'lv', 'lt', 'lu', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk',
+  'si', 'es', 'se', 'gb', 'no', 'is', 'li',
+];
+
+export function currencyForCountry(country = ''): string {
+  const code = (country || '').trim().toLowerCase();
+  if (code === 'ch' || code === 'switzerland' || code === 'suiza') return 'chf';
+  if (EURO_COUNTRIES.includes(code)) return 'eur';
+  return 'usd';
+}
+
+export const COUNTRIES: { code: string; name: string }[] = [
+  { code: 'at', name: 'Austria' }, { code: 'be', name: 'Belgium' },
+  { code: 'bg', name: 'Bulgaria' }, { code: 'hr', name: 'Croatia' },
+  { code: 'cy', name: 'Cyprus' }, { code: 'cz', name: 'Czech Republic' },
+  { code: 'dk', name: 'Denmark' }, { code: 'ee', name: 'Estonia' },
+  { code: 'fi', name: 'Finland' }, { code: 'fr', name: 'France' },
+  { code: 'de', name: 'Germany' }, { code: 'gr', name: 'Greece' },
+  { code: 'hu', name: 'Hungary' }, { code: 'ie', name: 'Ireland' },
+  { code: 'it', name: 'Italy' }, { code: 'lv', name: 'Latvia' },
+  { code: 'lt', name: 'Lithuania' }, { code: 'lu', name: 'Luxembourg' },
+  { code: 'mt', name: 'Malta' }, { code: 'nl', name: 'Netherlands' },
+  { code: 'pl', name: 'Poland' }, { code: 'pt', name: 'Portugal' },
+  { code: 'ro', name: 'Romania' }, { code: 'sk', name: 'Slovakia' },
+  { code: 'si', name: 'Slovenia' }, { code: 'es', name: 'Spain' },
+  { code: 'se', name: 'Sweden' }, { code: 'gb', name: 'United Kingdom' },
+  { code: 'no', name: 'Norway' }, { code: 'is', name: 'Iceland' },
+  { code: 'li', name: 'Liechtenstein' }, { code: 'ch', name: 'Switzerland' },
+  { code: 'us', name: 'United States' },
+];
+
 export function currencySymbol(cur: string, custom = ''): string {
   if (cur === 'eur') return '€';
   if (cur === 'chf') return 'CHF';
@@ -43,7 +76,7 @@ export function currencySymbol(cur: string, custom = ''): string {
 export function fmtMoney(n: number, cur = 'usd', custom = ''): string {
   const num = Number(n) || 0;
   const s = currencySymbol(cur, custom);
-  const str = num.toLocaleString('en-US', { maximumFractionDigits: num % 1 ? 2 : 0 });
+  const str = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return cur === 'eur' ? `${str} ${s}` : `${s} ${str}`;
 }
 

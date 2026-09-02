@@ -45,6 +45,17 @@
   --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-card-hover: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
   --shadow-elevated: 0 20px 40px rgba(0,0,0,0.1);
+
+  --pm-bg-1: #0f2b3c;
+  --pm-bg-2: #1a4a5e;
+  --pm-navy: #0a1628;
+  --pm-cyan: #00d4aa;
+  --pm-orange: #ff8c42;
+  --pm-blue: #4a90d9;
+  --pm-green: #2ecc71;
+  --pm-purple: #9b59b6;
+  --pm-red: #ff6b6b;
+  --pm-text: #2d3748;
 }
 
 body {
@@ -230,4 +241,37 @@ body {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* ===== Project Management Dashboard (PM) palette ===== */
+.bg-pm-gradient {
+  background: linear-gradient(135deg, var(--pm-bg-1) 0%, var(--pm-bg-2) 100%);
+}
+
+@keyframes pm-gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: pm-gradient-pan 8s ease infinite;
+}
+
+.pm-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.pm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+}
+
+.pm-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--pm-text);
 }

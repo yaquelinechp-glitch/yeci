@@ -141,7 +141,7 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
             className="w-14 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none" />
           <button onClick={handleGenerate} disabled={generating}
             className="text-xs bg-aconso-500 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-aconso-600 transition-colors disabled:opacity-50">
-            {generating ? '...' : '📚 ' + (t('courses.generateQuiz') || 'Desde banco')}
+            {generating ? '...' : (t('courses.generateQuiz') || 'Desde banco')}
           </button>
         </div>
       </div>
@@ -195,7 +195,6 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
       {/* Empty state */}
       {questions.length === 0 && !showForm && (
         <div className="text-center py-8">
-          <div className="text-3xl mb-2">📝</div>
           <p className="text-sm font-medium text-gray-700 mb-1">{t('courses.noExamQuestions') || 'No hay preguntas en el examen'}</p>
           <p className="text-xs text-gray-400 mb-4">{t('courses.createFirstQuestion') || 'Crea una pregunta o genera desde el banco.'}</p>
           <button onClick={() => { setShowForm(true); setEditing(null); setForm(emptyForm()); }}

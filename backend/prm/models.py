@@ -32,6 +32,7 @@ class Partner(models.Model):
     google_id = models.CharField(max_length=100, blank=True, default="")
     phone = models.CharField(max_length=50, default="")
     tax_id = models.CharField(max_length=50, default="")
+    country = models.CharField(max_length=100, default="", blank=True)
     contact_name = models.CharField(max_length=200, default="")
     first_name = models.CharField(max_length=200, default="")
     last_name = models.CharField(max_length=200, default="")
@@ -681,3 +682,20 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.partner_id} {self.type} {self.id}"
+
+
+class CostExportSetting(models.Model):
+    """Admin-configurable fixed texts for the partner cost-exporter (Excel export of the ARR calculator)."""
+
+    title = models.JSONField(default=dict, blank=True, help_text="Traducciones { en, es, de } - Document title")
+    subtitle = models.JSONField(default=dict, blank=True, help_text="Traducciones { en, es, de } - Subtitle / intro")
+    footer = models.JSONField(default=dict, blank=True, help_text="Traducciones { en, es, de } - Footer / notes")
+    product_col = models.JSONField(default=dict, blank=True, help_text="Traducciones { en, es, de } - Products column header")
+    annual_col = models.JSONField(default=dict, blank=True, help_text="Traducciones { en, es, de } - Annual license column header")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return "CostExportSetting"

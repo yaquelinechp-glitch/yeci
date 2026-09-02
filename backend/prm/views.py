@@ -26,7 +26,7 @@ from .models import (
     TokenBlacklist, LoginAttempt, PartnerOnboarding, PartnerUser, MdfRequest,
     Reward, RewardRedemption, PointTransaction, ChannelConflict,
     Communication, CommunicationRecipient, Product, Notification,
-    CourseExamQuestion,
+    CourseExamQuestion, CostExportSetting,
 )
 from . import security
 from .rewards import (
@@ -48,6 +48,22 @@ from .serializers import (
 
 # ─── Auth helpers ───────────────────────────────────────
 
+EURO_CURRENCY_COUNTRIES = [
+    "at", "be", "bg", "hr", "cy", "cz", "dk", "ee", "fi", "fr", "de", "gr",
+    "hu", "ie", "it", "lv", "lt", "lu", "mt", "nl", "pl", "pt", "ro", "sk",
+    "si", "es", "se", "gb", "no", "is", "li",
+]
+
+def currency_for_country(country: str = "") -> str:
+    """Derive currency from the partner's country. Europe -> EUR, Switzerland -> CHF, default USD."""
+    code = (country or "").strip().lower()
+    if code in ("ch", "switzerland", "suiza"):
+        return "chf"
+    if code in EURO_CURRENCY_COUNTRIES:
+        return "eur"
+    return "usd"
+
+
 def _make_user_response(user, member=None):
     """Build JWT + user payload for a Partner (optionally acting as a PartnerUser member)."""
     refresh = RefreshToken()
@@ -63,6 +79,7 @@ def _make_user_response(user, member=None):
         "user": {
             "id": user.id, "company_name": user.company_name, "email": (member.email if member else user.email),
             "phone": user.phone, "tax_id": user.tax_id,
+            "country": user.country or "",
             "contact_name": (member.contact_name if member else user.contact_name),
             "first_name": (member.first_name if member else user.first_name) or "",
             "last_name": (member.last_name if member else user.last_name) or "",
@@ -164,12 +181,16 @@ def profile(request):
             "contact_name": target.contact_name or "",
             "company_name": user.company_name or "",
             "email": user.email or "",
+            "country": user.country or "",
         })
 
     data = request.data or {}
     for f in ("first_name", "last_name", "username"):
         if f in data:
             setattr(target, f, (str(data.get(f) or "")).strip()[:200])
+    if "country" in data:
+        user.country = ((data.get("country") or "").strip())[:100]
+    user.save(update_fields=["first_name", "last_name", "username", "country"])
     if "avatar" in data:
         av = (data.get("avatar") or "").strip()
         if av and not av.startswith("data:image/"):
@@ -201,6 +222,7 @@ def register_view(request):
         company_name=d["company_name"], email=d["email"],
         password_hash=password_hash,
         phone=d.get("phone", ""), tax_id=d.get("tax_id", ""),
+        country=d.get("country", ""),
         contact_name=d.get("contact_name", ""),
         why_partner=d.get("why_partner", ""), sales_approach=d.get("sales_approach", ""),
     )
@@ -1989,7 +2011,7 @@ def pipeline_list_or_create(request):
         probability=probability,
         amount=d.get("amount", 0.0),
         scan_one_time_fee=d.get("scan_one_time_fee", 0.0),
-        currency=d.get("currency", "usd"),
+        currency=(d.get("currency", "usd") if user.role == "admin" else currency_for_country(user.country)),
         custom_currency=d.get("custom_currency", ""),
         delivery_quarter=d.get("delivery_quarter", ""),
         close_date=d.get("close_date"),
@@ -2041,6 +2063,8 @@ def opportunity_detail(request, opp_id):
     ser = OpportunityUpdateSerializer(data=request.data, partial=True)
     ser.is_valid(raise_exception=True)
     d = ser.validated_data
+    if user.role == "socio":
+        d["currency"] = currency_for_country(user.country)
     from_stage = opp.stage
     to_stage = d.get("stage", opp.stage)
 
@@ -3454,3 +3478,186 @@ def _current_user(request):
         return partner
     except Exception:
         return None
+
+
+# ─── Cost exporter (ARR calculator -> Excel) ───────────
+
+_COST_DEFAULT_TEXTS = {
+    "title": {"en": "Cost Indication", "es": "Indicación de costos", "de": "Kostenindikation"},
+    "subtitle": {
+        "en": "Estimated annual costs for the proposed products",
+        "es": "Costes anuales estimados para los productos propuestos",
+        "de": "Geschätzte jährliche Kosten für die vorgeschlagenen Produkte",
+    },
+    "footer": {
+        "en": "This is an indicative, non-binding cost estimate prepared by the partner.",
+        "es": "Esta es una estimación de costos orientativa y no vinculante preparada por el partner.",
+        "de": "Dies ist eine unverbindliche, indikative Kostenschätzung des Partners.",
+    },
+    "product_col": {"en": "Product", "es": "Producto", "de": "Produkt"},
+    "annual_col": {"en": "Annual license cost", "es": "Coste anual de licencia", "de": "Jährliche Lizenzkosten"},
+}
+
+
+def _get_cost_settings():
+    obj = CostExportSetting.objects.first()
+    if not obj:
+        obj = CostExportSetting.objects.create(
+            title=_COST_DEFAULT_TEXTS["title"],
+            subtitle=_COST_DEFAULT_TEXTS["subtitle"],
+            footer=_COST_DEFAULT_TEXTS["footer"],
+            product_col=_COST_DEFAULT_TEXTS["product_col"],
+            annual_col=_COST_DEFAULT_TEXTS["annual_col"],
+        )
+    return obj
+
+
+def _cost_settings_payload(obj):
+    payload = {}
+    for f in ("title", "subtitle", "footer", "product_col", "annual_col"):
+        payload[f] = getattr(obj, f) if isinstance(getattr(obj, f), dict) else {}
+        if not payload[f]:
+            payload[f] = _COST_DEFAULT_TEXTS[f]
+    return payload
+
+
+def _text_multi(raw, lang, key):
+    d = raw if isinstance(raw, dict) else {}
+    for k in (lang, "es", "en"):
+        if d.get(k):
+            return d[k]
+    return key
+
+
+@api_view(["GET", "PUT"])
+def calculator_settings(request):
+    user = _current_user(request)
+    if not user:
+        return Response({"detail": "Unauthorized"}, status=401)
+
+    obj = _get_cost_settings()
+    if request.method == "PUT":
+        if user.role != "admin":
+            return Response({"detail": "Admin access required"}, status=403)
+        data = request.data or {}
+        for f in ("title", "subtitle", "footer", "product_col", "annual_col"):
+            if f in data:
+                setattr(obj, f, data[f])
+        obj.save()
+        return Response(_cost_settings_payload(obj))
+
+    return Response(_cost_settings_payload(obj))
+
+
+@api_view(["POST"])
+def calculator_export(request):
+    """
+    Generate an .xlsx 'cost indication' from the ARR calculator.
+    Body: { products: [{key, name, price, annual, m12, m24, m36, currency}],
+            company_name, company_size, currency, total12, total24, total36 }
+    Applies admin-configured fixed texts.
+    """
+    user = _current_user(request)
+    if not user:
+        return Response({"detail": "Unauthorized"}, status=401)
+
+    import io
+    from openpyxl import Workbook
+
+    lang = request.query_params.get("lang", "es")
+    data = request.data or {}
+    settings = _get_cost_settings()
+    symbol_map = {"eur": "€", "chf": "CHF", "usd": "$", "otro": "$"}
+    fmt_money = lambda n, cur: f"{symbol_map.get(cur, '$')} {round((float(n) or 0), 2):,.2f}"
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Costos"
+
+    title = _text_multi(settings.title, lang, "Cost Indication")
+    subtitle = _text_multi(settings.subtitle, lang, "")
+    footer = _text_multi(settings.footer, lang, "")
+    product_col = _text_multi(settings.product_col, lang, "Product")
+    annual_col = _text_multi(settings.annual_col, lang, "Annual license cost")
+
+    company = (data.get("company_name") or "").strip() or user.company_name or ""
+    company_size = data.get("company_size") or ""
+    currency = data.get("currency") or currency_for_country(user.country)
+
+    ws["A1"] = title
+    ws["A1"].font = openpyxl_font(bold=True, size=14)
+    ws["A2"] = subtitle
+    ws["A2"].font = openpyxl_font(italic=True, color="666666")
+    r = 4
+    if company:
+        ws.cell(row=r, column=1, value=f"{company}  ({company_size})").font = openpyxl_font(bold=True)
+        r += 1
+    r += 1
+
+    head = r
+    ws.cell(row=head, column=1, value=product_col).font = openpyxl_font(bold=True)
+    ws.cell(row=head, column=2, value=annual_col).font = openpyxl_font(bold=True)
+    ws.cell(row=head, column=3, value="12m").font = openpyxl_font(bold=True)
+    ws.cell(row=head, column=4, value="24m").font = openpyxl_font(bold=True)
+    ws.cell(row=head, column=5, value="36m").font = openpyxl_font(bold=True)
+    for c in range(1, 6):
+        ws.cell(row=head, column=c).fill = openpyxl_fill("DDEEF7")
+
+    rr = head + 1
+    total12 = 0.0
+    total24 = 0.0
+    total36 = 0.0
+    for p in data.get("products", []):
+        row_cur = p.get("currency") or currency
+        ws.cell(row=rr, column=1, value=p.get("name") or p.get("key") or "")
+        ws.cell(row=rr, column=2, value=round((float(p.get("price") or 0)), 2))
+        ws.cell(row=rr, column=2).number_format = "#,##0.00"
+        ws.cell(row=rr, column=3, value=round((float(p.get("m12") or 0)), 2)).number_format = "#,##0.00"
+        ws.cell(row=rr, column=4, value=round((float(p.get("m24") or 0)), 2)).number_format = "#,##0.00"
+        ws.cell(row=rr, column=5, value=round((float(p.get("m36") or 0)), 2)).number_format = "#,##0.00"
+        total12 += float(p.get("m12") or 0)
+        total24 += float(p.get("m24") or 0)
+        total36 += float(p.get("m36") or 0)
+        rr += 1
+
+    if data.get("total12") is not None:
+        total12 = float(data["total12"] or 0)
+    if data.get("total24") is not None:
+        total24 = float(data["total24"] or 0)
+    if data.get("total36") is not None:
+        total36 = float(data["total36"] or 0)
+
+    ws.cell(row=rr, column=1, value="TOTAL").font = openpyxl_font(bold=True)
+    ws.cell(row=rr, column=3, value=round(total12, 2)).font = openpyxl_font(bold=True)
+    ws.cell(row=rr, column=3).number_format = "#,##0.00"
+    ws.cell(row=rr, column=4, value=round(total24, 2)).font = openpyxl_font(bold=True)
+    ws.cell(row=rr, column=4).number_format = "#,##0.00"
+    ws.cell(row=rr, column=5, value=round(total36, 2)).font = openpyxl_font(bold=True)
+    ws.cell(row=rr, column=5).number_format = "#,##0.00"
+    ws.cell(row=rr, column=2, value=round(sum(float(p.get("price") or 0) for p in data.get("products", [])), 2)).font = openpyxl_font(bold=True)
+    ws.cell(row=rr, column=2).number_format = "#,##0.00"
+
+    if footer:
+        frow = rr + 2
+        ws.cell(row=frow, column=1, value=footer).font = openpyxl_font(italic=True, color="888888")
+
+    for col, width in zip("ABCDE", [30, 22, 14, 14, 14]):
+        ws.column_dimensions[col].width = width
+
+    bio = io.BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    from django.http import HttpResponse
+    resp = HttpResponse(bio.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    resp["Content-Disposition"] = 'attachment; filename="cost_indication.xlsx"'
+    return resp
+
+
+def openpyxl_font(bold=False, italic=False, size=11, color="000000"):
+    from openpyxl.styles import Font
+    return Font(bold=bold, italic=italic, size=size, color=color)
+
+
+def openpyxl_fill(hex_color):
+    from openpyxl.styles import PatternFill
+    return PatternFill(start_color=hex_color, end_color=hex_color, fill_type="solid")

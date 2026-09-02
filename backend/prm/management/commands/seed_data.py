@@ -48,7 +48,7 @@ class Command(BaseCommand):
         # Admin
         Partner.objects.create(
             id="admin-001", company_name="aconso", email="admin@aconso.com",
-            password_hash=hpw("admin123"), contact_name="Jessy Admin",
+            password_hash=hpw("admin123"), contact_name="Admin",
             role="admin", status="activo", commission_rate=0, training_track="",
         )
 
@@ -65,12 +65,17 @@ class Command(BaseCommand):
             ("partner-005", "p78 (projekt0708)", "p78@demo.com", "p78@projekt0708.de", "en_revision", 10.0, "ventas", "", ""),
             ("partner-006", "CloudBase Partners", "cloudbase@demo.com", "sales@cloudbase.io", "solicitado", 10.0, "", "", ""),
         ]
+        country_for_pid = {
+            "partner-001": "be", "partner-002": "be",
+            "partner-003": "ch", "partner-004": "de",
+            "partner-005": "de", "partner-006": "us",
+        }
         for pid, name, email, contact, st, rate, track, why, sales in partners_data:
             Partner.objects.create(
                 id=pid, company_name=name, email=email, password_hash=hpw("admin123"),
                 contact_name=contact, role="socio", status=st, commission_rate=rate,
                 training_track=track, phone="+49 89 123456", tax_id=f"DE{pid[-3:]}",
-                why_partner=why, sales_approach=sales,
+                why_partner=why, sales_approach=sales, country=country_for_pid.get(pid, ""),
             )
 
         # Courses (multi-language JSONField + LMS fields)
@@ -332,16 +337,16 @@ class Command(BaseCommand):
         # Opportunities (Pipeline — HubSpot-aligned fields)
         # (id, partner, company, size, products, mode, stage, prob, amount, one_time, quarter, close, owner, cm, type, forecast, source, next_steps, notes, loss)
         opps_data = [
-            ("opp-001", "partner-001", "Banco Santander", ">5000", ["dpa"], "cloud", "negociacion", 75, 85000, 0, "T3/2026", "2026-08-15", "Carlos Ruiz", "Jessy Admin", "ampliacion", "best_case", "generada_partner", "Revisar propuesta con procurement", "Negociando renovación", ""),
-            ("opp-002", "partner-001", "Telefonica España", ">5000", ["dpa", "hr_doc_box"], "cloud", "cualificada", 30, 42000, 5000, "T4/2026", "2026-09-01", "Carlos Ruiz", "Jessy Admin", "nuevo", "pipeline", "asignada_aconso", "Programar demo con RRHH", "Reunión inicial agendada", ""),
-            ("opp-003", "partner-001", "BBVA Digital", ">5000", ["insights"], "cloud", "propuesta_enviada", 55, 120000, 0, "T3/2026", "2026-07-30", "Carlos Ruiz", "Jessy Admin", "cross_sell", "commit", "generada_partner", "Seguimiento con CFO", "Propuesta enviada, en revisión", ""),
-            ("opp-004", "partner-002", "ING Belgium", ">5000", ["dpa"], "on_premises", "propuesta_enviada", 55, 95000, 12000, "T3/2026", "2026-07-28", "Sofie Vandenberg", "Jessy Admin", "nuevo", "best_case", "recomendacion_cliente", "Esperando aprobación legal", "Propuesta enviada", ""),
-            ("opp-005", "partner-002", "KBC Group", ">5000", ["scan_services"], "cloud", "registrada", 10, 68000, 15000, "T4/2026", "2026-10-15", "Sofie Vandenberg", "Jessy Admin", "nuevo", "pipeline", "generada_partner", "Primera llamada de descubrimiento", "Contacto inicial via LinkedIn", ""),
-            ("opp-006", "partner-002", "Belfius Bank", ">5000", ["hr_doc_box"], "cloud", "cualificada", 30, 110000, 0, "T3/2026", "2026-08-20", "Sofie Vandenberg", "Jessy Admin", "nuevo", "best_case", "asignada_aconso", "Preparar demo técnica", "Demo programada", ""),
-            ("opp-007", "partner-004", "Allianz Germany", ">5000", ["dpa", "insights"], "cloud", "negociacion", 75, 75000, 0, "T4/2026", "2026-08-05", "Markus Schmidt", "Jessy Admin", "ampliacion", "commit", "generada_partner", "Cerrar términos de contrato", "Negociando términos", ""),
-            ("opp-008", "partner-004", "Deutsche Bank", ">5000", ["dpa"], "cloud", "cualificada", 30, 55000, 0, "T4/2026", "2026-09-10", "Markus Schmidt", "Jessy Admin", "nuevo", "pipeline", "generada_partner", "Calificar requisitos de seguridad", "Calificando requisitos", ""),
-            ("opp-009", "partner-001", "Repsol", "1000-5000", ["dpa", "hr_doc_box", "scan_services"], "cloud", "ganada", 100, 38000, 8000, "T3/2026", "2026-07-15", "Carlos Ruiz", "Jessy Admin", "nuevo", "commit", "recomendacion_cliente", "Onboarding del proyecto", "Contrato firmado", ""),
-            ("opp-010", "partner-002", "Ageas Insurance", "1000-5000", ["dpa"], "cloud", "perdida", 0, 45000, 0, "T3/2026", "2026-07-10", "Sofie Vandenberg", "Jessy Admin", "nuevo", "omitted", "asignada_aconso", "", "Eligió otra solución", "competencia"),
+            ("opp-001", "partner-001", "Banco Santander", ">5000", ["dpa"], "cloud", "negociacion", 75, 85000, 0, "T3/2026", "2026-08-15", "Carlos Ruiz", "Admin", "ampliacion", "best_case", "generada_partner", "Revisar propuesta con procurement", "Negociando renovación", ""),
+            ("opp-002", "partner-001", "Telefonica España", ">5000", ["dpa", "hr_doc_box"], "cloud", "cualificada", 30, 42000, 5000, "T4/2026", "2026-09-01", "Carlos Ruiz", "Admin", "nuevo", "pipeline", "asignada_aconso", "Programar demo con RRHH", "Reunión inicial agendada", ""),
+            ("opp-003", "partner-001", "BBVA Digital", ">5000", ["insights"], "cloud", "propuesta_enviada", 55, 120000, 0, "T3/2026", "2026-07-30", "Carlos Ruiz", "Admin", "cross_sell", "commit", "generada_partner", "Seguimiento con CFO", "Propuesta enviada, en revisión", ""),
+            ("opp-004", "partner-002", "ING Belgium", ">5000", ["dpa"], "on_premises", "propuesta_enviada", 55, 95000, 12000, "T3/2026", "2026-07-28", "Sofie Vandenberg", "Admin", "nuevo", "best_case", "recomendacion_cliente", "Esperando aprobación legal", "Propuesta enviada", ""),
+            ("opp-005", "partner-002", "KBC Group", ">5000", ["scan_services"], "cloud", "registrada", 10, 68000, 15000, "T4/2026", "2026-10-15", "Sofie Vandenberg", "Admin", "nuevo", "pipeline", "generada_partner", "Primera llamada de descubrimiento", "Contacto inicial via LinkedIn", ""),
+            ("opp-006", "partner-002", "Belfius Bank", ">5000", ["hr_doc_box"], "cloud", "cualificada", 30, 110000, 0, "T3/2026", "2026-08-20", "Sofie Vandenberg", "Admin", "nuevo", "best_case", "asignada_aconso", "Preparar demo técnica", "Demo programada", ""),
+            ("opp-007", "partner-004", "Allianz Germany", ">5000", ["dpa", "insights"], "cloud", "negociacion", 75, 75000, 0, "T4/2026", "2026-08-05", "Markus Schmidt", "Admin", "ampliacion", "commit", "generada_partner", "Cerrar términos de contrato", "Negociando términos", ""),
+            ("opp-008", "partner-004", "Deutsche Bank", ">5000", ["dpa"], "cloud", "cualificada", 30, 55000, 0, "T4/2026", "2026-09-10", "Markus Schmidt", "Admin", "nuevo", "pipeline", "generada_partner", "Calificar requisitos de seguridad", "Calificando requisitos", ""),
+            ("opp-009", "partner-001", "Repsol", "1000-5000", ["dpa", "hr_doc_box", "scan_services"], "cloud", "ganada", 100, 38000, 8000, "T3/2026", "2026-07-15", "Carlos Ruiz", "Admin", "nuevo", "commit", "recomendacion_cliente", "Onboarding del proyecto", "Contrato firmado", ""),
+            ("opp-010", "partner-002", "Ageas Insurance", "1000-5000", ["dpa"], "cloud", "perdida", 0, 45000, 0, "T3/2026", "2026-07-10", "Sofie Vandenberg", "Admin", "nuevo", "omitted", "asignada_aconso", "", "Eligió otra solución", "competencia"),
         ]
         for oid, pid, company, size, products, mode, stage, prob, amount, one_time, qtr, cd, owner, cm, otype, forecast, source, next_steps, notes, loss in opps_data:
             o = Opportunity(

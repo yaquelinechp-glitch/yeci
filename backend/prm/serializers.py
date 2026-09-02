@@ -18,7 +18,7 @@ class PartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Partner
         fields = [
-            "id", "company_name", "email", "phone", "tax_id", "contact_name",
+            "id", "company_name", "email", "phone", "tax_id", "country", "contact_name",
             "role", "training_track", "status", "commission_rate", "notes", "why_partner",
             "sales_approach", "certification_date", "created_at",
         ]
@@ -30,6 +30,7 @@ class PartnerCreateSerializer(serializers.Serializer):
     password = serializers.CharField()
     phone = serializers.CharField(default="", required=False)
     tax_id = serializers.CharField(default="", required=False)
+    country = serializers.CharField(default="", required=False)
     contact_name = serializers.CharField(default="", required=False)
     why_partner = serializers.CharField(default="", required=False)
     sales_approach = serializers.CharField(default="", required=False)

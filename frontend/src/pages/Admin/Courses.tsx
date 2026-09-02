@@ -85,8 +85,8 @@ export default function AdminCourses() {
                 {phaseNum}
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">{t('courses.phase')} {phaseNum}</h2>
-                <p className="text-xs text-gray-400">{phaseCourses.length} {phaseCourses.length === 1 ? t('courses.courseTitle') : t('courses.courses')}</p>
+                <h2 className="text-lg font-bold text-white">{t('courses.phase')} {phaseNum}</h2>
+                <p className="text-xs text-white/60">{phaseCourses.length} {phaseCourses.length === 1 ? t('courses.courseTitle') : t('courses.courses')}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

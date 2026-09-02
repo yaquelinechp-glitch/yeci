@@ -35,7 +35,7 @@ export const authApi = {
 
 export const profileApi = {
   get: () => api.get('/profile'),
-  update: (data: { first_name?: string; last_name?: string; username?: string; avatar?: string }) => api.put('/profile', data),
+  update: (data: { first_name?: string; last_name?: string; username?: string; avatar?: string; country?: string }) => api.put('/profile', data),
 };
 
 export const partnersApi = {
@@ -141,6 +141,13 @@ export const productsApi = {
   create: (data: any) => api.post('/products/', data),
   update: (key: string, data: any) => api.patch(`/products/${key}`, data),
   remove: (key: string) => api.delete(`/products/${key}`),
+};
+
+export const calculatorApi = {
+  settings: () => api.get('/calculator/settings'),
+  saveSettings: (data: any) => api.put('/calculator/settings', data),
+  exportExcel: (data: any) =>
+    api.post('/calculator/export', data, { params: { lang: lang() }, responseType: 'blob' }),
 };
 
 export const chatApi = {

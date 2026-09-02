@@ -85,7 +85,7 @@ function LoginForm() {
                 <label className="block text-sm font-medium mb-1">{t('auth.password')}</label>
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none" placeholder="••••••••" required />
               </div>
-              {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">⚠ {error}</div>}
+              {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{error}</div>}
               <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">{loading ? '...' : t('auth.loginBtn')}</button>
             </form>
 
