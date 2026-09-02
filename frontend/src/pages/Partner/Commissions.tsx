@@ -13,16 +13,16 @@ export default function Commissions() {
   const paid = commissions.filter((c) => c.paid_date).reduce((sum, c) => sum + c.amount, 0);
 
   const summaryCards = [
-    { label: t('commissions.totalEarned'), value: `$${total.toLocaleString()}`, color: 'border-emerald-500', bg: 'bg-emerald-50' },
-    { label: t('commissions.pending'), value: `$${pending.toLocaleString()}`, color: 'border-amber-500', bg: 'bg-amber-50' },
-    { label: t('commissions.paid'), value: `$${paid.toLocaleString()}`, color: 'border-aconso-500', bg: 'bg-aconso-50' },
+    { label: t('commissions.totalEarned'), value: `$${total.toLocaleString()}`, color: 'border-emerald-500' },
+    { label: t('commissions.pending'), value: `$${pending.toLocaleString()}`, color: 'border-amber-500' },
+    { label: t('commissions.paid'), value: `$${paid.toLocaleString()}`, color: 'border-aconso-500' },
   ];
 
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('commissions.title')}</h1>
-        <p className="text-white/70 mt-1">{t('commissions.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('commissions.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('commissions.subtitle')}</p>
       </div>
 
       {/* Summary Cards */}
@@ -54,6 +54,7 @@ export default function Commissions() {
             {commissions.length === 0 ? (
               <tr>
                 <td colSpan={4} className="text-center py-16">
+                  <div className="text-4xl mb-3"></div>
                   <div className="text-gray-400 text-lg">{t('commissions.noCommissions')}</div>
                   <div className="text-gray-400 text-sm mt-2">{t('commissions.commissionsWillAppear')}</div>
                 </td>

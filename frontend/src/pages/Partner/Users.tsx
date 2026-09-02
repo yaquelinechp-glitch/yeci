@@ -80,6 +80,7 @@ export default function PartnerUsers() {
   if (isMember) {
     return (
       <div className="card p-12 text-center">
+        <div className="text-5xl mb-4"></div>
         <p className="text-gray-500">{t('users.memberNoAccess')}</p>
       </div>
     );
@@ -90,8 +91,8 @@ export default function PartnerUsers() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('users.title')}</h1>
-        <p className="text-white/70 mt-1">{t('users.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('users.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('users.subtitle')}</p>
       </div>
 
       {msg && (
@@ -117,7 +118,7 @@ export default function PartnerUsers() {
                   <div className="font-medium text-gray-900 text-sm">{user?.contact_name || user?.company_name}</div>
                   <div className="text-xs text-gray-500">{user?.email}</div>
                 </div>
-                <span className="badge bg-aconso-600 text-white border border-aconso-700">{roleLabel('owner')}</span>
+                <span className="badge bg-aconso-600 text-white border border-aconso-700"> {roleLabel('owner')}</span>
               </div>
               {sorted.map((m) => (
                 <div key={m.id} className="rounded-xl border border-gray-200 p-4 flex flex-wrap items-center gap-3">
@@ -146,11 +147,11 @@ export default function PartnerUsers() {
                   )}
                   <div className="flex items-center gap-1">
                     {m.status === 'activo' ? (
-                      <button onClick={() => updateMember(m, { status: 'desactivado' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.disable')}>{t('users.disable')}</button>
+                      <button onClick={() => updateMember(m, { status: 'desactivado' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.disable')}></button>
                     ) : (
-                      <button onClick={() => updateMember(m, { status: 'activo' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.enable')}>{t('users.enable')}</button>
+                      <button onClick={() => updateMember(m, { status: 'activo' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.enable')}>▶</button>
                     )}
-                    <button onClick={() => removeMember(m)} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('users.remove')}>{t('users.remove')}</button>
+                    <button onClick={() => removeMember(m)} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('users.remove')}></button>
                   </div>
                 </div>
               ))}
@@ -161,7 +162,7 @@ export default function PartnerUsers() {
 
         {/* Invite form */}
         <div className="card p-6 h-fit">
-          <h2 className="font-bold text-gray-900 mb-4">{t('users.inviteTitle')}</h2>
+          <h2 className="font-bold text-gray-900 mb-4"> {t('users.inviteTitle')}</h2>
           <form onSubmit={sendInvite} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">{t('auth.email')} *</label>
@@ -194,7 +195,7 @@ export default function PartnerUsers() {
 
           {inviteUrl && (
             <div className="mt-4 p-4 rounded-xl border border-emerald-200 bg-emerald-50">
-              <div className="text-sm font-semibold text-emerald-800 mb-2">{t('users.inviteCreated')}</div>
+              <div className="text-sm font-semibold text-emerald-800 mb-2"> {t('users.inviteCreated')}</div>
               <div className="flex gap-2">
                 <input
                   readOnly value={`${window.location.origin}${inviteUrl}`}
@@ -202,7 +203,7 @@ export default function PartnerUsers() {
                   className="flex-1 min-w-0 text-xs border border-emerald-200 rounded-lg px-3 py-2 bg-white text-gray-700"
                 />
                 <button type="button" onClick={copyInvite} className="btn-secondary !py-1.5 text-xs whitespace-nowrap">
-                  {copied ? '✓' : t('users.copy')}
+                  {copied ? '' : t('users.copy')}
                 </button>
               </div>
             </div>

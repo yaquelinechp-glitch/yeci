@@ -177,6 +177,7 @@ export default function ChatWidget() {
           className={`fixed z-[70] select-none touch-none rounded-full flex items-center justify-center shadow-xl cursor-grab active:cursor-grabbing transition-shadow hover:shadow-2xl ${open ? 'bg-gray-800' : 'bg-gradient-to-br from-aconso-600 to-aconso-400'} text-white`}
           title={t('chat.title')}
         >
+          <span className="text-2xl pointer-events-none">💬</span>
           {!open && (
             <span className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-white pointer-events-none"></span>
           )}

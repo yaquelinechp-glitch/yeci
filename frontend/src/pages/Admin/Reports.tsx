@@ -20,7 +20,7 @@ export default function AdminReports() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   useEffect(() => { reportsApi.adminStats().then((r) => setStats(r.data)); }, []);
 
-  if (!stats) return <div className="text-white/60">{t('common.loading')}</div>;
+  if (!stats) return <div className="text-gray-400">{t('common.loading')}</div>;
 
   const dealData = Object.entries(stats.deals_by_status || {}).map(([status, value]) => ({
     name: t(DEAL_STATUS_KEYS[status] || `deals.statuses.${status}`),
@@ -36,8 +36,8 @@ export default function AdminReports() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('reports.title')}</h1>
-        <p className="text-white/70 mt-1">{t('reports.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('reports.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('reports.subtitle')}</p>
       </div>
 
       {/* Summary Cards */}

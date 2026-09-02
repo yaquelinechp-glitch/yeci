@@ -38,12 +38,15 @@ export default function Landing() {
                     <div className="grid grid-cols-2 gap-4 w-full">
                       {benefits.slice(0, 4).map((b, i) => (
                         <div key={i} className="bg-white/20 rounded-2xl p-4 text-center">
+                          <div className="text-3xl mb-1">{['', '', '', ''][i]}</div>
                           <div className="text-white text-sm font-medium leading-tight">{b.title}</div>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent-500 rounded-full animate-pulse-amber"></div>
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent-500 rounded-full flex items-center justify-center animate-pulse-amber">
+                    <span className="text-2xl"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -103,6 +106,9 @@ export default function Landing() {
             <div className="grid md:grid-cols-3 gap-6">
               {benefits.map((b: any, i: number) => (
                 <div key={i} className="card card-interactive p-8 group cursor-default">
+                  <div className="w-14 h-14 rounded-2xl bg-accent-50 flex items-center justify-center text-2xl mb-5 group-hover:bg-accent-100 transition-colors">
+                    {['', '', '', '', '', ''][i]}
+                  </div>
                   <h3 className="font-bold text-lg mb-3 text-gray-800">{b.title}</h3>
                   <p className="text-gray-500 leading-relaxed">{b.desc}</p>
                 </div>

@@ -160,7 +160,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
               {open && (
                 <div className="absolute right-0 top-11 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                    <span className="font-semibold text-gray-900 text-sm">{t('notifications.title')}</span>
+                    <span className="font-semibold text-gray-900 text-sm"> {t('notifications.title')}</span>
                     <button onClick={markAll} className="text-xs text-aconso-600 hover:text-aconso-800">{t('notifications.markAll')}</button>
                   </div>
                   {isAdmin && (
@@ -183,6 +183,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                   <div className="max-h-80 overflow-y-auto">
                     {items.length === 0 ? (
                       <div className="px-4 py-10 text-center text-gray-400 text-sm">
+                        <div className="text-3xl mb-2"></div>
                         {t('notifications.empty')}
                       </div>
                     ) : items.slice(0, 10).map((n) => (

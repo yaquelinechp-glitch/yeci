@@ -72,7 +72,7 @@ export default function AdminCourses() {
 
       {courses.length === 0 ? (
         <div className="card p-16 text-center">
-          <div className="text-5xl mb-4">📚</div>
+          <div className="text-5xl mb-4"></div>
           <p className="text-gray-500 text-lg mb-2">{t('courses.noCourses')}</p>
           <p className="text-gray-400 text-sm mb-6">{t('courses.createFirst')}</p>
           <button onClick={handleCreate} className="btn-primary">+ {t('courses.createCourse')}</button>
@@ -85,8 +85,8 @@ export default function AdminCourses() {
                 {phaseNum}
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">{t('courses.phase')} {phaseNum}</h2>
-                <p className="text-xs text-white/60">{phaseCourses.length} {phaseCourses.length === 1 ? t('courses.courseTitle') : t('courses.courses')}</p>
+                <h2 className="text-lg font-bold text-gray-900">{t('courses.phase')} {phaseNum}</h2>
+                <p className="text-xs text-gray-400">{phaseCourses.length} {phaseCourses.length === 1 ? t('courses.courseTitle') : t('courses.courses')}</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -110,7 +110,7 @@ export default function AdminCourses() {
                       <div className="flex items-center justify-between">
                         <div className="flex gap-2 text-xs text-gray-400">
                           <span className="bg-gray-100 px-2 py-1 rounded-md">{(c.category && CATEGORY_I18N[c.category]) ? t(CATEGORY_I18N[c.category]) : t('courses.uncategorized')}</span>
-                          <span className="flex items-center gap-1">🎬 {c.video_count} {t('courses.videos')}</span>
+                          <span className="flex items-center gap-1"> {c.video_count} {t('courses.videos')}</span>
                         </div>
                       </div>
                       <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">

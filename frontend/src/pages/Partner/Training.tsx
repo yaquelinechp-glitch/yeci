@@ -67,7 +67,7 @@ export default function PartnerTraining() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="animate-spin w-8 h-8 border-2 border-aconso-500 border-t-transparent rounded-full"></div>
-        <span className="ml-3 text-white/60">{t('common.loading')}</span>
+        <span className="ml-3 text-gray-400">{t('common.loading')}</span>
       </div>
     );
   }
@@ -75,6 +75,7 @@ export default function PartnerTraining() {
   if (!data) {
     return (
       <div className="card p-16 text-center">
+        <div className="text-5xl mb-4"></div>
         <p className="text-gray-500">{t('common.error')}</p>
       </div>
     );
@@ -98,8 +99,8 @@ export default function PartnerTraining() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('lms.title')}</h1>
-        <p className="text-white/70 mt-1">{t('lms.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('lms.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('lms.subtitle')}</p>
       </div>
 
       {msg && (
@@ -110,14 +111,15 @@ export default function PartnerTraining() {
 
       {/* Onboarding checklist */}
       <div className="card mb-6 p-6">
-        <h2 className="font-bold text-gray-900 mb-1">{t('lms.onboardingTitle')}</h2>
+        <h2 className="font-bold text-gray-900 mb-1"> {t('lms.onboardingTitle')}</h2>
         <p className="text-sm text-gray-500 mb-4">{t('lms.onboardingSubtitle')}</p>
 
         {!onboarding || !onboarding.started ? (
           <div className="flex flex-col items-center py-6 text-center">
+            <div className="text-4xl mb-3"></div>
             <p className="text-gray-500 text-sm max-w-md mb-4">{t('lms.onboardingSubtitle')}</p>
             <button onClick={startOnboarding} disabled={starting} className="btn-primary">
-              {starting ? t('common.loading') : t('lms.startOnboarding')}
+              {starting ? t('common.loading') : '▶ ' + t('lms.startOnboarding')}
             </button>
           </div>
         ) : (
@@ -134,20 +136,20 @@ export default function PartnerTraining() {
               </div>
               {onboarding.next_milestone && (
                 <div className="text-xs text-gray-500 bg-aconso-50 border border-aconso-100 rounded-lg px-3 py-1.5">
-                  {t('lms.nextMilestone', { n: onboarding.next_milestone.days_left })}
+                   {t('lms.nextMilestone', { n: onboarding.next_milestone.days_left })}
                 </div>
               )}
             </div>
 
             {onboarding.completed && (
               <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-emerald-50 text-emerald-700 border border-emerald-200">
-                {t('lms.onboardingDone')} {t('lms.onboardingDoneSub')}
+                 {t('lms.onboardingDone')} {t('lms.onboardingDoneSub')}
               </div>
             )}
 
             {onboarding.reminders.length > 0 && (
               <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-amber-50 text-amber-800 border border-amber-200">
-                <div className="font-semibold mb-1">{t('lms.remindersTitle')}</div>
+                <div className="font-semibold mb-1"> {t('lms.remindersTitle')}</div>
                 <ul className="list-disc list-inside space-y-0.5">
                   {onboarding.reminders.map((r) => <li key={r}>{r}</li>)}
                 </ul>
@@ -170,7 +172,7 @@ export default function PartnerTraining() {
                       <div key={step.key} className={`flex items-start gap-2.5 rounded-lg p-2 -mx-2 ${step.overdue ? 'bg-red-50' : ''}`}>
                         {step.auto ? (
                           <span className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${step.done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                            {step.done ? '✓' : '·'}
+                            {step.done ? '' : '·'}
                           </span>
                         ) : (
                           <button
@@ -178,7 +180,7 @@ export default function PartnerTraining() {
                             disabled={toggling === step.key}
                             className={`mt-0.5 w-5 h-5 rounded border-2 shrink-0 flex items-center justify-center text-[11px] font-bold transition-colors ${step.done ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 text-transparent hover:border-aconso-400'}`}
                           >
-                            ✓
+                            
                           </button>
                         )}
                         <div className="min-w-0">
@@ -188,7 +190,7 @@ export default function PartnerTraining() {
                               {step.auto ? t('lms.autoStep') : t('lms.manualStep')}
                             </span>
                             {step.overdue && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600">{t('lms.overdue')}</span>
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600"> {t('lms.overdue')}</span>
                             )}
                             {!step.done && !step.overdue && step.days_left !== null && step.days_left !== undefined && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-aconso-50 text-aconso-600">
@@ -212,17 +214,18 @@ export default function PartnerTraining() {
         <h2 className="font-bold text-gray-900 mb-4">{t('lms.certificationTitle')}</h2>
         {bestCert ? (
           <div className="flex flex-wrap items-center gap-6">
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-4xl shadow-md"></div>
             <div>
               <div className="text-sm text-gray-500">{t('lms.level')}: <span className="font-semibold text-gray-900">{CERT_LEVELS[bestCert.level]?.[i18n.language] || bestCert.level}</span></div>
               <div className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${CERT_STATUS_COLORS[bestCert.status] || 'bg-gray-100 text-gray-600'}`}>
                 {t(`lms.statuses.${bestCert.status}`)}
               </div>
-              <div className="text-sm text-gray-500 mt-2">{t('lms.validUntil')}: {new Date(bestCert.valid_until).toLocaleDateString()}</div>
+              <div className="text-sm text-gray-500 mt-2"> {t('lms.validUntil')}: {new Date(bestCert.valid_until).toLocaleDateString()}</div>
             </div>
           </div>
         ) : (
           <div className="text-sm text-gray-500 flex items-center gap-2">
-            {t('lms.noCertification')}
+            <span className="text-2xl"></span> {t('lms.noCertification')}
           </div>
         )}
 
@@ -234,7 +237,7 @@ export default function PartnerTraining() {
             <div className="flex flex-wrap gap-2">
               {next_level.requirements.map((req) => (
                 <span key={req.key} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${req.done ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}>
-                  <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${req.done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'}`}>{req.done ? '✓' : '·'}</span>
+                  <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${req.done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'}`}>{req.done ? '' : '·'}</span>
                   {req.label}
                 </span>
               ))}
@@ -301,7 +304,7 @@ export default function PartnerTraining() {
                   <div className="flex-1 min-w-[200px]">
                     <div className="font-medium text-gray-900 text-sm">{latest.course_title}</div>
                     <div className="text-xs text-gray-500 mt-0.5">
-                      {results.length} {results.length === 1 ? t('quiz.attempt') : t('quiz.attempts')} · {t('quiz.score')}: {best.score}%
+                      {results.length} {results.length === 1 ? t('quiz.attempt') : t('quiz.attempts')} ·  {t('quiz.score')}: {best.score}%
                     </div>
                     <div className="mt-2 flex gap-1">
                       {results.slice(0, 5).map((r) => (
@@ -311,18 +314,18 @@ export default function PartnerTraining() {
                   </div>
                   <div className="flex items-center gap-2">
                     {passed ? (
-                      <span className="badge bg-emerald-500 text-white border border-emerald-600">✓</span>
+                      <span className="badge bg-emerald-500 text-white border border-emerald-600"></span>
                     ) : (
                       <span className="text-xs font-medium text-amber-600">{t('quiz.failed')}</span>
                     )}
                     {latest.certificate_url && (
                       <a href={latest.certificate_url} target="_blank" rel="noreferrer" className="btn-secondary !py-1.5 text-xs">
-                        {t('lms.downloadCertificate')}
+                         {t('lms.downloadCertificate')}
                       </a>
                     )}
                     {!latest.certificate_url && passed && (
                       <button onClick={() => downloadCertificate(courseId, latest.course_title)} disabled={downloading === courseId} className="btn-secondary !py-1.5 text-xs">
-                        {downloading === courseId ? t('common.loading') : t('lms.downloadCertificate')}
+                        {downloading === courseId ? t('common.loading') : ' ' + t('lms.downloadCertificate')}
                       </button>
                     )}
                   </div>

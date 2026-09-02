@@ -362,8 +362,8 @@ export default function Pipeline() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">{t('pipeline.title')}</h1>
-          <p className="text-white/70 mt-1">{t('pipeline.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('pipeline.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('pipeline.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 rounded-lg p-1">
@@ -528,7 +528,7 @@ export default function Pipeline() {
                 <div key={s} className="flex items-center gap-2 flex-1">
                   <button type="button" onClick={() => s < wizardStep && setWizardStep(s)}
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${wizardStep === s ? 'bg-aconso-600 text-white' : wizardStep > s ? 'bg-emerald-500 text-white cursor-pointer' : 'bg-gray-200 text-gray-500'}`}>
-                    {wizardStep > s ? '✓' : s}
+                    {wizardStep > s ? '' : s}
                   </button>
                   <span className={`text-xs font-medium ${wizardStep >= s ? 'text-gray-900' : 'text-gray-400'}`}>
                     {t(`common.step${s}`)}
@@ -585,7 +585,7 @@ export default function Pipeline() {
                             className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition-colors ${
                               checked ? 'bg-aconso-600 text-white border-aconso-600' : 'bg-white text-gray-700 border-gray-200 hover:border-aconso-400'
                             }`}>
-                            {checked ? '✓ ' : ''}{productName(p)}
+                            {checked ? ' ' : ''}{productName(p)}
                           </button>
                         );
                       })}
@@ -596,7 +596,7 @@ export default function Pipeline() {
                           <span key={k} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-aconso-50 text-aconso-700 border border-aconso-200">
                             {productLabel(k)}
                             <button type="button" onClick={() => setForm({ ...form, products: form.products.filter((x) => x !== k) })}
-                              className="text-aconso-400 hover:text-aconso-700">✕</button>
+                              className="text-aconso-400 hover:text-aconso-700"></button>
                           </span>
                         ))}
                       </div>

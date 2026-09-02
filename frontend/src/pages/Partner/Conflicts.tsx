@@ -43,7 +43,7 @@ export default function PartnerConflicts() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="animate-spin w-8 h-8 border-2 border-aconso-500 border-t-transparent rounded-full"></div>
-        <span className="ml-3 text-white/60">{t('common.loading')}</span>
+        <span className="ml-3 text-gray-400">{t('common.loading')}</span>
       </div>
     );
   }
@@ -63,8 +63,8 @@ export default function PartnerConflicts() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('conflicts.title')}</h1>
-        <p className="text-white/70 mt-1">{t('conflicts.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('conflicts.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('conflicts.subtitle')}</p>
       </div>
 
       {msg && (
@@ -127,24 +127,24 @@ export default function PartnerConflicts() {
                 <div className="flex flex-wrap items-start gap-4">
                   <div className="flex-1 min-w-[220px]">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-gray-900 text-sm">{c.company_name}</span>
+                      <span className="font-medium text-gray-900 text-sm"> {c.company_name}</span>
                       <span className={statusBadge(c.status)}>{t(`conflicts.statuses.${c.status}`)}</span>
                     </div>
                     <div className="text-xs text-gray-500 mt-2 space-y-1">
                       {c.opportunity && (
-                        <div>{c.opportunity.partner_name} — <span className="text-gray-700">{c.opportunity.name}</span></div>
+                        <div> {c.opportunity.partner_name} — <span className="text-gray-700">{c.opportunity.name}</span></div>
                       )}
                       {c.conflicting_opportunity && (
-                        <div>{c.conflicting_opportunity.partner_name} — <span className="text-gray-700">{c.conflicting_opportunity.name}</span></div>
+                        <div> {c.conflicting_opportunity.partner_name} — <span className="text-gray-700">{c.conflicting_opportunity.name}</span></div>
                       )}
                       {!c.opportunity && !c.conflicting_opportunity && (
                         <div className="text-gray-400">{t('conflicts.noOpps')}</div>
                       )}
                     </div>
-                    {c.notes && <p className="text-xs text-gray-600 mt-2">{c.notes}</p>}
+                    {c.notes && <p className="text-xs text-gray-600 mt-2"> {c.notes}</p>}
                     {c.status === 'resuelto' && (
                       <div className="mt-2 text-xs px-3 py-2 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-100">
-                        {t('conflicts.winner')}: <span className="font-bold">{c.winner_partner_name || '—'}</span>
+                         {t('conflicts.winner')}: <span className="font-bold">{c.winner_partner_name || '—'}</span>
                         {c.resolution && <div className="mt-1 text-emerald-700">{c.resolution}</div>}
                       </div>
                     )}

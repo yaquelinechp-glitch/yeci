@@ -178,7 +178,7 @@ function RegisterForm() {
         <div className="pt-16 min-h-screen flex items-center justify-center p-8">
           <div className="w-full max-w-md text-center">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
-              <span className="text-3xl">🚫</span>
+              <span className="text-3xl"></span>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth.inviteInvalid')}</h2>
             <p className="text-gray-500 mb-8">{t('auth.inviteInvalidDesc')}</p>
@@ -198,12 +198,12 @@ function RegisterForm() {
         <div className="pt-16 min-h-screen flex items-center justify-center p-8">
           <div className="w-full max-w-md">
             <div className="mb-8 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-aconso-100 flex items-center justify-center text-3xl">🤝</div>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-aconso-100 flex items-center justify-center text-3xl"></div>
               <h2 className="text-2xl font-bold text-gray-900">{t('auth.inviteTitle')}</h2>
               <p className="text-gray-500 mt-1">{t('auth.inviteSubtitle', { partner: invite.partner_name })}</p>
             </div>
             <div className="bg-aconso-50 border border-aconso-100 rounded-xl px-4 py-3 mb-6 text-sm text-aconso-800">
-              📧 {invite.email}
+               {invite.email}
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -320,7 +320,7 @@ function RegisterForm() {
                         { check: /[!@#$%^&*()_\-+=[\]{}|;:'",.<>?/~`]/.test(form.password), label: 'Special char' },
                       ].map((r) => (
                         <div key={r.label} className={`text-xs ${r.check ? 'text-emerald-600' : 'text-gray-400'}`}>
-                          {r.check ? '✓' : '○'} {r.label}
+                          {r.check ? '' : '○'} {r.label}
                         </div>
                       ))}
                     </div>

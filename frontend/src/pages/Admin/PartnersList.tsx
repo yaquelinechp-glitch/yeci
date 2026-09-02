@@ -72,8 +72,8 @@ export default function PartnersList() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('admin.allPartners')}</h1>
-        <p className="text-white/70 mt-1">{t('admin.partnersSubtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('admin.allPartners')}</h1>
+        <p className="text-gray-500 mt-1">{t('admin.partnersSubtitle')}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -98,15 +98,16 @@ export default function PartnersList() {
           ))}
         </div>
         <div className="flex-1"></div>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder={t('common.search')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-white pl-4 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 w-64"
-            />
-          </div>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder={t('common.search')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 w-64"
+          />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></span>
+        </div>
       </div>
 
       <div className="table-container">
@@ -236,7 +237,7 @@ export default function PartnersList() {
                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0 ${
                                   isComplete ? 'bg-emerald-500' : isActive ? 'bg-aconso-500' : 'bg-gray-300'
                                 }`}>
-                                  {isComplete ? '✓' : ph}
+                                  {isComplete ? '' : ph}
                                 </div>
                                 {ph < allPhases[allPhases.length - 1] && (
                                   <div className={`w-4 h-0.5 ${isComplete ? 'bg-emerald-400' : 'bg-gray-200'}`} />
@@ -264,7 +265,7 @@ export default function PartnersList() {
                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white ${
                                   course.completed ? 'bg-emerald-500' : 'bg-aconso-500'
                                 }`}>
-                                  {course.completed ? '✓' : course.title.charAt(0)}
+                                  {course.completed ? '' : course.title.charAt(0)}
                                 </div>
                                 <div>
                                   <div className="font-semibold text-sm text-gray-900">{course.title}</div>
@@ -321,7 +322,7 @@ export default function PartnersList() {
                                                   <div key={v.id} className={`text-[10px] px-2 py-0.5 rounded-full border ${
                                                     done ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-400 border-gray-200'
                                                   }`}>
-                                                    {t('courses.day')} {v.day}{done ? ' ✓' : ''}
+                                                    {t('courses.day')} {v.day}{done ? ' ' : ''}
                                                   </div>
                                                 );
                                               })}

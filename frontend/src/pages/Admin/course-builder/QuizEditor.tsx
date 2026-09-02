@@ -142,6 +142,7 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
 
       {questions.length === 0 && !showForm && (
         <div className="text-center py-6 mb-2">
+          <div className="text-3xl mb-2"></div>
           <p className="text-sm font-medium text-gray-700 mb-1">{t('courses.createFirstQuestion') || 'Crea tu primera pregunta'}</p>
           <p className="text-xs text-gray-400 mb-4">{t('courses.createFirstQuestionDesc') || 'Elige la respuesta correcta haciendo clic en la opción.'}</p>
           <button onClick={() => { setShowForm(true); setEditing(null); setForm(emptyForm()); }}
@@ -153,6 +154,7 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
 
       {/* Generate from bank */}
       <div className="flex flex-col items-center gap-3 p-5 bg-gradient-to-b from-aconso-50 to-white rounded-xl border border-aconso-100">
+        <div className="text-2xl"></div>
         <p className="text-sm font-semibold text-gray-800 text-center">{t('courses.generateQuiz') || 'Generar desde el banco'}</p>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500">{t('quiz.questionsCount') || 'Preguntas'}:</span>
@@ -161,7 +163,7 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
             className="w-14 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none" />
           <button onClick={handleGenerate} disabled={generating}
             className="btn-primary text-xs px-4 py-1.5">
-            {generating ? '...' : (t('courses.generateQuiz') || 'Generar')}
+            {generating ? '...' : ' ' + (t('courses.generateQuiz') || 'Generar')}
           </button>
         </div>
       </div>
@@ -181,7 +183,7 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
                 ))}
               </div>
               <button onClick={() => { setShowForm(false); setEditing(null); setForm(emptyForm()); }}
-                className="text-gray-400 hover:text-gray-600 text-sm">✕</button>
+                className="text-gray-400 hover:text-gray-600 text-sm"></button>
             </div>
           </div>
 

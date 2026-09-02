@@ -161,12 +161,12 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
           <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 transition-colors">← {t('common.back') || 'Volver'}</button>
           <div className="h-5 w-px bg-gray-200" />
           <div>
-            <h1 className="text-lg font-bold text-white truncate max-w-md">{courseTitle(course)}</h1>
-            <p className="text-xs text-white/60">{totalVideos} {t('courses.videos')} · {pc.length} {t('courses.phases')}</p>
+            <h1 className="text-lg font-bold text-gray-900 truncate max-w-md">{courseTitle(course)}</h1>
+            <p className="text-xs text-gray-400">{totalVideos} {t('courses.videos')} · {pc.length} {t('courses.phases')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {uploadMsg && <span className="text-sm text-emerald-600 font-medium animate-fade-in">{uploadMsg}</span>}
+          {uploadMsg && <span className="text-sm text-emerald-600 font-medium animate-fade-in"> {uploadMsg}</span>}
           {msg && <span className="text-sm text-emerald-600 font-medium animate-fade-in">{msg}</span>}
           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
             course.status === 'publicado' ? 'bg-emerald-100 text-emerald-700' : course.status === 'archivado' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
@@ -175,13 +175,13 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
           </span>
           <button onClick={async () => { if (!confirm(t('courses.duplicate'))) return; await coursesApi.duplicate(course.id); onSaved(); }}
             className="text-xs text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-            📄 {t('courses.duplicate')}
+             {t('courses.duplicate')}
           </button>
           <button onClick={() => setView('info')} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-            {t('common.edit')}
+             {t('common.edit')}
           </button>
           <button onClick={handleDone} disabled={saving} className="btn-primary text-sm">
-            {saving ? '...' : t('courses.done') + ' ✓'}
+            {saving ? '...' : t('courses.done') + ' '}
           </button>
         </div>
       </div>
@@ -219,13 +219,13 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
             />
           ) : editorView === 'bank' ? (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">{t('courses.questionBank')}</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-1"> {t('courses.questionBank')}</h2>
               <p className="text-sm text-gray-500 mb-4">{t('courses.questionBankDesc') || 'Crea y gestiona preguntas. Asigna videos con un clic.'}</p>
               <QuestionBank courseVideos={course.videos} courseId={course.id} onRefresh={refresh} />
             </>
           ) : (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">{t('courses.examFinal')}</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-1"> {t('courses.examFinal')}</h2>
               <p className="text-sm text-gray-500 mb-4">{t('courses.examDesc') || 'Vista previa del examen final. Las preguntas se generan desde el banco.'}</p>
               <ExamEditor courseId={course.id} examCount={course.exam_questions_count || 5} onRefresh={refresh} />
             </>
@@ -270,7 +270,7 @@ function DayContent({ course, phase, day, onUpload, onUploadUrl, onRefresh }: {
   return (
     <div>
       <h3 className="text-sm font-semibold text-gray-900 mb-1">
-        {t('courses.phase')} {phase} · {t('courses.day')} {day}
+         {t('courses.phase')} {phase} · {t('courses.day')} {day}
       </h3>
       <p className="text-xs text-gray-400 mb-4">{dayVideos.length} {t('courses.videos')}</p>
 
@@ -294,7 +294,7 @@ function DayContent({ course, phase, day, onUpload, onUploadUrl, onRefresh }: {
         <p className="text-xs text-gray-400 mb-3">{t('courses.uploadVideo') || 'Subir video'} — {t('courses.phase')} {phase} · {t('courses.day')} {day}</p>
         <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
           className="w-full py-2.5 bg-aconso-500 text-white rounded-xl text-sm font-medium hover:bg-aconso-600 transition-colors disabled:opacity-50 mb-2">
-          {uploading ? '...' : '⬆ ' + t('courses.uploadFromPc')}
+          {uploading ? '...' : ' ' + t('courses.uploadFromPc')}
         </button>
         <input ref={fileRef} type="file" accept="video/mp4,video/webm,video/ogg" className="hidden"
           onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />

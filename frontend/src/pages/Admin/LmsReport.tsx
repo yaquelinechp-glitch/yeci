@@ -41,7 +41,7 @@ export default function AdminLmsReport() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="animate-spin w-8 h-8 border-2 border-aconso-500 border-t-transparent rounded-full"></div>
-        <span className="ml-3 text-white/60">{t('common.loading')}</span>
+        <span className="ml-3 text-gray-400">{t('common.loading')}</span>
       </div>
     );
   }
@@ -51,8 +51,8 @@ export default function AdminLmsReport() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('lms.reportTitle')}</h1>
-        <p className="text-white/70 mt-1">{t('lms.reportSubtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900"> {t('lms.reportTitle')}</h1>
+        <p className="text-gray-500 mt-1">{t('lms.reportSubtitle')}</p>
       </div>
 
       <div className="card p-6 mb-6">

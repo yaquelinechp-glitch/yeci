@@ -54,54 +54,52 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
 
   const links: NavLink[] = isAdmin
     ? [
-        { to: '/admin', label: t('nav.dashboard') },
+        { to: '/admin', label: t('nav.dashboard'), },
         { to: '/admin/partners', label: t('nav.partners'), badge: partnersBadge },
         { to: '/admin/pipeline', label: t('nav.pipeline'), badge: pipelineBadge },
-        { to: '/admin/courses', label: t('nav.courses') },
-        { to: '/admin/lms-report', label: t('nav.lmsReport') },
-        { to: '/admin/conflicts', label: t('nav.conflicts') },
-        { to: '/admin/reports', label: t('nav.reports') },
-        { to: '/admin/cost-export', label: t('nav.costExport') },
-        { to: '/admin/security', label: t('nav.security') },
+        { to: '/admin/courses', label: t('nav.courses'), },
+        { to: '/admin/lms-report', label: t('nav.lmsReport'), },
+        { to: '/admin/conflicts', label: t('nav.conflicts'), },
+        { to: '/admin/reports', label: t('nav.reports'), },
+        { to: '/admin/cost-export', label: t('nav.costExport'), },
+        { to: '/admin/security', label: t('nav.security'), },
       ]
     : [
-        { to: '/partner', label: t('nav.dashboard') },
-        { to: '/partner/pipeline', label: t('nav.pipeline') },
-        { to: '/partner/courses', label: t('nav.courses') },
-        { to: '/partner/training', label: t('nav.training') },
-        { to: '/partner/conflicts', label: t('nav.conflicts') },
-        { to: '/partner/notifications', label: t('nav.notifications') },
-        { to: '/partner/users', label: t('nav.users') },
+        { to: '/partner', label: t('nav.dashboard'), },
+        { to: '/partner/pipeline', label: t('nav.pipeline'), },
+        { to: '/partner/courses', label: t('nav.courses'), },
+        { to: '/partner/training', label: t('nav.training'), },
+        { to: '/partner/conflicts', label: t('nav.conflicts'), },
+        { to: '/partner/notifications', label: t('nav.notifications'), },
+        { to: '/partner/users', label: t('nav.users'), },
       ];
 
   return (
     <>
       {mobileOpen && (
-        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/60 z-40 md:hidden" onClick={onClose} />
+        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/50 z-40 md:hidden" onClick={onClose} />
       )}
-      <aside className={`w-64 bg-[#0a1628] text-white min-h-screen fixed left-0 top-16 bottom-0 overflow-y-auto scrollbar-thin z-50 transition-transform duration-300 ${
+      <aside className={`w-64 bg-dark-800 text-white min-h-screen fixed left-0 top-16 bottom-0 overflow-y-auto scrollbar-thin z-50 transition-transform duration-300 ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0`}>
-      <div className="p-5">
-        <button onClick={() => setProfileOpen(true)} className="group w-full text-left flex items-center gap-3 rounded-xl p-2.5 hover:bg-[rgba(0,212,170,0.15)] transition-all" title={t('profile.title')}>
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#0070ad] flex items-center justify-center font-bold ring-2 ring-white/20 overflow-hidden group-hover:ring-[#00d4aa]/60 transition-all shrink-0 text-sm">
+      <div className="p-6 text-center border-b border-white/10">
+        <button onClick={() => setProfileOpen(true)} className="group mx-auto block" title={t('profile.title')}>
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-xl font-bold mx-auto mb-3 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
             {user?.avatar ? (
               <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
             ) : (
               profileInitials()
             )}
           </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold text-white truncate group-hover:text-[#00d4aa] transition-colors">
-              {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
-            </div>
-            <div className="text-[11px] text-white/60 truncate">
-              {user?.contact_name || t('nav.brand')}
-            </div>
+          <div className="font-semibold text-white group-hover:text-accent-300 transition-colors">
+            {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
+          </div>
+          <div className="text-xs text-dark-200 mt-0.5">
+            {([user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() && user?.username) ? user.username : (user?.contact_name || (isAdmin ? t('nav.admin') : ''))}
           </div>
         </button>
       </div>
-      <nav className="px-3">
+      <nav className="mt-4 px-3">
         {links.map((link) => {
           const isActive = location.pathname === link.to;
           return (
@@ -109,22 +107,23 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
               key={link.to}
               to={link.to}
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 text-sm rounded-xl mb-1 transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg mb-1 transition-all duration-200 ${
                 isActive
-                  ? 'bg-[rgba(0,212,170,0.2)] text-white border-l-3 border-[#00d4aa]'
-                  : 'text-white/70 hover:bg-[rgba(0,212,170,0.15)] hover:text-white'
+                  ? 'bg-accent-500/15 text-accent-400 border-l-3 border-accent-500'
+                  : 'text-dark-200 hover:bg-white/5 hover:text-white'
               }`}
             >
-              <span className={isActive ? 'font-semibold' : ''}>{link.label}</span>
+              <span className={isActive ? 'font-medium' : ''}>{link.label}</span>
               {typeof link.badge === 'number' && link.badge > 0 && (
-                <span className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center shadow">{link.badge}</span>
+                <span className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center">{link.badge}</span>
               )}
             </Link>
           );
         })}
       </nav>
-      <div className="mt-4 border-t border-white/10 px-3">
-        <button onClick={() => { logout(); onClose(); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:text-red-400 hover:bg-[rgba(0,212,170,0.1)] rounded-xl transition-all duration-200 mt-2">
+      <div className="absolute bottom-0 w-full border-t border-white/10 px-3">
+        <button onClick={() => { logout(); onClose(); }} className="w-full flex items-center gap-3 px-4 py-4 text-sm text-dark-200 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all duration-200 mt-2">
+          <span className="text-lg"></span>
           {t('nav.logout')}
         </button>
       </div>

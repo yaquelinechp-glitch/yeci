@@ -55,6 +55,7 @@ export default function CourseSidebar({
     <div className="border-r border-gray-200 bg-white flex flex-col h-full overflow-hidden">
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs text-gray-400"></span>
           <span className="text-xs font-semibold text-gray-900 truncate">{courseTitle(course)}</span>
         </div>
         <div className="text-[11px] text-gray-400">{totalVideos} {t('courses.videos')} · {pc.length} {t('courses.phases')}</div>
@@ -80,6 +81,7 @@ export default function CourseSidebar({
                   {t('courses.phase')} {p.phase}
                 </span>
                 <span className="text-[10px] text-gray-400 mr-1">{phaseVids.length}</span>
+                <span className={`text-gray-400 text-xs transition-transform ${expanded ? 'rotate-90' : ''}`}>▶</span>
               </button>
 
               {expanded && (
@@ -112,7 +114,7 @@ export default function CourseSidebar({
                                   <button onClick={e => { e.stopPropagation(); onReorderVideo(v.id, 1); }}
                                     className="text-[10px] text-gray-400 hover:text-aconso-600 px-0.5">▼</button>
                                   <button onClick={e => { e.stopPropagation(); onDeleteVideo(v.id); }}
-                                    className="text-[10px] text-gray-400 hover:text-red-500 px-0.5">✕</button>
+                                    className="text-[10px] text-gray-400 hover:text-red-500 px-0.5"></button>
                                 </div>
                               </div>
                             );
@@ -138,12 +140,14 @@ export default function CourseSidebar({
           className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
             selectedView === 'bank' ? 'bg-aconso-50 text-aconso-700 border border-aconso-200' : 'text-gray-600 hover:bg-gray-50'
           }`}>
+          <span></span>
           <span className="flex-1 text-left">{t('courses.questionBank')}</span>
         </button>
         <button onClick={onSelectExam}
           className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
             selectedView === 'exam' ? 'bg-aconso-50 text-aconso-700 border border-aconso-200' : 'text-gray-600 hover:bg-gray-50'
           }`}>
+          <span></span>
           <span className="flex-1 text-left">{t('courses.examFinal')}</span>
         </button>
       </div>

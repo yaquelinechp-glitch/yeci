@@ -46,10 +46,10 @@ export default function AdminSecurity() {
     setRegisterLoading(true);
     try {
       const res = await adminApi.registerAdmin(form);
-      setRegisterMsg(`OK ${t('security.adminCreated', { name: res.data.company_name })}`);
+      setRegisterMsg(` ${t('security.adminCreated', { name: res.data.company_name })}`);
       setForm({ company_name: '', email: '', password: '', contact_name: '', phone: '', tax_id: '' });
     } catch (err: any) {
-      setRegisterMsg(`${err?.response?.data?.detail || t('common.error')}`);
+      setRegisterMsg(` ${err?.response?.data?.detail || t('common.error')}`);
     } finally {
       setRegisterLoading(false);
     }
@@ -63,8 +63,8 @@ export default function AdminSecurity() {
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-500 text-xl">&#128737;</div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{t('security.title')}</h1>
-              <p className="text-sm text-white/70">{t('security.subtitle')}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{t('security.title')}</h1>
+              <p className="text-sm text-gray-500">{t('security.subtitle')}</p>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export default function AdminSecurity() {
               <p className="text-sm text-gray-500 mb-6">{t('security.createAdminDesc')}</p>
               {registerMsg && (
                 <div className={`mb-5 px-4 py-3 rounded-xl text-sm ${
-                  registerMsg.startsWith('OK ') ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                  registerMsg.startsWith('') ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
                 }`}>{registerMsg}</div>
               )}
               <form onSubmit={handleRegister} className="space-y-4">

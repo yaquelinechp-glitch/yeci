@@ -101,8 +101,8 @@ export default function CourseInfoStep({ course, existingCourses, onCreated, onC
     <div className="max-w-3xl mx-auto animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">{course ? t('courses.editCourse') : t('courses.createCourse')}</h1>
-          <p className="text-white/70 mt-1">{course ? t('courses.editCourseDesc') : t('courses.createCourseDesc')}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{course ? t('courses.editCourse') : t('courses.createCourse')}</h1>
+          <p className="text-gray-500 mt-1">{course ? t('courses.editCourseDesc') : t('courses.createCourseDesc')}</p>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ export default function CourseInfoStep({ course, existingCourses, onCreated, onC
                 </div>
                 <button type="button" onClick={() => thumbRef.current?.click()} disabled={thumbUploading}
                   className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 whitespace-nowrap">
-                  {thumbUploading ? '...' : '⬆ ' + t('courses.uploadFromPc')}
+                  {thumbUploading ? '...' : ' ' + t('courses.uploadFromPc')}
                 </button>
                 <input ref={thumbRef} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleThumbFile(e.target.files[0]); }} />
               </div>
@@ -155,7 +155,7 @@ export default function CourseInfoStep({ course, existingCourses, onCreated, onC
                       if (parent && !parent.querySelector('.thumb-error')) {
                         const err = document.createElement('div');
                         err.className = 'thumb-error absolute inset-0 flex items-center justify-center text-[10px] text-red-400 bg-gray-50';
-                        err.textContent = 'URL inválida';
+                        err.textContent = ' URL inválida';
                         parent.appendChild(err);
                       }
                     }}
@@ -238,7 +238,7 @@ export default function CourseInfoStep({ course, existingCourses, onCreated, onC
                 </div>
                 {phases.length > 1 && (
                   <button type="button" onClick={() => removePhase(pi)}
-                    className="text-gray-400 hover:text-red-500 px-1.5 py-1 rounded-lg hover:bg-red-50 transition-colors text-xs">✕</button>
+                    className="text-gray-400 hover:text-red-500 px-1.5 py-1 rounded-lg hover:bg-red-50 transition-colors text-xs"></button>
                 )}
               </div>
             ))}
@@ -303,7 +303,7 @@ export default function CourseInfoStep({ course, existingCourses, onCreated, onC
         <div className="flex justify-between pt-2">
           <button type="button" onClick={onCancel} className="text-sm text-gray-500 hover:text-gray-700">{t('common.cancel')}</button>
           <button type="submit" disabled={saving} className="btn-primary px-8">
-            {saving ? '...' : course ? t('courses.saveAndContinue') : t('courses.createAndContinue')}
+            {saving ? '...' : course ? t('courses.saveAndContinue') : t('courses.createAndContinue')} →
           </button>
         </div>
       </form>
