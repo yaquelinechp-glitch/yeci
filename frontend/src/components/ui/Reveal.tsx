@@ -8,6 +8,7 @@ interface Props {
   delay?: number;
   className?: string;
   as?: 'div' | 'section' | 'span';
+  immediate?: boolean;
 }
 
 const DIR_CLASS: Record<Direction, string> = {
@@ -17,11 +18,12 @@ const DIR_CLASS: Record<Direction, string> = {
   zoom: ' zoom',
 };
 
-export default function Reveal({ children, direction = 'up', delay = 0, className = '', as = 'div' }: Props) {
+export default function Reveal({ children, direction = 'up', delay = 0, className = '', as = 'div', immediate = false }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(immediate);
 
   useEffect(() => {
+    if (immediate) return;
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -37,7 +39,7 @@ export default function Reveal({ children, direction = 'up', delay = 0, classNam
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [immediate]);
 
   const Tag = as;
   const delayClass = delay ? ` reveal-delay-${delay}` : '';
