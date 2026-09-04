@@ -7,6 +7,7 @@ import CourseSidebar from './CourseSidebar';
 import VideoPanel from './VideoPanel';
 import QuestionBank from './QuestionBank';
 import ExamEditor from './ExamEditor';
+import CheckpointEditor from './CheckpointEditor';
 
 type View = 'info' | 'editor';
 type EditorView = 'video' | 'bank' | 'exam';
@@ -213,6 +214,9 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
               course={course}
               phase={activePhase}
               day={activeDay}
+              courseId={course.id}
+              selectedVideoId={selectedVideoId}
+              onSelectVideo={setSelectedVideoId}
               onUpload={handleUploadVideo}
               onUploadUrl={handleUploadUrl}
               onRefresh={refresh}
@@ -241,8 +245,10 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
   );
 }
 
-function DayContent({ course, phase, day, onUpload, onUploadUrl, onRefresh }: {
-  course: Course; phase: number; day: number;
+function DayContent({ course, phase, day, courseId, selectedVideoId, onSelectVideo, onUpload, onUploadUrl, onRefresh }: {
+  course: Course; phase: number; day: number; courseId: string;
+  selectedVideoId: string | null;
+  onSelectVideo: (id: string) => void;
   onUpload: (file: File, phase: number, day: number) => Promise<void>;
   onUploadUrl: (url: string, phase: number, day: number) => Promise<void>;
   onRefresh: () => void;
@@ -255,6 +261,8 @@ function DayContent({ course, phase, day, onUpload, onUploadUrl, onRefresh }: {
   const dayVideos = course.videos
     .filter(v => (v.phase || 1) === phase && (v.day || 1) === day)
     .sort((a, b) => a.video_order - b.video_order);
+
+  const selectedVideo = dayVideos.find(v => v.id === selectedVideoId) || null;
 
   const handleFile = async (file: File) => {
     setUploading(true);
@@ -276,17 +284,23 @@ function DayContent({ course, phase, day, onUpload, onUploadUrl, onRefresh }: {
 
       {dayVideos.length > 0 && (
         <div className="space-y-2 mb-4">
-          {dayVideos.map((v, i) => (
-            <div key={v.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <span className="w-6 h-6 rounded-full bg-aconso-100 text-aconso-600 flex items-center justify-center text-[10px] font-bold shrink-0">{i + 1}</span>
-              <div className="w-20 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0">
-                <video className="w-full h-full object-cover" preload="metadata"><source src={v.video_url} /></video>
+          {dayVideos.map((v, i) => {
+            const isActive = v.id === selectedVideoId;
+            return (
+              <div key={v.id}
+                onClick={() => onSelectVideo(isActive ? null : v.id)}
+                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${isActive ? 'bg-aconso-50 ring-2 ring-aconso-500' : 'bg-gray-50 hover:bg-gray-100'}`}>
+                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isActive ? 'bg-aconso-500 text-white' : 'bg-aconso-100 text-aconso-600'}`}>{i + 1}</span>
+                <div className="w-20 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0">
+                  <video className="w-full h-full object-cover" preload="metadata"><source src={v.video_url} /></video>
+                </div>
+                <span className="text-sm text-gray-700 truncate flex-1">
+                  {typeof v.title === 'string' ? v.title : v.title?.en || v.title?.es || v.title?.de || t('courses.untitled')}
+                </span>
+                {isActive && <span className="text-[11px] font-semibold text-aconso-600 shrink-0">{t('checkpoints.title')}</span>}
               </div>
-              <span className="text-sm text-gray-700 truncate flex-1">
-                {typeof v.title === 'string' ? v.title : v.title?.en || v.title?.es || v.title?.de || t('courses.untitled')}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -308,6 +322,21 @@ function DayContent({ course, phase, day, onUpload, onUploadUrl, onRefresh }: {
           </button>
         </div>
       </div>
+
+      {selectedVideo && (
+        <div className="mt-4 p-4 bg-amber-50/30 border border-amber-200 rounded-xl">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+               {t('checkpoints.title')}
+              <span className="text-[11px] font-normal text-gray-400">
+                {typeof selectedVideo.title === 'string' ? selectedVideo.title : selectedVideo.title?.en || selectedVideo.title?.es || selectedVideo.title?.de || ''}
+              </span>
+            </h4>
+            <button onClick={() => onSelectVideo(null)} className="text-gray-400 hover:text-gray-600 text-sm">✕</button>
+          </div>
+          <CheckpointEditor courseId={courseId} video={{ id: selectedVideo.id, video_url: selectedVideo.video_url, title: selectedVideo.title }} />
+        </div>
+      )}
     </div>
   );
 }

@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next';
 import type { CourseVideo, QuizQuestion } from '../../../types';
 import { coursesApi } from '../../../services/api';
 import QuizEditor from './QuizEditor';
-import CheckpointEditor from './CheckpointEditor';
 
-type Tab = 'info' | 'quiz' | 'checkpoints';
+type Tab = 'info' | 'quiz';
 
 interface Props {
   courseId: string;
@@ -16,7 +15,7 @@ interface Props {
 
 export default function VideoPanel({ courseId, video, onRefresh, onClose }: Props) {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<Tab>('checkpoints');
+  const [tab, setTab] = useState<Tab>('quiz');
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
 
@@ -48,10 +47,10 @@ export default function VideoPanel({ courseId, video, onRefresh, onClose }: Prop
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-sm px-1 shrink-0"></button>
         </div>
         <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
-          {(['info', 'quiz', 'checkpoints'] as const).map(t2 => (
+          {(['info', 'quiz'] as const).map(t2 => (
             <button key={t2} onClick={() => setTab(t2)}
               className={`flex-1 py-2 rounded-md text-xs font-semibold transition-all ${tab === t2 ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-              {t2 === 'info' ? ' ' + t('courses.info') : t2 === 'quiz' ? ' Quiz' + (questions.length > 0 ? ` (${questions.length})` : '') : ' ' + t('checkpoints.title')}
+              {t2 === 'info' ? ' ' + t('courses.info') : ' Quiz' + (questions.length > 0 ? ` (${questions.length})` : '')}
             </button>
           ))}
         </div>
@@ -75,8 +74,6 @@ export default function VideoPanel({ courseId, video, onRefresh, onClose }: Prop
               )}
             </div>
           </div>
-        ) : tab === 'checkpoints' ? (
-          <CheckpointEditor courseId={courseId} video={{ id: video.id, video_url: video.video_url, title: video.title }} />
         ) : (
           <div>
             {loadingQuiz ? (
