@@ -126,6 +126,34 @@ body {
   .reveal-visible { animation: none; }
 }
 
+/* Modern phase transitions */
+@keyframes blur-out {
+  0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: translateY(-28px) scale(1.04); filter: blur(10px); }
+}
+
+@keyframes blur-in {
+  0% { opacity: 0; transform: translateY(28px) scale(0.96); filter: blur(10px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes rise-in {
+  0% { opacity: 0; transform: translateY(20px); filter: blur(6px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.animate-blur-out {
+  animation: blur-out 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-blur-in {
+  animation: blur-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise-in {
+  animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* 3D flip card */
 .flip-perspective {
   perspective: 1200px;
