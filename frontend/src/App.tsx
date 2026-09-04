@@ -16,6 +16,7 @@ import AdminSecurity from './pages/Admin/Security';
 import AdminLmsReport from './pages/Admin/LmsReport';
 import AdminConflicts from './pages/Admin/Conflicts';
 import AdminCostExport from './pages/Admin/CostExport';
+import AdminCourseAnalytics from './pages/Admin/CourseAnalytics';
 
 import PartnerDashboard from './pages/Partner/Dashboard';
 import PartnerCourses from './pages/Partner/Courses';
@@ -52,6 +53,7 @@ export default function App() {
 <Route path="lms-report" element={<AdminLmsReport />} />
 <Route path="conflicts" element={<AdminConflicts />} />
 <Route path="cost-export" element={<AdminCostExport />} />
+<Route path="course-analytics" element={<AdminCourseAnalytics />} />
 </Route>
 
         <Route path="/partner" element={<ProtectedRoute role="socio"><DashboardLayout /></ProtectedRoute>}>

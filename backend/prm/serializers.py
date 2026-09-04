@@ -78,6 +78,7 @@ class CourseSerializer(serializers.ModelSerializer):
     rating_avg = serializers.SerializerMethodField()
     rating_count = serializers.SerializerMethodField()
     rated = serializers.SerializerMethodField()
+    total_duration = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -85,9 +86,9 @@ class CourseSerializer(serializers.ModelSerializer):
             "id", "title", "description", "thumbnail_url", "category",
             "level", "track", "status", "related_products", "pass_mark", "validity_months",
             "prerequisite_course_id", "prerequisite", "quiz_questions_count",
-            "exam_questions_count", "materials",
+            "exam_questions_count", "max_quiz_attempts", "materials",
             "phase_config", "videos", "video_count", "progress_pct", "completed",
-            "deadline", "rating_avg", "rating_count", "rated", "created_at",
+            "deadline", "rating_avg", "rating_count", "rated", "total_duration", "created_at",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -152,6 +153,10 @@ class CourseSerializer(serializers.ModelSerializer):
             return prog.completed if prog else False
         return False
 
+    def get_total_duration(self, obj):
+        from django.db.models import Sum
+        return obj.videos.aggregate(total=Sum('duration_seconds'))['total'] or 0
+
 
 class CourseCreateSerializer(serializers.Serializer):
     title = serializers.JSONField()
@@ -167,6 +172,7 @@ class CourseCreateSerializer(serializers.Serializer):
     prerequisite_course_id = serializers.CharField(default="", required=False, allow_blank=True)
     quiz_questions_count = serializers.IntegerField(default=8, required=False)
     exam_questions_count = serializers.IntegerField(default=5, required=False)
+    max_quiz_attempts = serializers.IntegerField(default=3, required=False)
     materials = serializers.JSONField(default=list, required=False)
     phase_config = serializers.JSONField(default=list, required=False)
 
@@ -185,6 +191,7 @@ class CourseUpdateSerializer(serializers.Serializer):
     prerequisite_course_id = serializers.CharField(required=False, allow_blank=True)
     quiz_questions_count = serializers.IntegerField(required=False)
     exam_questions_count = serializers.IntegerField(required=False)
+    max_quiz_attempts = serializers.IntegerField(required=False)
     materials = serializers.JSONField(required=False)
     phase_config = serializers.JSONField(required=False)
 

@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      nav: { home: 'Home', login: 'Login', register: 'Register', logout: 'Logout', dashboard: 'Dashboard', partners: 'Partners', courses: 'Courses', pipeline: 'Pipeline', deals: 'My Deals', reports: 'Reports', requests: 'Requests', security: 'Security', admin: 'Admin', training: 'Training', lmsReport: 'LMS Report', users: 'Team Members', conflicts: 'Conflicts', notifications: 'Notifications', brand: 'Partner Academy', costExport: 'Cost Indication Texts' },
+      nav: { home: 'Home', login: 'Login', register: 'Register', logout: 'Logout', dashboard: 'Dashboard', partners: 'Partners', courses: 'Courses', pipeline: 'Pipeline', deals: 'My Deals', reports: 'Reports', requests: 'Requests', security: 'Security', admin: 'Admin', training: 'Training', lmsReport: 'LMS Report', users: 'Team Members', conflicts: 'Conflicts', notifications: 'Notifications', brand: 'Partner Academy', costExport: 'Cost Indication Texts', courseAnalytics: 'Course Analytics' },
       landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Work with aconso: deal registration, team training and rewards.',
         cta: 'Access the Portal →', ctaSecondary: 'What the portal includes', programTitle: 'Partner Portal',
@@ -278,6 +278,13 @@ const resources = {
         noRatings: 'No ratings yet',
         assignedToYou: 'Assigned to you',
         noAssignments: 'Not assigned',
+        totalDuration: 'Duration',
+        attemptsRemaining: 'Attempts remaining',
+        maxAttemptsReached: 'Max attempts reached',
+        dueInDays: 'Due in {n} days',
+        overdue: 'Overdue',
+        assignCourse: 'Assign Course',
+        existingAssignments: 'Existing Assignments',
         editCourse: 'Edit Course', editCourseDesc: 'Edit course details',
         createCourseDesc: 'Fill in the course details',
         courseIdentity: 'Course Identity', courseConfig: 'Configuration',
@@ -437,6 +444,7 @@ const resources = {
         levels: { associate: 'Associate', professional: 'Professional', expert: 'Expert' },
         statuses: { valid: 'Valid', pending_update: 'Valid, update pending', expired: 'Expired' },
         validUntil: 'Valid until',
+        exportExcel: 'Export to Excel',
         tracks: 'Learning Paths',
         trackVentas: 'Route A — Sales',
         trackTecnica: 'Route B — Technical',
@@ -485,7 +493,7 @@ const resources = {
   },
   es: {
     translation: {
-      nav: { home: 'Inicio', login: 'Iniciar Sesión', register: 'Registrarse', logout: 'Cerrar Sesión', dashboard: 'Panel', partners: 'Partners', courses: 'Cursos', pipeline: 'Pipeline', deals: 'Mis Deals', reports: 'Reportes', requests: 'Solicitudes', security: 'Seguridad', admin: 'Administrador', training: 'Formación', lmsReport: 'Informe LMS', users: 'Equipo', conflicts: 'Conflictos', notifications: 'Notificaciones', brand: 'Partner Academy', costExport: 'Textos Indicador Costos' },
+      nav: { home: 'Inicio', login: 'Iniciar Sesión', register: 'Registrarse', logout: 'Cerrar Sesión', dashboard: 'Panel', partners: 'Partners', courses: 'Cursos', pipeline: 'Pipeline', deals: 'Mis Deals', reports: 'Reportes', requests: 'Solicitudes', security: 'Seguridad', admin: 'Administrador', training: 'Formación', lmsReport: 'Informe LMS', users: 'Equipo', conflicts: 'Conflictos', notifications: 'Notificaciones', brand: 'Partner Academy', costExport: 'Textos Indicador Costos', courseAnalytics: 'Analítica de Cursos' },
 landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Trabaja con aconso: registro de deals, formación de tu equipo y recompensas.',
         cta: 'Acceder al Portal →', ctaSecondary: 'Qué incluye el portal', programTitle: 'Portal de Partners',
@@ -758,6 +766,13 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         noRatings: 'Aún no hay valoraciones',
         assignedToYou: 'Asignado a ti',
         noAssignments: 'No asignado',
+        totalDuration: 'Duración',
+        attemptsRemaining: 'Intentos restantes',
+        maxAttemptsReached: 'Máximo de intentos alcanzado',
+        dueInDays: 'Vence en {n} días',
+        overdue: 'Vencido',
+        assignCourse: 'Asignar Curso',
+        existingAssignments: 'Asignaciones existentes',
         editCourse: 'Editar Curso', editCourseDesc: 'Editar detalles del curso',
         createCourseDesc: 'Completa los detalles del curso',
         courseIdentity: 'Identidad del Curso', courseConfig: 'Configuración',
@@ -918,6 +933,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         levels: { associate: 'Associate', professional: 'Professional', expert: 'Expert' },
         statuses: { valid: 'Válido', pending_update: 'Válido, actualización pendiente', expired: 'Caducado' },
         validUntil: 'Válido hasta',
+        exportExcel: 'Exportar a Excel',
         tracks: 'Rutas de aprendizaje',
         trackVentas: 'Ruta A — Ventas',
         trackTecnica: 'Ruta B — Técnica',
@@ -966,7 +982,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
   },
   de: {
     translation: {
-      nav: { home: 'Startseite', login: 'Anmelden', register: 'Registrieren', logout: 'Abmelden', dashboard: 'Dashboard', partners: 'Partner', courses: 'Kurse', pipeline: 'Pipeline', deals: 'Meine Deals', reports: 'Berichte', requests: 'Anfragen', security: 'Sicherheit', admin: 'Administrator', training: 'Schulung', lmsReport: 'LMS-Bericht', users: 'Team', conflicts: 'Konflikte', notifications: 'Benachrichtigungen', brand: 'Partner Academy', costExport: 'Kostenindikation-Texte' },
+      nav: { home: 'Startseite', login: 'Anmelden', register: 'Registrieren', logout: 'Abmelden', dashboard: 'Dashboard', partners: 'Partner', courses: 'Kurse', pipeline: 'Pipeline', deals: 'Meine Deals', reports: 'Berichte', requests: 'Anfragen', security: 'Sicherheit', admin: 'Administrator', training: 'Schulung', lmsReport: 'LMS-Bericht', users: 'Team', conflicts: 'Konflikte', notifications: 'Benachrichtigungen', brand: 'Partner Academy', costExport: 'Kostenindikation-Texte', courseAnalytics: 'Kursanalyse' },
       landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Arbeiten Sie mit aconso: Deal-Registrierung, Team-Schulung und Prämien.',
         cta: 'Zum Portal →', ctaSecondary: 'Was das Portal enthält', programTitle: 'Partner-Portal',
@@ -1239,6 +1255,13 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         noRatings: 'Noch keine Bewertungen',
         assignedToYou: 'Dir zugewiesen',
         noAssignments: 'Nicht zugewiesen',
+        totalDuration: 'Dauer',
+        attemptsRemaining: 'Verbleibende Versuche',
+        maxAttemptsReached: 'Maximale Versuche erreicht',
+        dueInDays: 'Fällig in {n} Tagen',
+        overdue: 'Überfällig',
+        assignCourse: 'Kurs zuweisen',
+        existingAssignments: 'Bestehende Zuweisungen',
         editCourse: 'Kurs bearbeiten', editCourseDesc: 'Kursdetails bearbeiten',
         createCourseDesc: 'Kursdetails ausfüllen',
         courseIdentity: 'Kursidentität', courseConfig: 'Konfiguration',
@@ -1399,6 +1422,7 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         levels: { associate: 'Associate', professional: 'Professional', expert: 'Expert' },
         statuses: { valid: 'Gültig', pending_update: 'Gültig, Update ausstehend', expired: 'Abgelaufen' },
         validUntil: 'Gültig bis',
+        exportExcel: 'Nach Excel exportieren',
         tracks: 'Lernpfade',
         trackVentas: 'Route A — Vertrieb',
         trackTecnica: 'Route B — Technik',

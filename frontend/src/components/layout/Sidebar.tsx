@@ -59,6 +59,7 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
         { to: '/admin/pipeline', label: t('nav.pipeline'), badge: pipelineBadge },
         { to: '/admin/courses', label: t('nav.courses'), },
         { to: '/admin/lms-report', label: t('nav.lmsReport'), },
+        { to: '/admin/course-analytics', label: t('nav.courseAnalytics'), },
         { to: '/admin/conflicts', label: t('nav.conflicts'), },
         { to: '/admin/reports', label: t('nav.reports'), },
         { to: '/admin/cost-export', label: t('nav.costExport'), },

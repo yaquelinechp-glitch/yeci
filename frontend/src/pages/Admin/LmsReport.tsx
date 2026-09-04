@@ -29,6 +29,7 @@ export default function AdminLmsReport() {
   const [courses, setCourses] = useState<ReportCourse[]>([]);
   const [partners, setPartners] = useState<ReportPartner[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     lmsApi.report().then((r) => {
@@ -36,6 +37,22 @@ export default function AdminLmsReport() {
       setPartners(r.data.partners || []);
     }).catch(() => { }).finally(() => setLoading(false));
   }, []);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const r = await lmsApi.exportExcel();
+      const blob = new Blob([r.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lms-report.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch { /* */ } finally { setExporting(false); }
+  };
 
   if (loading) {
     return (
@@ -51,8 +68,15 @@ export default function AdminLmsReport() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900"> {t('lms.reportTitle')}</h1>
-        <p className="text-gray-500 mt-1">{t('lms.reportSubtitle')}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900"> {t('lms.reportTitle')}</h1>
+            <p className="text-gray-500 mt-1">{t('lms.reportSubtitle')}</p>
+          </div>
+          <button onClick={handleExport} disabled={exporting} className="btn-primary disabled:opacity-50">
+            {exporting ? t('common.loading') : t('lms.exportExcel')}
+          </button>
+        </div>
       </div>
 
       <div className="card p-6 mb-6">

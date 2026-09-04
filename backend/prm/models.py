@@ -81,8 +81,10 @@ class Course(models.Model):
     pass_mark = models.IntegerField(default=80)
     validity_months = models.IntegerField(default=12)
     prerequisite_course_id = models.CharField(max_length=100, blank=True, default="")
+    max_quiz_attempts = models.IntegerField(default=3)
     quiz_questions_count = models.IntegerField(default=8)
     exam_questions_count = models.IntegerField(default=5)
+    max_quiz_attempts = models.IntegerField(default=3)
     materials = models.JSONField(default=list, blank=True)
     phase_config = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -684,6 +686,17 @@ class Notification(models.Model):
         return f"{self.partner_id} {self.type} {self.id}"
 
 
+class VideoWatchEvent(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
+    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="watch_events")
+    video = models.ForeignKey(CourseVideo, on_delete=models.CASCADE, related_name="watch_events")
+    watch_seconds = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("partner", "video")
+
+
 class CostExportSetting(models.Model):
     """Admin-configurable fixed texts for the partner cost-exporter (Excel export of the ARR calculator)."""
 
@@ -699,3 +712,14 @@ class CostExportSetting(models.Model):
 
     def __str__(self):
         return "CostExportSetting"
+
+
+class VideoWatchEvent(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
+    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="watch_events")
+    video = models.ForeignKey(CourseVideo, on_delete=models.CASCADE, related_name="watch_events")
+    watch_seconds = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("partner", "video")

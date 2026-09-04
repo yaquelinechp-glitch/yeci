@@ -17,6 +17,7 @@ urlpatterns = [
     path("courses/", views.courses_list_or_create),
     path("courses/progress", views.update_progress),
     path("courses/progress/<str:partner_id>", views.get_partner_progress),
+    path("courses/watch-time", views.track_watch_time),
     path("courses/quiz-bank", views.quiz_bank),
     path("courses/quiz-bank/<str:question_id>", views.quiz_bank_detail),
     path("materials/upload", views.upload_material),
@@ -74,6 +75,9 @@ urlpatterns = [
 
     path("lms/overview", views.lms_overview),
     path("lms/report", views.lms_report),
+    path("lms/export", views.lms_export_excel),
+    path("lms/analytics", views.lms_analytics),
+    path("lms/check-deadlines", views.check_deadline_reminders),
     path("lms/certificate/<str:course_id>", views.certificate_download),
     path("lms/onboarding", views.onboarding_view),
     path("lms/onboarding/step", views.onboarding_step),

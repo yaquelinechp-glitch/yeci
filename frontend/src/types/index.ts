@@ -62,6 +62,8 @@ export interface Course {
   rating_avg: number;
   rating_count: number;
   rated: boolean;
+  total_duration: number;
+  max_quiz_attempts: number;
   created_at: string;
 }
 
@@ -403,5 +405,18 @@ export interface ConflictStats {
   closed?: number;
   by_status?: Record<string, number>;
   by_company?: { company_name: string; count: number }[];
+}
+
+export interface LmsAnalytics {
+  courses: {
+    course_id: string;
+    title: string;
+    track: string;
+    enrolled: number;
+    started: number;
+    quiz_passed: number;
+    completed: number;
+    exam_passed: number;
+  }[];
 }
 

@@ -11,6 +11,28 @@ const TRACK_BADGE: Record<string, string> = {
   todas: 'bg-gray-100 text-gray-600',
 };
 
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function deadlineBadge(deadline: string | null, t: any) {
+  if (!deadline) return null;
+  const now = new Date();
+  const dl = new Date(deadline);
+  const diffMs = dl.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / 86400000);
+  if (diffDays < 0) {
+    return <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-red-100 text-red-700">{t('courses.overdue')}</span>;
+  }
+  if (diffDays <= 3) {
+    return <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-amber-100 text-amber-700">{t('courses.dueInDays', { n: diffDays })}</span>;
+  }
+  return <span className="text-[11px] text-amber-600 font-medium">{deadline.slice(0, 10)}</span>;
+}
+
 export default function PartnerCourses() {
   const { t, i18n } = useTranslation();
   const [courses, setCourses] = useState<Course[]>([]);

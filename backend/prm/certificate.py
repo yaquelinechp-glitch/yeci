@@ -1,4 +1,4 @@
-"""Minimal pure-Python PDF certificate generator (Helvetica / WinAnsi)."""
+"""Pure-Python PDF certificate generator with decorative design (Helvetica / WinAnsi)."""
 
 
 def _pdf_escape(text):
@@ -18,8 +18,13 @@ def _to_winansi(text):
         return ""
 
 
+def _text_line(text, size, x, y, color_rgb, bold=False):
+    font = "/F2" if bold else "/F1"
+    return f"BT {font} {size} Tf {color_rgb} rg 1 0 0 1 {x:.1f} {y} Tm ({_to_winansi(_pdf_escape(text))}) Tj ET"
+
+
 def build_certificate_pdf(partner_name, course_title, score, date_str, lang="es", accent_rgb=(58, 170, 53)):
-    """Return bytes of a single-page A4 (612x792 pt) certificate."""
+    """Return bytes of a single-page A4 (612x792 pt) certificate with decorative design."""
     if lang == "es":
         issuer = "aconso Partner Academy"
         doc_title = "CERTIFICADO"
@@ -27,6 +32,7 @@ def build_certificate_pdf(partner_name, course_title, score, date_str, lang="es"
         completed = "ha completado satisfactoriamente el curso"
         score_label = "con una puntuacion de"
         date_label = "Fecha"
+        cert_id_label = "ID de certificado"
     elif lang == "de":
         issuer = "aconso Partner Akademie"
         doc_title = "ZERTIFIKAT"
@@ -34,6 +40,7 @@ def build_certificate_pdf(partner_name, course_title, score, date_str, lang="es"
         completed = "den Kurs erfolgreich abgeschlossen hat"
         score_label = "mit einer Punktzahl von"
         date_label = "Datum"
+        cert_id_label = "Zertifikat-ID"
     else:
         issuer = "aconso Partner Academy"
         doc_title = "CERTIFICATE"
@@ -41,38 +48,87 @@ def build_certificate_pdf(partner_name, course_title, score, date_str, lang="es"
         completed = "has successfully completed the course"
         score_label = "with a score of"
         date_label = "Date"
-
-    entries = [
-        (issuer, 24, "accent"),
-        (doc_title, 17, "dark"),
-        ("", 14, "dark"),
-        (body, 12, "dark"),
-        (partner_name, 17, "dark"),
-        (completed, 12, "dark"),
-        (course_title, 14, "dark"),
-        (f"{score_label} {score}%", 11, "dark"),
-        ("", 14, "dark"),
-        (f"{date_label}: {date_str}", 11, "dark"),
-    ]
+        cert_id_label = "Certificate ID"
 
     accent = " ".join(str(v) for v in accent_rgb)
-    ops = []
-    # decorative border
-    ops.append("q 1.5 w %s rg 36 36 540 720 re S 2.5 w 44 44 524 704 re S Q" % accent)
-    # small fill bar
-    ops.append("q %s rg 306 52 0 4 m 306 56 l 0 0 0 0 h Q" % accent)
+    dark = "0.16 0.16 0.16"
+    mid = "0.45 0.45 0.45"
+    light_bg = "0.97 0.97 0.97"
 
-    y = 690
-    for text, size, color in entries:
-        txt = _to_winansi(_pdf_escape(text))
-        if txt:
-            width = size * 0.5 * len(txt)
-            x = 306 - width / 2
-        else:
-            x = 306
-        fill = accent if color == "accent" else "0.16 0.16 0.16"
-        ops.append(f"BT /F1 {size} Tf {fill} rg 1 0 0 1 {x:.1f} {y} Tm ({txt}) Tj ET")
-        y -= size * 1.55
+    ops = []
+
+    # Background light fill
+    ops.append(f"q {light_bg} rg 0 0 612 792 re f Q")
+
+    # Top decorative bar
+    ops.append(f"q {accent} rg 0 740 612 52 re f Q")
+
+    # Bottom decorative bar
+    ops.append(f"q {accent} rg 0 0 612 40 re f Q")
+
+    # Outer border
+    ops.append(f"q 2 w {accent} rg 30 30 552 732 re S Q")
+
+    # Inner border
+    ops.append(f"q 0.8 w 0.7 0.7 0.7 rg 42 42 528 708 re S Q")
+
+    # Decorative corner diamonds
+    for cx, cy in [(42, 42), (570, 42), (42, 750), (570, 750)]:
+        ops.append(f"q {accent} rg {cx} {cy} 5 0 360 arc f Q")
+
+    # Small decorative line under header bar
+    ops.append(f"q {accent} rg 180 730 252 1.5 re f Q")
+
+    # "aconso" brand in header
+    ops.append(_text_line(issuer, 14, 306, 762, "1 1 1", bold=True))
+
+    # Certificate title
+    ops.append(_text_line(doc_title, 28, 306, 700, accent, bold=True))
+
+    # Decorative line under title
+    ops.append(f"q {accent} rg 200 690 212 1 re f Q")
+
+    # Body text
+    y = 665
+    ops.append(_text_line(body, 13, 306, y, dark))
+    y -= 35
+
+    # Partner name (large, bold)
+    ops.append(_text_line(partner_name, 22, 306, y, dark, bold=True))
+    y -= 15
+
+    # Underline for name
+    name_w = min(len(partner_name) * 11, 400)
+    ops.append(f"q {accent} rg {306 - name_w/2:.1f} {y} {name_w:.1f} 0.8 re f Q")
+    y -= 30
+
+    # Course completion text
+    ops.append(_text_line(completed, 13, 306, y, dark))
+    y -= 28
+
+    # Course title
+    ops.append(_text_line(course_title, 16, 306, y, dark, bold=True))
+    y -= 30
+
+    # Score badge
+    score_text = f"{score_label} {score}%"
+    ops.append(_text_line(score_text, 13, 306, y, dark))
+    y -= 25
+
+    # Score visual bar
+    bar_width = 200
+    bar_x = 306 - bar_width / 2
+    ops.append(f"q 0.85 0.85 0.85 rg {bar_x:.1f} {y} {bar_width} 8 re f Q")
+    filled = int(bar_width * min(score, 100) / 100)
+    if filled > 0:
+        ops.append(f"q {accent} rg {bar_x:.1f} {y} {filled} 8 re f Q")
+    y -= 30
+
+    # Date and cert ID
+    import hashlib
+    cert_hash = hashlib.md5(f"{partner_name}:{course_title}:{score}:{date_str}".encode()).hexdigest()[:12].upper()
+    ops.append(_text_line(f"{date_label}: {date_str}", 10, 200, y, mid))
+    ops.append(_text_line(f"{cert_id_label}: {cert_hash}", 10, 410, y, mid))
 
     content = "\n".join(ops).encode("latin-1", "replace")
     objs = []
@@ -80,10 +136,11 @@ def build_certificate_pdf(partner_name, course_title, score, date_str, lang="es"
     objs.append(b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>")
     objs.append(
         b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
-        b"/Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>"
+        b"/Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>"
     )
     objs.append(b"<< /Length %d >>\nstream\n" % len(content) + content + b"\nendstream")
     objs.append(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>")
+    objs.append(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>")
 
     out = bytearray(b"%PDF-1.4\n")
     offsets = []

@@ -103,6 +103,7 @@ export const coursesApi = {
   getAssignments: (courseId: string) => api.get(`/courses/${courseId}/assignments`),
   createAssignment: (courseId: string, partnerId: string, deadline: string) => api.post(`/courses/${courseId}/assignments`, { partner_id: partnerId, deadline }),
   deleteAssignment: (courseId: string, assignmentId: string) => api.delete(`/courses/${courseId}/assignments/${assignmentId}`),
+  trackWatchTime: (videoId: string, watchSeconds: number) => api.post('/courses/watch-time', { video_id: videoId, watch_seconds: watchSeconds }),
 };
 
 export const dealsApi = {
@@ -170,6 +171,9 @@ export const lmsApi = {
   onboarding: () => api.get(`/lms/onboarding?lang=${lang()}`),
   startOnboarding: () => api.post(`/lms/onboarding?lang=${lang()}`),
   setOnboardingStep: (key: string, done: boolean) => api.patch(`/lms/onboarding/step?lang=${lang()}`, { key, done }),
+  exportExcel: () => api.get('/lms/export', { responseType: 'blob' }),
+  analytics: () => api.get('/lms/analytics'),
+  checkDeadlines: () => api.get('/lms/check-deadlines'),
 };
 
 export const adminApi = {

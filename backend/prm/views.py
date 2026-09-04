@@ -21,7 +21,7 @@ from django.db.models import Sum, Q, Count, F, Avg
 
 from .models import (
     Partner, Course, CourseVideo, QuizQuestion, QuizBankQuestion, CourseAssignment,
-    CourseRating, QuizAttempt, PartnerProgress,
+    CourseRating, QuizAttempt, PartnerProgress, VideoWatchEvent,
     Deal, Commission, Opportunity, OpportunityEvent, TrainingResult, Certification,
     TokenBlacklist, LoginAttempt, PartnerOnboarding, PartnerUser, MdfRequest,
     Reward, RewardRedemption, PointTransaction, ChannelConflict,
@@ -43,6 +43,7 @@ from .serializers import (
     OpportunitySerializer, OpportunityCreateSerializer, OpportunityUpdateSerializer,
     OpportunityEventSerializer, TrainingResultSerializer, CertificationSerializer,
     ProductSerializer, NotificationSerializer, CourseExamQuestionSerializer,
+    localize,
 )
 
 
@@ -390,6 +391,8 @@ def courses_list_or_create(request):
     if request.method == "GET":
         if user.role == "socio" and user.status != "activo":
             return Response({"detail": "Solo partners aprobados pueden ver cursos"}, status=403)
+        if user.role == "admin":
+            _check_deadline_reminders()
         partner = user if user.role == "socio" else None
         courses = _visible_courses(user)
         return Response(CourseSerializer(courses, many=True, partner=partner, lang=lang).data)
@@ -892,6 +895,13 @@ def course_exam_submit(request, course_id):
     except Course.DoesNotExist:
         return Response({"detail": "Course not found"}, status=404)
 
+    if course.prerequisite_course_id:
+        prereq_done = PartnerProgress.objects.filter(
+            partner=user, course_id=course.prerequisite_course_id, completed=True
+        ).exists()
+        if not prereq_done:
+            return Response({"detail": "Prerequisite course not completed"}, status=403)
+
     exam = _exam_questions(course, str(user.id))
     answers = request.data.get("answers", [])
     answers_by_id = {a.get("question_id"): a for a in answers}
@@ -944,6 +954,12 @@ def course_exam_submit(request, course_id):
             prog.completed_at = dj_timezone.now()
         prog.save()
         _recompute_certification(user)
+        _notify(
+            [user.id], "curso_completado",
+            {"en": f"Course completed: {course.title.get('en','')}", "es": f"Curso completado: {course.title.get('es','') or course.title.get('en','')}", "de": f"Kurs abgeschlossen: {course.title.get('de','') or course.title.get('en','')}"},
+            {"en": "Congratulations! You have completed the course.", "es": "Felicidades! Has completado el curso.", "de": "Herzlichen Glück! Sie haben den Kurs abgeschlossen."},
+            "/partner/courses",
+        )
 
     return Response({"score": score, "correct": correct_count, "total": total, "passed": passed, "pass_mark": course.pass_mark, "results": results})
 
@@ -1250,6 +1266,27 @@ def submit_quiz(request, course_id, video_id):
     except (CourseVideo.DoesNotExist, Course.DoesNotExist):
         return Response({"detail": "Video not found"}, status=404)
 
+    if course.prerequisite_course_id:
+        prereq_done = PartnerProgress.objects.filter(
+            partner=user, course_id=course.prerequisite_course_id, completed=True
+        ).exists()
+        if not prereq_done:
+            return Response({"detail": "Prerequisite course not completed"}, status=403)
+
+    from django.db.models.functions import TruncSecond
+    rounds = (
+        QuizAttempt.objects.filter(partner=user, video=video)
+        .annotate(second=TruncSecond("created_at"))
+        .values("second")
+        .distinct()
+        .count()
+    )
+    if rounds >= course.max_quiz_attempts:
+        return Response(
+            {"detail": "Max quiz attempts reached", "max_attempts": course.max_quiz_attempts, "attempts_used": rounds},
+            status=403,
+        )
+
     answers = request.data.get("answers", [])
     if not answers:
         return Response({"detail": "No answers provided"}, status=400)
@@ -1317,8 +1354,14 @@ def submit_quiz(request, course_id, video_id):
 
     if passed and prog.completed:
         _recompute_certification(user)
+        _notify(
+            [user.id], "curso_completado",
+            {"en": f"Course completed: {course.title.get('en','')}", "es": f"Curso completado: {course.title.get('es','') or course.title.get('en','')}", "de": f"Kurs abgeschlossen: {course.title.get('de','') or course.title.get('en','')}"},
+            {"en": "Congratulations! You have completed the course.", "es": "Felicidades! Has completado el curso.", "de": "Herzlichen Glück! Sie haben den Kurs abgeschlossen."},
+            "/partner/courses",
+        )
 
-    return Response({"score": score, "correct": correct_count, "total": total, "passed": passed, "pass_mark": pass_mark, "results": results})
+    return Response({"score": score, "correct": correct_count, "total": total, "passed": passed, "pass_mark": pass_mark, "results": results, "attempts_used": rounds, "max_attempts": course.max_quiz_attempts})
 
 
 @api_view(["GET"])
@@ -3661,3 +3704,160 @@ def openpyxl_font(bold=False, italic=False, size=11, color="000000"):
 def openpyxl_fill(hex_color):
     from openpyxl.styles import PatternFill
     return PatternFill(start_color=hex_color, end_color=hex_color, fill_type="solid")
+
+
+# ─── LMS Export Excel (Feature 2) ──────────────────────
+
+
+@api_view(["GET"])
+def lms_export_excel(request):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+
+    import io
+    from openpyxl import Workbook
+
+    wb = Workbook()
+
+    ws_courses = wb.active
+    ws_courses.title = "Courses"
+    ws_courses.append(["Course Title", "Track", "Started", "Completed", "Completion Rate", "Pass Rate"])
+
+    for c in Course.objects.all():
+        started = PartnerProgress.objects.filter(course=c).exclude(progress_pct=0).count()
+        completed = PartnerProgress.objects.filter(course=c, completed=True).count()
+        passed_results = TrainingResult.objects.filter(course=c, passed=True).count()
+        total_results = TrainingResult.objects.filter(course=c).count()
+        completion_rate = round(completed / started * 100) if started else 0
+        pass_rate = round(passed_results / total_results * 100) if total_results else 0
+        ws_courses.append([
+            c.title.get("en") or "",
+            c.track or "",
+            started,
+            completed,
+            completion_rate,
+            pass_rate,
+        ])
+
+    ws_partners = wb.create_sheet("Partners")
+    ws_partners.append(["Company Name", "Track", "Courses Completed", "Certification Level", "Cert Status"])
+
+    for p in Partner.objects.exclude(role="admin"):
+        _refresh_certification_status(p)
+        cert = Certification.objects.filter(partner=p).first()
+        courses_completed = PartnerProgress.objects.filter(partner=p, completed=True).count()
+        ws_partners.append([
+            p.company_name,
+            p.training_track or "",
+            courses_completed,
+            cert.level if cert else "",
+            cert.status if cert else "",
+        ])
+
+    bio = io.BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    resp = HttpResponse(
+        bio.read(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = 'attachment; filename="lms_report.xlsx"'
+    return resp
+
+
+# ─── Deadline Reminders (Feature 4) ────────────────────
+
+
+_deadline_reminder_last_run = None
+
+
+def _check_deadline_reminders():
+    global _deadline_reminder_last_run
+    now = dj_timezone.now()
+    if _deadline_reminder_last_run is not None and (now - _deadline_reminder_last_run).total_seconds() < 3600:
+        return 0
+    _deadline_reminder_last_run = now
+
+    today = dj_timezone.localdate()
+    deadline_threshold = today + timedelta(days=3)
+    assignments = CourseAssignment.objects.filter(deadline__lte=deadline_threshold).select_related("course", "partner")
+    created_count = 0
+    for asg in assignments:
+        already = Notification.objects.filter(
+            partner=asg.partner,
+            type="curso_asignado",
+            created_at__date=today,
+        ).filter(
+            Q(title__icontains=asg.course.title.get("en") or "") | Q(message__icontains="deadline")
+        ).exists()
+        if already:
+            continue
+        is_overdue = asg.deadline < today
+        if is_overdue:
+            title = {"en": f"Course overdue: {asg.course.title.get('en','')}", "es": f"Curso vencido: {asg.course.title.get('es','') or asg.course.title.get('en','')}", "de": f"Kurs überfällig: {asg.course.title.get('de','') or asg.course.title.get('en','')}"}
+            message = {"en": f"The deadline was {asg.deadline.isoformat()}. Please complete the course.", "es": f"La fecha límite fue {asg.deadline.isoformat()}. Por favor completa el curso.", "de": f"Die Frist war am {asg.deadline.isoformat()}. Bitte schließen Sie den Kurs ab."}
+        else:
+            title = {"en": f"Deadline approaching: {asg.course.title.get('en','')}", "es": f"Fecha límite próxima: {asg.course.title.get('es','') or asg.course.title.get('en','')}", "de": f"Deadline bevorsteht: {asg.course.title.get('de','') or asg.course.title.get('en','')}"}
+            message = {"en": f"The deadline is {asg.deadline.isoformat()}. Please complete the course.", "es": f"La fecha límite es {asg.deadline.isoformat()}. Por favor completa el curso.", "de": f"Die Frist ist am {asg.deadline.isoformat()}. Bitte schließen Sie den Kurs ab."}
+        _notify([asg.partner_id], "curso_asignado", title, message, "/partner/courses")
+        created_count += 1
+    return created_count
+
+
+@api_view(["GET"])
+def check_deadline_reminders(request):
+    user = _current_user(request)
+    if not user:
+        return Response({"detail": "Unauthorized"}, status=401)
+    count = _check_deadline_reminders()
+    return Response({"ok": True, "created": count})
+
+
+# ─── Watch Time Tracking (Feature 8) ───────────────────
+
+
+@api_view(["POST"])
+def track_watch_time(request):
+    user = _current_user(request)
+    if not user:
+        return Response({"detail": "Unauthorized"}, status=401)
+    video_id = request.data.get("video_id")
+    watch_seconds = int(request.data.get("watch_seconds", 0))
+    if not video_id:
+        return Response({"detail": "video_id required"}, status=400)
+    event, created = VideoWatchEvent.objects.update_or_create(
+        partner=user, video_id=video_id,
+        defaults={"watch_seconds": watch_seconds},
+    )
+    return Response({"ok": True, "watch_seconds": event.watch_seconds})
+
+
+# ─── LMS Analytics (Feature 9) ─────────────────────────
+
+
+@api_view(["GET"])
+def lms_analytics(request):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+
+    courses_data = []
+    for c in Course.objects.all():
+        enrolled = PartnerProgress.objects.filter(course=c).count()
+        started = PartnerProgress.objects.filter(course=c).exclude(progress_pct=0).count()
+        quiz_passed = PartnerProgress.objects.filter(course=c).exclude(progress_pct=0).count()
+        completed = PartnerProgress.objects.filter(course=c, completed=True).count()
+        exam_passed = TrainingResult.objects.filter(course=c, passed=True).count()
+        courses_data.append({
+            "course_id": c.id,
+            "title": localize(c, "title", "en"),
+            "track": c.track,
+            "enrolled": enrolled,
+            "started": started,
+            "quiz_passed": quiz_passed,
+            "completed": completed,
+            "exam_passed": exam_passed,
+        })
+
+    return Response({"courses": courses_data})
