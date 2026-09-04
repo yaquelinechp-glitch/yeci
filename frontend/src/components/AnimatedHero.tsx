@@ -2,15 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-const PHASE1_DURATION = 6000;
-const STEP_INTERVAL = 750;
-const CARD_INTERVAL = 3500;
+const PHASE1_DURATION = 4300;
+const STEP_INTERVAL = 700;
+const CARD_INTERVAL = 2600;
 const FADE_MS = 850;
 const EXIT_MS = 1350;
 
 export default function AnimatedHero() {
   const { t } = useTranslation();
-  const [phase, setPhase] = useState<1 | 2 | 3>(1);
+  const [phase, setPhase] = useState<1 | 2 | 3 | 4>(1);
   const [exiting, setExiting] = useState(false);
   const [phase2Step, setPhase2Step] = useState(-1);
   const [cardIdx, setCardIdx] = useState(0);
@@ -56,14 +56,21 @@ export default function AnimatedHero() {
     return () => { window.clearInterval(id); clearTimers(); };
   }, [phase]);
 
-  // Phase 3: rotate cards like a page-turn cycle
+  // Phase 3: rotate cards like a page-turn cycle, then → 4 (login invite)
   useEffect(() => {
     if (phase !== 3) return;
+    const cyclesRef = { n: 0 };
     const id = window.setInterval(() => {
       setCardTurn(true);
       setTimeout(() => {
+        cyclesRef.n++;
         setCardIdx(prev => (prev + 1) % benefits.length);
         setCardTurn(false);
+        if (cyclesRef.n >= 3) {
+          window.clearInterval(id);
+          setExiting(true);
+          schedule(() => { setPhase(4); setExiting(false); }, 900);
+        }
       }, 620);
     }, CARD_INTERVAL);
     return () => window.clearInterval(id);
@@ -177,6 +184,32 @@ export default function AnimatedHero() {
               {benefits.map((_, i) => (
                 <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${i === cardIdx ? 'bg-accent-400 scale-125' : 'bg-white/30'}`} />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* PHASE 4 — Login invite */}
+        {phase === 4 && (
+          <div className="text-center py-8">
+            <div className="animate-blur-in" style={{ animationDelay: '0.05s' }}>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-5">
+                {t('landing.ctaTitle')}
+              </h2>
+            </div>
+            <div className="animate-blur-in" style={{ animationDelay: '0.25s' }}>
+              <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+                {t('landing.ctaDesc')}
+              </p>
+            </div>
+            <div className="animate-blur-in" style={{ animationDelay: '0.45s' }}>
+              <div className="flex flex-wrap gap-4 justify-center items-center">
+                <Link to="/login" className="btn-primary !bg-accent-500 !text-white text-lg !px-9 !py-3.5 shadow-lg shadow-accent-500/40">
+                  {t('landing.cta')}
+                </Link>
+                <Link to="/register" className="btn-secondary !border-white/30 !text-white hover:!bg-white/10 text-lg !px-9 !py-3.5">
+                  {t('auth.registerTitle')}
+                </Link>
+              </div>
             </div>
           </div>
         )}
