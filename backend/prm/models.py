@@ -149,6 +149,21 @@ class QuizBankQuestion(models.Model):
         ordering = ["-created_at"]
 
 
+class VideoCheckpoint(models.Model):
+    id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
+    video = models.ForeignKey(CourseVideo, on_delete=models.CASCADE, related_name="checkpoints")
+    timestamp_seconds = models.FloatField()
+    question = models.JSONField(default=dict)
+    options = models.JSONField(default=list)
+    correct_index = models.IntegerField(default=0)
+    on_wrong_timestamp = models.FloatField(default=0)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order"]
+
+
 class CourseAssignment(models.Model):
     id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="assignments")

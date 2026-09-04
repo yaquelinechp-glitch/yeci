@@ -371,6 +371,16 @@ export interface CourseRating {
   created_at: string;
 }
 
+export interface VideoCheckpoint {
+  id: string;
+  timestamp_seconds: number;
+  question: string;
+  options: string[];
+  correct_index: number;
+  on_wrong_timestamp: number;
+  order: number;
+}
+
 export interface ConflictOpportunity {
   id: string;
   name: string;

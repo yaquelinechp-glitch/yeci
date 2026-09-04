@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
     Partner, Course, CourseVideo, QuizQuestion, QuizBankQuestion, CourseAssignment,
-    CourseRating, QuizAttempt, PartnerProgress,
+    CourseRating, QuizAttempt, PartnerProgress, VideoCheckpoint,
     Deal, Commission, Opportunity, OpportunityEvent, TrainingResult, Certification,
     Product, Notification, CourseExamQuestion,
 )
@@ -212,6 +212,18 @@ class QuizBankQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizBankQuestion
         fields = ["id", "question", "options", "correct_index", "correct_indices", "fill_answer", "question_type", "track", "created_at"]
+
+
+class VideoCheckpointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VideoCheckpoint
+        fields = ["id", "timestamp_seconds", "question", "options", "correct_index", "on_wrong_timestamp", "order"]
+
+
+class VideoCheckpointPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VideoCheckpoint
+        fields = ["id", "timestamp_seconds", "question", "options", "order"]
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):

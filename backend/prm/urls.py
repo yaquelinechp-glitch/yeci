@@ -47,6 +47,11 @@ urlpatterns = [
     path("courses/<str:course_id>/videos/<str:video_id>/quiz/bank/<str:question_id>", views.add_bank_question_to_video),
     path("courses/<str:course_id>/videos/<str:video_id>/quiz/<str:question_id>", views.quiz_question_detail),
 
+    path("courses/<str:course_id>/videos/<str:video_id>/checkpoints", views.video_checkpoints),
+    path("courses/<str:course_id>/videos/<str:video_id>/checkpoints/reorder", views.reorder_checkpoints),
+    path("courses/<str:course_id>/videos/<str:video_id>/checkpoints/submit/<str:checkpoint_id>", views.submit_checkpoint),
+    path("courses/<str:course_id>/videos/<str:video_id>/checkpoints/<str:checkpoint_id>", views.video_checkpoint_detail),
+
     path("products/", views.products_list_or_create),
     path("products/<str:product_key>", views.product_detail),
 

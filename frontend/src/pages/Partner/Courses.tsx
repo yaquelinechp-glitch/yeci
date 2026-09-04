@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { coursesApi } from '../../services/api';
-import type { Course, CourseVideo, QuizQuestion, QuizResult, PhaseConfig } from '../../types';
+import type { Course, CourseVideo, QuizQuestion, QuizResult, PhaseConfig, VideoCheckpoint } from '../../types';
 import { TRACKS } from '../../constants';
 
 const TRACK_BADGE: Record<string, string> = {
@@ -46,6 +46,11 @@ export default function PartnerCourses() {
   const [playingVideo, setPlayingVideo] = useState<CourseVideo | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [checkpoints, setCheckpoints] = useState<VideoCheckpoint[]>([]);
+  const [activeCheckpoint, setActiveCheckpoint] = useState<VideoCheckpoint | null>(null);
+  const [checkpointAnswer, setCheckpointAnswer] = useState<number | null>(null);
+  const [checkpointFeedback, setCheckpointFeedback] = useState<{ correct: boolean } | null>(null);
+  const [checkpointDone, setCheckpointDone] = useState<Set<string>>(new Set());
   const [selPhase, setSelPhase] = useState(1);
   const [selDay, setSelDay] = useState(1);
   const [examOpen, setExamOpen] = useState(false);
@@ -87,7 +92,19 @@ export default function PartnerCourses() {
     loadRating(c.id);
   };
 
-  const openPlayer = (v: CourseVideo) => { setPlayingVideo(v); };
+  const openPlayer = (v: CourseVideo) => {
+    setPlayingVideo(v);
+    setCheckpoints([]);
+    setActiveCheckpoint(null);
+    setCheckpointAnswer(null);
+    setCheckpointFeedback(null);
+    setCheckpointDone(new Set());
+    if (selected) {
+      coursesApi.getCheckpoints(selected.id, v.id).then((r) => {
+        setCheckpoints(r.data || []);
+      }).catch(() => setCheckpoints([]));
+    }
+  };
 
   const openExam = async () => {
     if (!selected) return;
@@ -139,6 +156,54 @@ export default function PartnerCourses() {
   const closePlayer = () => {
     if (videoRef.current) { videoRef.current.pause(); }
     setPlayingVideo(null);
+    setCheckpoints([]);
+    setActiveCheckpoint(null);
+    setCheckpointAnswer(null);
+    setCheckpointFeedback(null);
+  };
+
+  const handleCheckpointSubmit = async (selectedIndex: number) => {
+    if (!activeCheckpoint || !selected || !playingVideo) return;
+    setCheckpointAnswer(selectedIndex);
+    setCheckpointFeedback(null);
+    try {
+      const r = await coursesApi.submitCheckpoint(selected.id, playingVideo.id, activeCheckpoint.id, selectedIndex);
+      const { correct, jump_to } = r.data;
+      setCheckpointFeedback({ correct });
+      if (correct) {
+        setCheckpointDone((prev) => new Set(prev).add(activeCheckpoint.id));
+        setTimeout(() => {
+          setActiveCheckpoint(null);
+          setCheckpointAnswer(null);
+          setCheckpointFeedback(null);
+          if (videoRef.current) videoRef.current.play();
+        }, 1200);
+      } else {
+        setTimeout(() => {
+          setActiveCheckpoint(null);
+          setCheckpointAnswer(null);
+          setCheckpointFeedback(null);
+          if (videoRef.current) {
+            videoRef.current.currentTime = jump_to || 0;
+            videoRef.current.play();
+          }
+        }, 1500);
+      }
+    } catch { /* */ }
+  };
+
+  const handleCheckpointTimeUpdate = () => {
+    if (!videoRef.current || !checkpoints.length || activeCheckpoint) return;
+    const t = videoRef.current.currentTime;
+    for (const cp of checkpoints) {
+      if (cp.timestamp_seconds > 0 && Math.abs(t - cp.timestamp_seconds) < 0.4 && !checkpointDone.has(cp.id)) {
+        videoRef.current.pause();
+        setActiveCheckpoint(cp);
+        setCheckpointAnswer(null);
+        setCheckpointFeedback(null);
+        break;
+      }
+    }
   };
 
   const loadQuiz = async (videoId: string) => {
@@ -434,20 +499,64 @@ export default function PartnerCourses() {
 
           {playingVideo && (
             <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-fade-in" onClick={closePlayer}>
-              <div className="bg-black rounded-2xl overflow-hidden max-w-4xl w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-black rounded-2xl overflow-hidden max-w-4xl w-full shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-6 py-4 bg-gray-900">
                   <h3 className="text-white font-semibold text-sm">{getLocalized(playingVideo.title)}</h3>
                   <button onClick={closePlayer} className="text-gray-400 hover:text-white transition-colors">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
-                <video ref={videoRef} className="w-full" controls autoPlay>
+                <video ref={videoRef} className="w-full" controls autoPlay onTimeUpdate={handleCheckpointTimeUpdate}>
                   <source src={playingVideo.video_url} type="video/mp4" />
                   {t('courses.videoNotSupported')}
                 </video>
                 {playingVideo.description && (
                   <div className="px-6 py-3 bg-gray-900">
                     <p className="text-gray-400 text-sm">{getLocalized(playingVideo.description)}</p>
+                  </div>
+                )}
+
+                {/* Checkpoint quiz overlay */}
+                {activeCheckpoint && (
+                  <div className="absolute inset-0 bg-black/90 flex items-center justify-center p-6">
+                    <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">{t('courses.exam') || t('checkpoints.title')}</span>
+                      </div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-4">{getLocalized(activeCheckpoint.question)}</h4>
+                      <div className="space-y-2">
+                        {(activeCheckpoint.options || []).map((opt: any, oi: number) => {
+                          const answered = checkpointAnswer !== null;
+                          const isSel = checkpointAnswer === oi;
+                          const isCorrect = checkpointFeedback?.correct && isSel;
+                          const isWrong = checkpointFeedback && !checkpointFeedback.correct && isSel;
+                          return (
+                            <button
+                              key={oi}
+                              disabled={answered}
+                              onClick={() => handleCheckpointSubmit(oi)}
+                              className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                                isCorrect ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                : isWrong ? 'border-red-500 bg-red-50 text-red-700'
+                                : answered ? 'border-gray-200 text-gray-400'
+                                : 'border-gray-200 text-gray-700 hover:border-amber-400 hover:bg-amber-50'
+                              }`}
+                            >
+                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-current mr-2 text-xs font-bold shrink-0">{String.fromCharCode(65 + oi)}</span>
+                              {getLocalized(opt)}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {checkpointFeedback && (
+                        <div className={`mt-4 p-3 rounded-xl text-sm font-semibold text-center ${
+                          checkpointFeedback.correct ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                        }`}>
+                          {checkpointFeedback.correct ? t('checkpoints.correctAnswer') : t('checkpoints.wrongAnswer')}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

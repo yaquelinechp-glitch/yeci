@@ -21,7 +21,7 @@ from django.db.models import Sum, Q, Count, F, Avg
 
 from .models import (
     Partner, Course, CourseVideo, QuizQuestion, QuizBankQuestion, CourseAssignment,
-    CourseRating, QuizAttempt, PartnerProgress, VideoWatchEvent,
+    CourseRating, QuizAttempt, PartnerProgress, VideoWatchEvent, VideoCheckpoint,
     Deal, Commission, Opportunity, OpportunityEvent, TrainingResult, Certification,
     TokenBlacklist, LoginAttempt, PartnerOnboarding, PartnerUser, MdfRequest,
     Reward, RewardRedemption, PointTransaction, ChannelConflict,
@@ -43,6 +43,7 @@ from .serializers import (
     OpportunitySerializer, OpportunityCreateSerializer, OpportunityUpdateSerializer,
     OpportunityEventSerializer, TrainingResultSerializer, CertificationSerializer,
     ProductSerializer, NotificationSerializer, CourseExamQuestionSerializer,
+    VideoCheckpointSerializer, VideoCheckpointPublicSerializer,
     localize,
 )
 
@@ -1420,6 +1421,85 @@ def get_course_video_progress(request, course_id):
     prog = PartnerProgress.objects.filter(partner=user, course_id=course_id).first()
     completed = prog.completed_videos if prog else []
     return Response({vid: True for vid in completed})
+
+
+# ─── Video Checkpoints (Interactive Quiz) ───────────────
+
+
+@api_view(["GET", "POST"])
+def video_checkpoints(request, course_id, video_id):
+    user = _current_user(request)
+    if not user:
+        return Response({"detail": "Unauthorized"}, status=401)
+    try:
+        video = CourseVideo.objects.get(id=video_id, course_id=course_id)
+    except CourseVideo.DoesNotExist:
+        return Response({"detail": "Video not found"}, status=404)
+
+    if request.method == "GET":
+        checkpoints = VideoCheckpoint.objects.filter(video=video)
+        if user.role == "admin":
+            data = VideoCheckpointSerializer(checkpoints, many=True).data
+        else:
+            data = VideoCheckpointPublicSerializer(checkpoints, many=True).data
+        return Response(data)
+
+    if user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+    ser = VideoCheckpointSerializer(data=request.data)
+    ser.is_valid(raise_exception=True)
+    max_order = VideoCheckpoint.objects.filter(video=video).order_by("-order").values_list("order", flat=True).first() or 0
+    checkpoint = VideoCheckpoint(video=video, order=max_order + 1, **ser.validated_data)
+    checkpoint.save()
+    return Response(VideoCheckpointSerializer(checkpoint).data, status=201)
+
+
+@api_view(["PUT", "DELETE"])
+def video_checkpoint_detail(request, course_id, video_id, checkpoint_id):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+    try:
+        checkpoint = VideoCheckpoint.objects.get(id=checkpoint_id, video_id=video_id, video__course_id=course_id)
+    except VideoCheckpoint.DoesNotExist:
+        return Response({"detail": "Checkpoint not found"}, status=404)
+    if request.method == "DELETE":
+        checkpoint.delete()
+        return Response({"ok": True})
+    ser = VideoCheckpointSerializer(checkpoint, data=request.data, partial=True)
+    ser.is_valid(raise_exception=True)
+    for k, v in ser.validated_data.items():
+        setattr(checkpoint, k, v)
+    checkpoint.save()
+    return Response(VideoCheckpointSerializer(checkpoint).data)
+
+
+@api_view(["POST"])
+def submit_checkpoint(request, course_id, video_id, checkpoint_id):
+    user = _current_user(request)
+    if not user:
+        return Response({"detail": "Unauthorized"}, status=401)
+    try:
+        checkpoint = VideoCheckpoint.objects.get(id=checkpoint_id, video_id=video_id, video__course_id=course_id)
+    except VideoCheckpoint.DoesNotExist:
+        return Response({"detail": "Checkpoint not found"}, status=404)
+    selected = int(request.data.get("selected_index", -1))
+    correct = selected == checkpoint.correct_index
+    jump_to = checkpoint.timestamp_seconds if correct else checkpoint.on_wrong_timestamp
+    return Response({"correct": correct, "jump_to": jump_to})
+
+
+@api_view(["PUT"])
+def reorder_checkpoints(request, course_id, video_id):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+    order = request.data.get("order", [])
+    if not order:
+        return Response({"detail": "No order provided"}, status=400)
+    for idx, cid in enumerate(order):
+        VideoCheckpoint.objects.filter(id=cid, video_id=video_id).update(order=idx)
+    return Response({"ok": True})
 
 
 @api_view(["POST"])

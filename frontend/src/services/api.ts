@@ -104,6 +104,14 @@ export const coursesApi = {
   createAssignment: (courseId: string, partnerId: string, deadline: string) => api.post(`/courses/${courseId}/assignments`, { partner_id: partnerId, deadline }),
   deleteAssignment: (courseId: string, assignmentId: string) => api.delete(`/courses/${courseId}/assignments/${assignmentId}`),
   trackWatchTime: (videoId: string, watchSeconds: number) => api.post('/courses/watch-time', { video_id: videoId, watch_seconds: watchSeconds }),
+  // Checkpoints (interactive video quiz)
+  getCheckpoints: (courseId: string, videoId: string) => api.get(`/courses/${courseId}/videos/${videoId}/checkpoints?lang=${lang()}`),
+  createCheckpoint: (courseId: string, videoId: string, data: any) => api.post(`/courses/${courseId}/videos/${videoId}/checkpoints`, data),
+  updateCheckpoint: (courseId: string, videoId: string, checkpointId: string, data: any) => api.put(`/courses/${courseId}/videos/${videoId}/checkpoints/${checkpointId}`, data),
+  deleteCheckpoint: (courseId: string, videoId: string, checkpointId: string) => api.delete(`/courses/${courseId}/videos/${videoId}/checkpoints/${checkpointId}`),
+  submitCheckpoint: (courseId: string, videoId: string, checkpointId: string, selectedIndex: number) =>
+    api.post(`/courses/${courseId}/videos/${videoId}/checkpoints/submit/${checkpointId}`, { selected_index: selectedIndex }),
+  reorderCheckpoints: (courseId: string, videoId: string, order: string[]) => api.put(`/courses/${courseId}/videos/${videoId}/checkpoints/reorder`, { order }),
 };
 
 export const dealsApi = {
