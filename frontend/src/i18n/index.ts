@@ -362,7 +362,7 @@ const resources = {
         noCheckpoints: 'No checkpoints yet',
         noCheckpointsHint: 'Play the video and click "Add Checkpoint" to pause at key moments',
         correctAnswer: 'Correct!',
-        wrongAnswer: 'Incorrect - rewinding',
+        wrongAnswer: 'Incorrect answer, please watch again',
         saved: 'Checkpoint saved',
       },
       pipeline: {
@@ -867,7 +867,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         noCheckpoints: 'Sin checkpoints aún',
         noCheckpointsHint: 'Reproduce el video y haz clic en "Agregar Checkpoint" en momentos clave',
         correctAnswer: '¡Correcto!',
-        wrongAnswer: 'Incorrecto - rebobinando',
+        wrongAnswer: 'La respuesta es incorrecta, vuelva a mirar',
         saved: 'Checkpoint guardado',
       },
       pipeline: {
@@ -1373,7 +1373,7 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         noCheckpoints: 'Noch keine Checkpoints',
         noCheckpointsHint: 'Video abspielen und "Checkpoint hinzufügen" an Schlüsselstellen klicken',
         correctAnswer: 'Richtig!',
-        wrongAnswer: 'Falsch - zurückspulen',
+        wrongAnswer: 'Falsche Antwort, bitte schauen Sie es sich noch einmal an',
         saved: 'Checkpoint gespeichert',
       },
       pipeline: {
