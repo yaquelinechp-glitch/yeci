@@ -126,6 +126,31 @@ body {
   .reveal-visible { animation: none; }
 }
 
+/* 3D flip card */
+.flip-perspective {
+  perspective: 1200px;
+}
+
+.flip-inner {
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  backface-visibility: hidden;
+  position: absolute;
+  inset: 0;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
 .card {
   background: white;
   border-radius: var(--radius-card);
