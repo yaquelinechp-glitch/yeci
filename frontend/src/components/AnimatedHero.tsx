@@ -103,10 +103,10 @@ export default function AnimatedHero() {
             <div className={`mt-14 ${exitCls(3)}`} style={exitStyle(3)}>
               <h2 className="text-xl md:text-2xl font-bold text-white mb-8">{t('landing.ctaSecondary')}</h2>
             </div>
-            <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
               {benefits.map((b, i) => (
                 <div key={i}
-                  className={`bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 px-8 py-6 text-left w-64 ${exiting ? 'animate-blur-out' : 'animate-rise-in'}`}
+                  className={`bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 px-6 py-6 text-left ${exiting ? 'animate-blur-out' : 'animate-rise-in'}`}
                   style={{ animationDelay: exiting ? `${0.4 + i * 0.12}s` : `${1 + i * 0.25}s` }}>
                   <div className="text-2xl mb-2">{['', '', ''][i]}</div>
                   <h3 className="text-white font-semibold text-base">{b.title}</h3>
