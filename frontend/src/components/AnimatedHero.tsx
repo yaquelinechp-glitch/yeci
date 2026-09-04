@@ -14,7 +14,7 @@ export default function AnimatedHero() {
   const [exiting, setExiting] = useState(false);
   const [phase2Step, setPhase2Step] = useState(-1);
   const [cardIdx, setCardIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [cardTurn, setCardTurn] = useState(false);
   const [phase2In, setPhase2In] = useState(false);
 
   const steps: string[] = t('landing.steps', { returnObjects: true }) as string[];
@@ -50,21 +50,21 @@ export default function AnimatedHero() {
       if (step >= steps.length) {
         window.clearInterval(id);
         schedule(() => setExiting(true), 1200);
-        schedule(() => { setPhase(3); setExiting(false); setCardIdx(0); setFlipped(false); }, 1200 + EXIT_MS);
+        schedule(() => { setPhase(3); setExiting(false); setCardIdx(0); setCardTurn(false); }, 1200 + EXIT_MS);
       }
     }, STEP_INTERVAL);
     return () => { window.clearInterval(id); clearTimers(); };
   }, [phase]);
 
-  // Phase 3: flip cards in loop
+  // Phase 3: rotate cards like a page-turn cycle
   useEffect(() => {
     if (phase !== 3) return;
     const id = window.setInterval(() => {
-      setFlipped(true);
+      setCardTurn(true);
       setTimeout(() => {
         setCardIdx(prev => (prev + 1) % benefits.length);
-        setFlipped(false);
-      }, 500);
+        setCardTurn(false);
+      }, 620);
     }, CARD_INTERVAL);
     return () => window.clearInterval(id);
   }, [phase]);
@@ -146,7 +146,7 @@ export default function AnimatedHero() {
           </div>
         )}
 
-        {/* PHASE 3 — Funciones del Portal (flip cards) */}
+        {/* PHASE 3 — Funciones del Portal (rotating cards) */}
         {phase === 3 && (
           <div className="text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-12 animate-rise-in">
@@ -154,18 +154,20 @@ export default function AnimatedHero() {
             </h2>
             <div className="flex justify-center">
               <div className="flip-perspective w-96 h-64">
-                <div className={`flip-inner w-full h-full ${flipped ? 'flipped' : ''}`}>
-                  {/* Current card (front) */}
-                  <div className="flip-face w-full h-full bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 p-8 flex flex-col items-center justify-center text-center">
-                    <div className="text-5xl mb-4">{['', '', ''][cardIdx]}</div>
-                    <h3 className="text-white text-xl font-bold mb-3">{benefits[cardIdx]?.title}</h3>
-                    <p className="text-white/70 text-sm leading-relaxed">{benefits[cardIdx]?.desc}</p>
-                  </div>
-                  {/* Next card (back) */}
-                  <div className="flip-face flip-back w-full h-full bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 p-8 flex flex-col items-center justify-center text-center">
-                    <div className="text-5xl mb-4">{['', '', ''][nextCardIdx]}</div>
-                    <h3 className="text-white text-xl font-bold mb-3">{benefits[nextCardIdx]?.title}</h3>
-                    <p className="text-white/70 text-sm leading-relaxed">{benefits[nextCardIdx]?.desc}</p>
+                <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
+                  {/* Current card exits while next enters */}
+                  {cardTurn && (
+                    <div className="absolute inset-0 cards-anim-out rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-8 flex flex-col items-center justify-center text-center">
+                      <div className="text-5xl mb-4">{['', '', ''][cardIdx]}</div>
+                      <h3 className="text-white text-xl font-bold mb-3">{benefits[cardIdx]?.title}</h3>
+                      <p className="text-white/70 text-sm leading-relaxed">{benefits[cardIdx]?.desc}</p>
+                    </div>
+                  )}
+                  <div key={cardTurn ? `in-${cardIdx}` : `cur-${cardIdx}`}
+                    className={`absolute inset-0 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-8 flex flex-col items-center justify-center text-center ${cardTurn ? 'cards-anim-in' : ''}`}>
+                    <div className="text-5xl mb-4">{['', '', ''][cardTurn ? nextCardIdx : cardIdx]}</div>
+                    <h3 className="text-white text-xl font-bold mb-3">{benefits[cardTurn ? nextCardIdx : cardIdx]?.title}</h3>
+                    <p className="text-white/70 text-sm leading-relaxed">{benefits[cardTurn ? nextCardIdx : cardIdx]?.desc}</p>
                   </div>
                 </div>
               </div>

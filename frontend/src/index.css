@@ -154,29 +154,29 @@ body {
   animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* 3D flip card */
+/* Card carousel page-turn cycle */
+@keyframes card-out {
+  0% { opacity: 1; transform: rotateY(0deg) translateX(0) scale(1); }
+  100% { opacity: 0; transform: rotateY(-80deg) translateX(-130px) scale(0.88); }
+}
+
+@keyframes card-in {
+  0% { opacity: 0; transform: rotateY(80deg) translateX(130px) scale(0.88); }
+  100% { opacity: 1; transform: rotateY(0deg) translateX(0) scale(1); }
+}
+
+.cards-anim-out {
+  transform-origin: left center;
+  animation: card-out 0.62s cubic-bezier(0.5, 0, 0.35, 1) forwards;
+}
+
+.cards-anim-in {
+  transform-origin: right center;
+  animation: card-in 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .flip-perspective {
   perspective: 1200px;
-}
-
-.flip-inner {
-  position: relative;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.flip-inner.flipped {
-  transform: rotateY(180deg);
-}
-
-.flip-face {
-  backface-visibility: hidden;
-  position: absolute;
-  inset: 0;
-}
-
-.flip-back {
-  transform: rotateY(180deg);
 }
 
 .card {
