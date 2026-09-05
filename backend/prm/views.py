@@ -353,6 +353,8 @@ def partner_detail(request, partner_id):
     ser = PartnerUpdateSerializer(data=request.data, partial=True)
     ser.is_valid(raise_exception=True)
     d = ser.validated_data
+    if user.role != "admin":
+        d.pop("partner_type", None)
     for k, v in d.items():
         setattr(partner, k, v)
     partner.save()
