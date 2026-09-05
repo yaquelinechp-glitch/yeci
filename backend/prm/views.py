@@ -366,6 +366,8 @@ def partner_type_detail(request, key):
                          "is_active": pt.is_active, "sort_order": pt.sort_order})
     if request.method == "DELETE":
         in_use = Partner.objects.filter(partner_type=pt.key).exists()
+        if PartnerType.objects.exclude(key=pt.key).filter(is_active=True).count() == 0:
+            return Response({"detail": "Cannot delete the last partner type"}, status=400)
         if in_use:
             return Response({"detail": "Cannot delete: partners use this type"}, status=400)
         pt.delete()
@@ -388,6 +390,29 @@ def partner_type_detail(request, key):
     pt.save()
     return Response({"key": pt.key, "label": pt.label, "default_commission_rate": pt.default_commission_rate,
                      "is_active": pt.is_active, "sort_order": pt.sort_order})
+
+
+@api_view(["POST"])
+def partner_type_reassign_and_delete(request, key):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+    pt = PartnerType.objects.filter(key=key).first()
+    if not pt:
+        return Response({"detail": "Partner type not found"}, status=404)
+    target = str((request.data or {}).get("to", "")).strip()
+    if not target:
+        return Response({"detail": "target 'to' is required"}, status=400)
+    if target == key:
+        return Response({"detail": "Target type must be different"}, status=400)
+    tgt = PartnerType.objects.filter(key=target).first()
+    if not tgt:
+        return Response({"detail": "Target partner type not found"}, status=404)
+    count = Partner.objects.filter(partner_type=pt.key).update(partner_type=tgt.key)
+    if PartnerType.objects.exclude(key=pt.key).filter(is_active=True).count() == 0:
+        return Response({"detail": "Cannot delete the last partner type"}, status=400)
+    pt.delete()
+    return Response({"moved": count, "deleted": key, "to": target})
 
 
 def _ensure_compliance_assignment(partner):

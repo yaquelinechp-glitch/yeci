@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { partnerTypesApi } from '../../services/api';
+import { partnerTypesApi, partnersApi } from '../../services/api';
+import type { User } from '../../types';
 
 interface PartnerType {
   key: string;
@@ -16,6 +17,7 @@ const slugify = (s: string) =>
 export default function PartnerTypes() {
   const { t } = useTranslation();
   const [types, setTypes] = useState<PartnerType[]>([]);
+  const [partners, setPartners] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [keyInput, setKeyInput] = useState('');
@@ -23,8 +25,20 @@ export default function PartnerTypes() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [editing, setEditing] = useState<Record<string, { label: string; rate: string; active: boolean }>>({});
+  const [deleteTarget, setDeleteTarget] = useState<PartnerType | null>(null);
+  const [deleteSearch, setDeleteSearch] = useState('');
+  const [moveTo, setMoveTo] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const load = () => {
+    partnerTypesApi.list().then((r) => {
+      setTypes(r.data || []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+    partnersApi.list().then((r) => setPartners(r.data || [])).catch(() => {});
+  };
+
+  const loadTypesOnly = () => {
     partnerTypesApi.list().then((r) => {
       setTypes(r.data || []);
       setLoading(false);
@@ -85,14 +99,51 @@ export default function PartnerTypes() {
   };
 
   const handleDelete = async (pt: PartnerType) => {
-    if (!window.confirm(t('admin.partnerTypesPage.deleteConfirm'))) return;
+    setMsg(null);
+    const inUse = partners.some((p) => p.partner_type === pt.key);
+    if (!inUse) {
+      if (!window.confirm(t('admin.partnerTypesPage.deleteConfirm'))) return;
+      try {
+        await partnerTypesApi.delete(pt.key);
+        setMsg({ ok: true, text: t('admin.partnerTypesPage.deleted') });
+        loadTypesOnly();
+      } catch (err: any) {
+        setMsg({ ok: false, text: err?.response?.data?.detail || t('common.error') });
+      }
+      return;
+    }
+    setDeleteTarget(pt);
+    setDeleteSearch('');
+    setMoveTo(types.find((x) => x.key !== pt.key && x.is_active)?.key || '');
+  };
+
+  const usingPartners = useMemo(() => {
+    if (!deleteTarget) return [];
+    const q = deleteSearch.trim().toLowerCase();
+    return partners
+      .filter((p) => p.partner_type === deleteTarget.key)
+      .filter((p) =>
+        !q ||
+        p.company_name.toLowerCase().includes(q) ||
+        p.contact_name.toLowerCase().includes(q) ||
+        p.email.toLowerCase().includes(q)
+      );
+  }, [deleteTarget, deleteSearch, partners]);
+
+  const handleReassignAndDelete = async () => {
+    if (!deleteTarget || !moveTo) return;
+    setDeleting(true);
     try {
-      await partnerTypesApi.delete(pt.key);
-      setMsg({ ok: true, text: t('admin.partnerTypesPage.deleted') });
-      load();
+      const r = await partnerTypesApi.deleteWithReassign(deleteTarget.key, moveTo);
+      setMsg({ ok: true, text: `${t('admin.partnerTypesPage.moved')} ${r.data.moved} → ${r.data.to}` });
+      setDeleteTarget(null);
+      loadTypesOnly();
+      partnersApi.list().then((resp) => setPartners(resp.data || [])).catch(() => {});
     } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      setMsg({ ok: false, text: detail || t('common.error') });
+      setMsg({ ok: false, text: err?.response?.data?.detail || t('common.error') });
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -219,6 +270,77 @@ export default function PartnerTypes() {
           </tbody>
         </table>
       </div>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => !deleting && setDeleteTarget(null)}>
+          <div className="bg-white w-full max-w-lg max-h-[80vh] overflow-hidden border border-gray-200 rounded-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{t('admin.partnerTypesPage.reassignTitle')} “{deleteTarget.label}”</h3>
+                <p className="text-sm text-gray-500 mt-1">{t('admin.partnerTypesPage.inUseCount', { n: partners.filter((p) => p.partner_type === deleteTarget.key).length })}</p>
+              </div>
+              <button onClick={() => setDeleteTarget(null)} disabled={deleting} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto max-h-[45vh]">
+              <div className="mb-4">
+                <select
+                  value={moveTo}
+                  onChange={(e) => setMoveTo(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 bg-white"
+                >
+                  <option value="" disabled>{t('admin.partnerTypesPage.moveToType')}</option>
+                  {types.filter((x) => x.key !== deleteTarget.key).map((x) => (
+                    <option key={x.key} value={x.key}>{x.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative mb-3">
+                <input
+                  type="text"
+                  placeholder={t('common.search')}
+                  value={deleteSearch}
+                  onChange={(e) => setDeleteSearch(e.target.value)}
+                  className="w-full pl-4 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500"
+                />
+              </div>
+
+              <div className="max-h-52 overflow-y-auto border border-gray-100 rounded-xl divide-y divide-gray-100">
+                {usingPartners.length === 0 && (
+                  <div className="text-center py-8 text-gray-400 text-sm">{t('common.noData')}</div>
+                )}
+                {usingPartners.map((p) => (
+                  <div key={p.id} className="flex items-center gap-2 px-3 py-2">
+                    <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600 shrink-0">
+                      {p.company_name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-800 truncate">{p.company_name}</div>
+                      <div className="text-xs text-gray-400 truncate">{p.contact_name} · {p.email}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-gray-100 flex items-center justify-end gap-3">
+              <button onClick={() => setDeleteTarget(null)} disabled={deleting} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">
+                {t('common.cancel')}
+              </button>
+              <button
+                onClick={handleReassignAndDelete}
+                disabled={deleting || !moveTo}
+                className="px-4 py-2 text-sm font-medium bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+              >
+                {deleting ? t('common.loading') : t('admin.partnerTypesPage.reassignAndDelete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

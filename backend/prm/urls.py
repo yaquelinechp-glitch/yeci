@@ -16,6 +16,7 @@ urlpatterns = [
 
     path("admin/partner-types", views.list_partner_types),
     path("admin/partner-types/<str:key>", views.partner_type_detail),
+    path("admin/partner-types/<str:key>/reassign", views.partner_type_reassign_and_delete),
 
     path("courses/", views.courses_list_or_create),
     path("courses/progress", views.update_progress),

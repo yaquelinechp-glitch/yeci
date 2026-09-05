@@ -51,6 +51,7 @@ export const partnerTypesApi = {
     api.post('/admin/partner-types', data),
   update: (key: string, data: any) => api.patch(`/admin/partner-types/${key}`, data),
   delete: (key: string) => api.delete(`/admin/partner-types/${key}`),
+  deleteWithReassign: (key: string, to: string) => api.post(`/admin/partner-types/${key}/reassign`, { to }),
 };
 
 export const coursesApi = {

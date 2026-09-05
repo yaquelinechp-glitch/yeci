@@ -170,6 +170,9 @@ const resources = {
           newType: 'New partner type', typeName: 'Name', typeKey: 'Key (identifier)', typeKeyHint: 'Auto-generated from the name, e.g. "distributor-gold"',
           defaultRate: 'Default commission %', active: 'Active', created: 'Type created', updated: 'Type updated', deleted: 'Type deleted',
           deleteConfirm: 'Delete this type?', inUse: 'Cannot delete: partners use this type',
+          reassignTitle: 'Reassign partners before deleting', inUseCount: '{{n}} partners use this type',
+          moveToType: 'Move partners to…', reassignAndDelete: 'Move & delete',
+          moved: 'Partners moved', inUsePartners: 'Partners using this type',
         },
       },
       partner: {
@@ -686,6 +689,9 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
           newType: 'Nuevo tipo de partner', typeName: 'Nombre', typeKey: 'Clave (identificador)', typeKeyHint: 'Se genera automáticamente desde el nombre, ej. "distribuidor-gold"',
           defaultRate: '% por defecto', active: 'Activo', created: 'Tipo creado', updated: 'Tipo actualizado', deleted: 'Tipo eliminado',
           deleteConfirm: '¿Eliminar este tipo?', inUse: 'No se puede eliminar: hay partners usando este tipo',
+          reassignTitle: 'Reasigna partners antes de eliminar', inUseCount: '{{n}} partners usan este tipo',
+          moveToType: 'Mover partners a…', reassignAndDelete: 'Mover y eliminar',
+          moved: 'Partners movidos', inUsePartners: 'Partners usando este tipo',
         },
       },
       partner: {
@@ -1203,6 +1209,9 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
           newType: 'Neuer Partnertyp', typeName: 'Name', typeKey: 'Schlüssel (Identifikator)', typeKeyHint: 'Automatisch aus dem Namen erzeugt, z. B. „distributor-gold“',
           defaultRate: 'Standard-Provision %', active: 'Aktiv', created: 'Typ erstellt', updated: 'Typ aktualisiert', deleted: 'Typ gelöscht',
           deleteConfirm: 'Diesen Typ löschen?', inUse: 'Löschen nicht möglich: Partner nutzen diesen Typ',
+          reassignTitle: 'Partner vor dem Löschen neu zuweisen', inUseCount: '{{n}} Partner nutzen diesen Typ',
+          moveToType: 'Partner verschieben zu…', reassignAndDelete: 'Verschieben & löschen',
+          moved: 'Partner verschoben', inUsePartners: 'Partner mit diesem Typ',
         },
       },
       partner: {
