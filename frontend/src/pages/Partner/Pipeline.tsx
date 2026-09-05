@@ -4,7 +4,7 @@ import { pipelineApi, productsApi, calculatorApi } from '../../services/api';
 import type { Opportunity, PipelineStats, Product } from '../../types';
 import { useAuthStore } from '../../store/auth';
 import {
-  STAGES, STAGE_PROB, STAGE_COLORS, STAGE_BORDERS,
+  STAGES, STAGE_PROB, STAGE_COLORS, STAGE_BORDERS, STAGE_BADGE_TEXT,
   OPPORTUNITY_TYPES, FORECAST_CATEGORIES,
   LOSS_REASONS,
   CURRENCIES, fmtMoney, currencyForCountry,
@@ -380,87 +380,110 @@ export default function Pipeline() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
-            { label: t('pipeline.totalPipeline'), value: fmt(stats.total_value), color: 'border-aconso-500' },
-            { label: t('pipeline.weightedValue'), value: fmt(stats.weighted_value), color: 'border-emerald-500' },
-            { label: t('pipeline.avgProbability'), value: `${stats.avg_probability}%`, color: 'border-amber-500' },
-            { label: t('pipeline.totalOpportunities'), value: String(stats.total_opportunities), color: 'border-purple-500' },
-            { label: t('pipeline.conflicts'), value: String(stats.conflicts || 0), color: 'border-red-400' },
+            { label: t('pipeline.totalPipeline'), value: fmt(stats.total_value), grad: 'from-aconso-500 to-aconso-700', icon: 'M4 6h16M4 12h16M4 18h16' },
+            { label: t('pipeline.weightedValue'), value: fmt(stats.weighted_value), grad: 'from-emerald-500 to-emerald-700', icon: 'M3 17l6-6 4 4 7-7m0 0v5m0-5h-5' },
+            { label: t('pipeline.avgProbability'), value: `${stats.avg_probability}%`, grad: 'from-amber-500 to-amber-600', icon: 'M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z' },
+            { label: t('pipeline.totalOpportunities'), value: String(stats.total_opportunities), grad: 'from-purple-500 to-purple-700', icon: 'M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h7a2 2 0 012 2v8a2 2 0 01-2 2H5z' },
+            { label: t('pipeline.conflicts'), value: String(stats.conflicts || 0), grad: 'from-red-500 to-red-600', icon: 'M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z' },
           ].map((m) => (
-            <div key={m.label} className={`card border-l-4 ${m.color} p-4`}>
-              <div className="text-sm text-gray-500 mb-1">{m.label}</div>
-              <div className="text-xl font-bold text-gray-900">{m.value}</div>
+            <div key={m.label} className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl p-4">
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${m.grad} text-white flex items-center justify-center shrink-0 shadow-sm`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={m.icon} /></svg>
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-medium text-gray-500 truncate">{m.label}</div>
+                <div className="text-lg font-bold text-gray-900 truncate">{m.value}</div>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 max-w-xs">
+          <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input type="text" placeholder={t('pipeline.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)}
-            className="bg-white w-full pl-4 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
+            className="bg-white w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
         </div>
         <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)}
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-aconso-500">
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500">
           <option value="">{t('pipeline.allStages')}</option>
           {STAGES.map((s) => <option key={s} value={s}>{stageI18n(s)}</option>)}
         </select>
+        <div className="flex-1"></div>
+        <div className="text-sm text-gray-500">
+          <span className="font-semibold text-gray-900">{opps.length}</span> {t('pipeline.totalOpportunities').toLowerCase()}
+        </div>
       </div>
 
       {view === 'board' ? (
-        <div className="grid grid-cols-6 gap-3 min-h-0">
-          {STAGES.map((stage) => {
-            const stageOpps = opps.filter((o) => o.stage === stage);
-            return (
-              <div key={stage} className={`bg-gray-50 rounded-xl border-2 border-dashed transition-colors min-w-0 ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200'}`}
-                {...(isAdmin ? {} : { onDragOver: (e: React.DragEvent) => onDragOver(e, stage), onDragLeave, onDrop: (e: React.DragEvent) => onDrop(e, stage) })}>
-                <div className="p-2 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${STAGE_COLORS[stage]}`} />
-                    <span className="text-xs font-semibold text-gray-700 truncate">{stageI18n(stage)}</span>
-                    <span className="text-[10px] bg-gray-200 text-gray-600 px-1 py-0.5 rounded-full shrink-0">{stageOpps.length}</span>
-                  </div>
-                  {!isAdmin && <button onClick={() => openCreate(stage)} className="text-gray-400 hover:text-aconso-600 transition-colors text-sm shrink-0">+</button>}
-                </div>
-                <div className="px-2 pb-2 space-y-1.5 min-h-[40px]">
-                  {stageOpps.map((opp) => (
-                    <div key={opp.id}
-                      draggable={!isAdmin}
-                      onDragStart={!isAdmin ? (e) => onDragStart(e, opp.id) : undefined}
-                      onDragEnd={!isAdmin ? () => setDragId(null) : undefined}
-                      onClick={() => isAdmin ? openDetail(opp) : openEdit(opp)}
-                      className={`bg-white rounded-lg p-2 border ${isAdmin ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'} shadow-sm hover:shadow-md transition-all ${dragId === opp.id ? 'opacity-50 scale-95' : ''} ${opp.conflict ? 'border-red-300 ring-1 ring-red-200' : STAGE_BORDERS[stage]}`}>
-                      <div className="flex items-start justify-between mb-0.5">
-                        <span className="font-medium text-xs text-gray-900 truncate">{opp.company_name}</span>
-                        {isAdmin && <span className="text-[10px] text-gray-400 ml-1 shrink-0">{opp.partner_name}</span>}
-                      </div>
-                      {opp.products_labels && opp.products_labels.length > 0 && (
-                        <div className="flex flex-wrap gap-0.5 mb-1">
-                          {opp.products_labels.map((p) => <span key={p} className="text-[9px] bg-gray-100 text-gray-500 px-1 rounded">{p}</span>)}
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-aconso-600">
-                          {fmtMoney(opp.amount, opp.currency, opp.custom_currency)}
-                          {opp.scan_one_time_fee > 0 && <span className="text-gray-400 font-medium ml-1">+ {fmtMoney(opp.scan_one_time_fee, opp.currency, opp.custom_currency)} scan</span>}
-                        </span>
-                        <span className="text-[10px] text-gray-400">{opp.probability}%</span>
-                      </div>
-                      {opp.conflict && <div className="text-[10px] text-red-500 font-medium mt-0.5">{t('pipeline.conflict')}</div>}
-                      {opp.close_date && (
-                        <div className="text-[10px] text-gray-400 mt-0.5">
-                          {new Date(opp.close_date).toLocaleDateString()} {isOverdue(opp.close_date) && <span className="text-red-500 font-medium">!</span>}
-                        </div>
-                      )}
-                      {!isAdmin && <div className="flex items-center gap-1 mt-1.5 pt-1.5 border-t border-gray-100">
-                        <button onClick={(e) => { e.stopPropagation(); openEdit(opp); }} className="text-[10px] text-gray-400 hover:text-aconso-600 transition-colors">{t('common.edit')}</button>
-                        <button onClick={(e) => { e.stopPropagation(); setDeleteId(opp.id); }} className="text-[10px] text-gray-400 hover:text-red-500 transition-colors">{t('common.delete')}</button>
-                      </div>}
+        <div className="overflow-x-auto pb-2 -mx-1 px-1">
+          <div className="flex gap-4 min-w-0">
+            {STAGES.map((stage) => {
+              const stageOpps = opps.filter((o) => o.stage === stage);
+              return (
+                <div key={stage} className={`w-72 shrink-0 rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
+                  {...(isAdmin ? {} : { onDragOver: (e: React.DragEvent) => onDragOver(e, stage), onDragLeave, onDrop: (e: React.DragEvent) => onDrop(e, stage) })}>
+                  <div className="p-3 border-b border-gray-100 bg-white rounded-t-2xl flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${STAGE_COLORS[stage]}`} />
+                      <span className="text-xs font-semibold text-gray-800 truncate">{stageI18n(stage)}</span>
+                      <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full shrink-0">{stageOpps.length}</span>
                     </div>
-                  ))}
+                    {!isAdmin && <button onClick={() => openCreate(stage)} className="w-5 h-5 flex items-center justify-center rounded-md text-gray-400 hover:text-aconso-600 hover:bg-aconso-50 transition-colors shrink-0">+</button>}
+                  </div>
+                  <div className="p-2 space-y-2 min-h-[60px]">
+                    {stageOpps.map((opp) => (
+                      <div key={opp.id}
+                        draggable={!isAdmin}
+                        onDragStart={!isAdmin ? (e) => onDragStart(e, opp.id) : undefined}
+                        onDragEnd={!isAdmin ? () => setDragId(null) : undefined}
+                        onClick={() => isAdmin ? openDetail(opp) : openEdit(opp)}
+                        className={`bg-white rounded-xl p-3 border ${isAdmin ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'} shadow-sm hover:shadow-md transition-all ${dragId === opp.id ? 'opacity-50 scale-95' : ''} ${opp.conflict ? 'border-red-300 ring-1 ring-red-200' : STAGE_BORDERS[stage]}`}>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <span className="font-medium text-[13px] text-gray-900 truncate">{opp.company_name}</span>
+                          <span className="text-[11px] text-gray-400 shrink-0">{opp.probability}%</span>
+                        </div>
+                        {isAdmin && opp.partner_name && <div className="text-[10px] text-gray-400 truncate mb-1">{opp.partner_name}</div>}
+                        {opp.products_labels && opp.products_labels.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-1.5">
+                            {opp.products_labels.map((p) => <span key={p} className="text-[9px] bg-aconso-50 text-aconso-700 px-1.5 py-0.5 rounded-full">{p}</span>)}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-bold text-aconso-700 truncate">
+                            {fmtMoney(opp.amount, opp.currency, opp.custom_currency)}
+                          </span>
+                          {opp.scan_one_time_fee > 0 && <span className="text-[9px] text-gray-400 shrink-0">+{fmtMoney(opp.scan_one_time_fee, opp.currency, opp.custom_currency)} scan</span>}
+                        </div>
+                        {opp.conflict && <div className="text-[10px] text-red-500 font-medium mt-1.5 flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" /></svg>
+                          {t('pipeline.conflict')}
+                        </div>}
+                        {opp.close_date && (
+                          <div className={`text-[10px] mt-1.5 ${isOverdue(opp.close_date) ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                            <span className="inline-block align-middle"><svg className="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></span>
+                            {new Date(opp.close_date).toLocaleDateString()} {isOverdue(opp.close_date) && '·'}
+                          </div>
+                        )}
+                        {!isAdmin && <div className="flex items-center gap-1 mt-2 pt-2 border-t border-gray-100">
+                          <button onClick={(e) => { e.stopPropagation(); openEdit(opp); }} className="text-[10px] text-gray-400 hover:text-aconso-600 transition-colors">{t('common.edit')}</button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteId(opp.id); }} className="text-[10px] text-gray-400 hover:text-red-500 transition-colors">{t('common.delete')}</button>
+                        </div>}
+                      </div>
+                    ))}
+                    {stageOpps.length === 0 && (
+                      <div className="text-center text-[11px] text-gray-400 py-8 border border-dashed border-gray-200 rounded-xl">
+                        {t('pipeline.noOpportunities')}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       ) : (
         <div className="table-container">
@@ -484,10 +507,20 @@ export default function Pipeline() {
                     <span className="flex items-center gap-1.5">{opp.company_name}</span>
                   </td>
                   <td>
-                    <span className={`badge text-white ${STAGE_COLORS[opp.stage]}`}>{stageI18n(opp.stage)}</span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full ${STAGE_COLORS[opp.stage]}`} />
+                      <span className={`text-xs font-medium ${STAGE_BADGE_TEXT[opp.stage]}`}>{stageI18n(opp.stage)}</span>
+                    </span>
                   </td>
-                  <td className="font-medium text-gray-900">{fmtMoney(opp.amount, opp.currency, opp.custom_currency)}</td>
-                  <td>{opp.probability}%</td>
+                  <td className="font-semibold text-gray-900 whitespace-nowrap">{fmtMoney(opp.amount, opp.currency, opp.custom_currency)}</td>
+                  <td>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="relative h-1.5 w-14 bg-gray-100 rounded-full overflow-hidden">
+                        <span className={`absolute inset-y-0 left-0 rounded-full ${STAGE_COLORS[opp.stage]}`} style={{ width: `${opp.probability}%` }} />
+                      </span>
+                      <span className="text-xs text-gray-600 font-medium">{opp.probability}%</span>
+                    </span>
+                  </td>
                   <td className="text-gray-500">{opp.close_date ? new Date(opp.close_date).toLocaleDateString() : '-'}</td>
                   <td className="text-gray-500 text-sm">{opp.deal_owner || '-'}</td>
                   {isAdmin && <td className="text-gray-500 text-sm">{opp.partner_name}</td>}
