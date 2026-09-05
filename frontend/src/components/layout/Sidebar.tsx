@@ -56,7 +56,6 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
     ? [
         { to: '/admin', label: t('nav.dashboard'), },
         { to: '/admin/partners', label: t('nav.partners'), badge: partnersBadge },
-        { to: '/admin/partner-types', label: t('nav.partnerTypes'), },
         { to: '/admin/pipeline', label: t('nav.pipeline'), badge: pipelineBadge },
         { to: '/admin/courses', label: t('nav.courses'), },
         { to: '/admin/lms-report', label: t('nav.lmsReport'), },
