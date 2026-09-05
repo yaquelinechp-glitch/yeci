@@ -24,12 +24,6 @@ class Partner(models.Model):
         ("", "Sin asignar"),
     ]
 
-    PARTNER_TYPE_CHOICES = [
-        ("distribuidor", "Distribuidor"),
-        ("agente", "Agente"),
-        ("referidor", "Referidor"),
-    ]
-
     id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
     company_name = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
@@ -49,7 +43,7 @@ class Partner(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="solicitado")
     certification_date = models.DateTimeField(null=True, blank=True)
     commission_rate = models.FloatField(default=10.0)
-    partner_type = models.CharField(max_length=20, choices=PARTNER_TYPE_CHOICES, default="agente")
+    partner_type = models.CharField(max_length=60, default="agente")
     mdf_budget_year = models.FloatField(default=5000.0)
     points_balance = models.IntegerField(default=0)
     points_earned = models.IntegerField(default=0)
@@ -61,6 +55,22 @@ class Partner(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class PartnerType(models.Model):
+    key = models.SlugField(max_length=60, primary_key=True)
+    label = models.CharField(max_length=120)
+    default_commission_rate = models.FloatField(default=10.0)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.label
+
+    class Meta:
+        ordering = ["sort_order", "key"]
 
 
 class Course(models.Model):

@@ -26,7 +26,7 @@ from .models import (
     TokenBlacklist, LoginAttempt, PartnerOnboarding, PartnerUser, MdfRequest,
     Reward, RewardRedemption, PointTransaction, ChannelConflict,
     Communication, CommunicationRecipient, Product, Notification,
-    CourseExamQuestion, CostExportSetting,
+    CourseExamQuestion, CostExportSetting, PartnerType,
 )
 from . import security
 from .rewards import (
@@ -89,6 +89,10 @@ def _make_user_response(user, member=None):
             "avatar": (member.avatar if member else user.avatar) or "",
             "role": user.role, "status": user.status, "training_track": user.training_track,
             "commission_rate": user.commission_rate, "partner_type": user.partner_type,
+            "partner_type_label": (
+                PartnerType.objects.filter(key=user.partner_type).values_list("label", flat=True).first()
+                if user.partner_type else ""
+            ),
             "certification_date": user.certification_date.isoformat() if user.certification_date else None,
             "why_partner": user.why_partner or "", "sales_approach": user.sales_approach or "",
             "created_at": user.created_at.isoformat() if user.created_at else "",
@@ -314,6 +318,76 @@ def list_solicitudes(request):
         status__in=["solicitado", "en_revision"]
     ).order_by("-created_at")
     return Response(PartnerSerializer(partners, many=True).data)
+
+
+@api_view(["GET", "POST"])
+def list_partner_types(request):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+    if request.method == "GET":
+        return Response(list(PartnerType.objects.all().values(
+            "key", "label", "default_commission_rate", "is_active", "sort_order"
+        )))
+    import re as _re
+    data = request.data or {}
+    label = str(data.get("label", "")).strip()
+    key = str(data.get("key", "")).strip().lower()
+    if not key:
+        key = label.lower()
+    key = _re.sub(r"[^a-z0-9]+", "-", key).strip("-")
+    if not key or not label:
+        return Response({"detail": "key and label are required"}, status=400)
+    if PartnerType.objects.filter(key=key).exists():
+        return Response({"detail": "A partner type with this key already exists"}, status=409)
+    try:
+        rate = float(data.get("default_commission_rate", 10.0))
+    except (TypeError, ValueError):
+        rate = 10.0
+    pt = PartnerType.objects.create(
+        key=key, label=label, default_commission_rate=rate,
+        is_active=bool(data.get("is_active", True)),
+        sort_order=int(data.get("sort_order", 0)),
+    )
+    return Response({"key": pt.key, "label": pt.label, "default_commission_rate": pt.default_commission_rate,
+                     "is_active": pt.is_active, "sort_order": pt.sort_order}, status=201)
+
+
+@api_view(["GET", "PATCH", "DELETE"])
+def partner_type_detail(request, key):
+    user = _current_user(request)
+    if not user or user.role != "admin":
+        return Response({"detail": "Admin access required"}, status=403)
+    pt = PartnerType.objects.filter(key=key).first()
+    if not pt:
+        return Response({"detail": "Partner type not found"}, status=404)
+    if request.method == "GET":
+        return Response({"key": pt.key, "label": pt.label, "default_commission_rate": pt.default_commission_rate,
+                         "is_active": pt.is_active, "sort_order": pt.sort_order})
+    if request.method == "DELETE":
+        in_use = Partner.objects.filter(partner_type=pt.key).exists()
+        if in_use:
+            return Response({"detail": "Cannot delete: partners use this type"}, status=400)
+        pt.delete()
+        return Response(status=204)
+    data = request.data or {}
+    if "label" in data and str(data.get("label", "")).strip():
+        pt.label = str(data.get("label")).strip()
+    if "default_commission_rate" in data:
+        try:
+            pt.default_commission_rate = float(data.get("default_commission_rate"))
+        except (TypeError, ValueError):
+            pass
+    if "is_active" in data:
+        pt.is_active = bool(data.get("is_active"))
+    if "sort_order" in data:
+        try:
+            pt.sort_order = int(data.get("sort_order"))
+        except (TypeError, ValueError):
+            pass
+    pt.save()
+    return Response({"key": pt.key, "label": pt.label, "default_commission_rate": pt.default_commission_rate,
+                     "is_active": pt.is_active, "sort_order": pt.sort_order})
 
 
 def _ensure_compliance_assignment(partner):

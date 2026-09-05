@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   en: {
     translation: {
-      nav: { home: 'Home', login: 'Login', register: 'Register', logout: 'Logout', dashboard: 'Dashboard', partners: 'Partners', courses: 'Courses', pipeline: 'Pipeline', deals: 'My Deals', reports: 'Reports', requests: 'Requests', security: 'Security', admin: 'Admin', training: 'Training', lmsReport: 'LMS Report', users: 'Team Members', conflicts: 'Conflicts', notifications: 'Notifications', brand: 'Partner Academy', costExport: 'Cost Indication Texts', courseAnalytics: 'Course Analytics' },
+      nav: { home: 'Home', login: 'Login', register: 'Register', logout: 'Logout', dashboard: 'Dashboard', partners: 'Partners', courses: 'Courses', pipeline: 'Pipeline', deals: 'My Deals', reports: 'Reports', requests: 'Requests', security: 'Security', admin: 'Admin', training: 'Training', lmsReport: 'LMS Report', users: 'Team Members', conflicts: 'Conflicts', notifications: 'Notifications', brand: 'Partner Academy', costExport: 'Cost Indication Texts', courseAnalytics: 'Course Analytics', partnerTypes: 'Partner Types' },
       landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Work with aconso: deal registration, team training and rewards.',
         cta: 'Access the Portal →', ctaSecondary: 'What the portal includes', programTitle: 'Partner Portal',
@@ -165,6 +165,12 @@ const resources = {
           distribuidor: 'Distributor', agente: 'Agent', referidor: 'Referrer',
         },
         partnerTypeLabel: 'Partner type',
+        partnerTypesPage: {
+          title: 'Partner Types', subtitle: 'Define the sales models and the commission each partner keeps.',
+          newType: 'New partner type', typeName: 'Name', typeKey: 'Key (identifier)', typeKeyHint: 'Auto-generated from the name, e.g. "distributor-gold"',
+          defaultRate: 'Default commission %', active: 'Active', created: 'Type created', updated: 'Type updated', deleted: 'Type deleted',
+          deleteConfirm: 'Delete this type?', inUse: 'Cannot delete: partners use this type',
+        },
       },
       partner: {
         title: 'Partner Dashboard', welcome: 'Welcome,', subtitle: 'Your partner portal — manage deals, learn the product, and track commissions.',
@@ -515,7 +521,7 @@ const resources = {
   },
   es: {
     translation: {
-      nav: { home: 'Inicio', login: 'Iniciar Sesión', register: 'Registrarse', logout: 'Cerrar Sesión', dashboard: 'Panel', partners: 'Partners', courses: 'Cursos', pipeline: 'Pipeline', deals: 'Mis Deals', reports: 'Reportes', requests: 'Solicitudes', security: 'Seguridad', admin: 'Administrador', training: 'Formación', lmsReport: 'Informe LMS', users: 'Equipo', conflicts: 'Conflictos', notifications: 'Notificaciones', brand: 'Partner Academy', costExport: 'Textos Indicador Costos', courseAnalytics: 'Analítica de Cursos' },
+      nav: { home: 'Inicio', login: 'Iniciar Sesión', register: 'Registrarse', logout: 'Cerrar Sesión', dashboard: 'Panel', partners: 'Partners', courses: 'Cursos', pipeline: 'Pipeline', deals: 'Mis Deals', reports: 'Reportes', requests: 'Solicitudes', security: 'Seguridad', admin: 'Administrador', training: 'Formación', lmsReport: 'Informe LMS', users: 'Equipo', conflicts: 'Conflictos', notifications: 'Notificaciones', brand: 'Partner Academy', costExport: 'Textos Indicador Costos', courseAnalytics: 'Analítica de Cursos', partnerTypes: 'Tipos de Partner' },
 landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Trabaja con aconso: registro de deals, formación de tu equipo y recompensas.',
         cta: 'Acceder al Portal →', ctaSecondary: 'Qué incluye el portal', programTitle: 'Portal de Partners',
@@ -675,6 +681,12 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
           distribuidor: 'Distribuidor', agente: 'Agente', referidor: 'Referidor',
         },
         partnerTypeLabel: 'Tipo de partner',
+        partnerTypesPage: {
+          title: 'Tipos de Partner', subtitle: 'Define los modelos de venta y el % que se queda cada partner.',
+          newType: 'Nuevo tipo de partner', typeName: 'Nombre', typeKey: 'Clave (identificador)', typeKeyHint: 'Se genera automáticamente desde el nombre, ej. "distribuidor-gold"',
+          defaultRate: '% por defecto', active: 'Activo', created: 'Tipo creado', updated: 'Tipo actualizado', deleted: 'Tipo eliminado',
+          deleteConfirm: '¿Eliminar este tipo?', inUse: 'No se puede eliminar: hay partners usando este tipo',
+        },
       },
       partner: {
         title: 'Panel de Partner', welcome: 'Bienvenido,', subtitle: 'Tu portal de partner — gestiona deals, aprende el producto y sigue tus comisiones.',
@@ -1026,7 +1038,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
   },
   de: {
     translation: {
-      nav: { home: 'Startseite', login: 'Anmelden', register: 'Registrieren', logout: 'Abmelden', dashboard: 'Dashboard', partners: 'Partner', courses: 'Kurse', pipeline: 'Pipeline', deals: 'Meine Deals', reports: 'Berichte', requests: 'Anfragen', security: 'Sicherheit', admin: 'Administrator', training: 'Schulung', lmsReport: 'LMS-Bericht', users: 'Team', conflicts: 'Konflikte', notifications: 'Benachrichtigungen', brand: 'Partner Academy', costExport: 'Kostenindikation-Texte', courseAnalytics: 'Kursanalyse' },
+      nav: { home: 'Startseite', login: 'Anmelden', register: 'Registrieren', logout: 'Abmelden', dashboard: 'Dashboard', partners: 'Partner', courses: 'Kurse', pipeline: 'Pipeline', deals: 'Meine Deals', reports: 'Berichte', requests: 'Anfragen', security: 'Sicherheit', admin: 'Administrator', training: 'Schulung', lmsReport: 'LMS-Bericht', users: 'Team', conflicts: 'Konflikte', notifications: 'Benachrichtigungen', brand: 'Partner Academy', costExport: 'Kostenindikation-Texte', courseAnalytics: 'Kursanalyse', partnerTypes: 'Partnertypen' },
       landing: {
         title: 'Partner', titleHighlight: 'Portal', subtitle: 'Arbeiten Sie mit aconso: Deal-Registrierung, Team-Schulung und Prämien.',
         cta: 'Zum Portal →', ctaSecondary: 'Was das Portal enthält', programTitle: 'Partner-Portal',
@@ -1186,6 +1198,12 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
           distribuidor: 'Distributor', agente: 'Agent', referidor: 'Referrer',
         },
         partnerTypeLabel: 'Partnertyp',
+        partnerTypesPage: {
+          title: 'Partnertypen', subtitle: 'Verkaufsmodelle und die Provision definieren, die jeder Partner behält.',
+          newType: 'Neuer Partnertyp', typeName: 'Name', typeKey: 'Schlüssel (Identifikator)', typeKeyHint: 'Automatisch aus dem Namen erzeugt, z. B. „distributor-gold“',
+          defaultRate: 'Standard-Provision %', active: 'Aktiv', created: 'Typ erstellt', updated: 'Typ aktualisiert', deleted: 'Typ gelöscht',
+          deleteConfirm: 'Diesen Typ löschen?', inUse: 'Löschen nicht möglich: Partner nutzen diesen Typ',
+        },
       },
       partner: {
         title: 'Partner Dashboard', welcome: 'Willkommen,', subtitle: 'Ihr Partner-Portal — Deals verwalten, Produkt lernen und Provisionen verfolgen.',

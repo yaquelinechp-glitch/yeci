@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    Partner, Course, CourseVideo, QuizQuestion, QuizBankQuestion, CourseAssignment,
+    Partner, PartnerType, Course, CourseVideo, QuizQuestion, QuizBankQuestion, CourseAssignment,
     CourseRating, QuizAttempt, PartnerProgress, VideoCheckpoint,
     Deal, Commission, Opportunity, OpportunityEvent, TrainingResult, Certification,
     Product, Notification, CourseExamQuestion,
@@ -15,13 +15,22 @@ def localize(obj, field_name, lang="en"):
 
 
 class PartnerSerializer(serializers.ModelSerializer):
+    partner_type_label = serializers.SerializerMethodField()
+
     class Meta:
         model = Partner
         fields = [
             "id", "company_name", "email", "phone", "tax_id", "country", "contact_name",
-            "role", "training_track", "status", "commission_rate", "partner_type", "notes", "why_partner",
+            "role", "training_track", "status", "commission_rate", "partner_type", "partner_type_label",
+            "notes", "why_partner",
             "sales_approach", "certification_date", "created_at",
         ]
+
+    def get_partner_type_label(self, obj):
+        if not obj.partner_type:
+            return ""
+        pt = PartnerType.objects.filter(key=obj.partner_type).first()
+        return pt.label if pt else obj.partner_type
 
 
 class PartnerCreateSerializer(serializers.Serializer):
@@ -43,8 +52,13 @@ class PartnerUpdateSerializer(serializers.Serializer):
     status = serializers.CharField(required=False)
     training_track = serializers.ChoiceField(choices=[c[0] for c in Partner.TRACK_CHOICES], required=False, allow_blank=True)
     commission_rate = serializers.FloatField(required=False)
-    partner_type = serializers.ChoiceField(choices=[c[0] for c in Partner.PARTNER_TYPE_CHOICES], required=False)
+    partner_type = serializers.CharField(required=False)
     notes = serializers.CharField(required=False)
+
+    def validate_partner_type(self, value):
+        if not PartnerType.objects.filter(key=value).exists():
+            raise serializers.ValidationError("Invalid partner type key")
+        return value
 
 
 class CourseVideoSerializer(serializers.ModelSerializer):

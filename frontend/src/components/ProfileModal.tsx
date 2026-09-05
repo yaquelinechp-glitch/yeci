@@ -183,7 +183,7 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
             <div className="bg-aconso-50 border border-aconso-200 rounded-xl px-4 py-3 flex items-center justify-between">
               <span className="text-sm text-gray-600">{t('profile.partnerType')}</span>
               <span className="badge bg-aconso-100 text-aconso-700 border border-aconso-200 font-medium">
-                {t(`admin.partnerTypes.${user.partner_type}`)}
+                {user.partner_type_label || t(`admin.partnerTypes.${user.partner_type}`) || user.partner_type}
               </span>
             </div>
           )}

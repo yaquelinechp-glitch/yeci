@@ -14,6 +14,9 @@ urlpatterns = [
     path("partners/solicitudes/list", views.list_solicitudes),
     path("partners/<str:partner_id>", views.partner_detail),
 
+    path("admin/partner-types", views.list_partner_types),
+    path("admin/partner-types/<str:key>", views.partner_type_detail),
+
     path("courses/", views.courses_list_or_create),
     path("courses/progress", views.update_progress),
     path("courses/progress/<str:partner_id>", views.get_partner_progress),

@@ -45,6 +45,14 @@ export const partnersApi = {
   update: (id: string, data: any) => api.patch(`/partners/${id}`, data),
 };
 
+export const partnerTypesApi = {
+  list: () => api.get('/admin/partner-types'),
+  create: (data: { key: string; label: string; default_commission_rate: number; is_active?: boolean }) =>
+    api.post('/admin/partner-types', data),
+  update: (key: string, data: any) => api.patch(`/admin/partner-types/${key}`, data),
+  delete: (key: string) => api.delete(`/admin/partner-types/${key}`),
+};
+
 export const coursesApi = {
   list: () => api.get(`/courses/?lang=${lang()}`),
   get: (id: string) => api.get(`/courses/${id}?lang=${lang()}`),

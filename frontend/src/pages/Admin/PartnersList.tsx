@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { partnersApi, coursesApi } from '../../services/api';
+import { partnersApi, coursesApi, partnerTypesApi } from '../../services/api';
 import type { User } from '../../types';
 
 interface PartnerCourseProgress {
@@ -15,9 +15,18 @@ interface PartnerCourseProgress {
   completed_videos: string[];
 }
 
+interface PartnerType {
+  key: string;
+  label: string;
+  default_commission_rate: number;
+  is_active: boolean;
+  sort_order: number;
+}
+
 export default function PartnersList() {
   const { t } = useTranslation();
   const [partners, setPartners] = useState<User[]>([]);
+  const [types, setTypes] = useState<PartnerType[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [selectedPartner, setSelectedPartner] = useState<User | null>(null);
@@ -25,6 +34,8 @@ export default function PartnersList() {
   const [progressLoading, setProgressLoading] = useState(false);
 
   useEffect(() => { partnersApi.list().then((r) => setPartners(r.data)); }, []);
+
+  useEffect(() => { partnerTypesApi.list().then((r) => setTypes(r.data || [])).catch(() => {}); }, []);
 
   useEffect(() => {
     if (!selectedPartner) return;
@@ -52,6 +63,31 @@ export default function PartnersList() {
     if (s === 'solicitado') return 'bg-amber-100 text-amber-700 border border-amber-200';
     if (s === 'en_revision') return 'bg-blue-100 text-blue-700 border border-blue-200';
     return 'bg-gray-100 text-gray-600 border border-gray-200';
+  };
+
+  const handleTypeChange = async (p: User, next: string) => {
+    const pt = types.find((x) => x.key === next);
+    const row = document.getElementById(`row-${p.id}`);
+    row?.classList.add('opacity-60');
+    const nextRate = pt ? pt.default_commission_rate : p.commission_rate;
+    setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: next, commission_rate: nextRate } : x));
+    try {
+      await partnersApi.update(p.id, { partner_type: next, commission_rate: nextRate });
+    } catch {
+      setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: p.partner_type, commission_rate: p.commission_rate } : x));
+    }
+    row?.classList.remove('opacity-60');
+  };
+
+  const handleRateBlur = async (p: User, next: number | null) => {
+    if (next === null || next === p.commission_rate) return;
+    const prev = p.commission_rate;
+    setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, commission_rate: next } : x));
+    try {
+      await partnersApi.update(p.id, { commission_rate: next });
+    } catch {
+      setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, commission_rate: prev } : x));
+    }
   };
 
   const filteredPartners = partners.filter((p) => {
@@ -126,6 +162,7 @@ export default function PartnersList() {
             {filteredPartners.map((p) => (
               <tr
                 key={p.id}
+                id={`row-${p.id}`}
                 onDoubleClick={() => handleDoubleClick(p)}
                 className="cursor-pointer hover:bg-aconso-50/50 transition-colors"
                 title={t('admin.doubleClickToView')}
@@ -145,25 +182,30 @@ export default function PartnersList() {
                 </td>
                 <td>
                   <select
-                    value={p.partner_type}
+                    value={p.partner_type || ''}
                     onClick={(e) => e.stopPropagation()}
-                    onChange={async (e) => {
-                      const next = e.target.value;
-                      e.currentTarget.closest('tr')?.classList.add('opacity-60');
-                      try {
-                        await partnersApi.update(p.id, { partner_type: next });
-                        setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: next } : x));
-                      } catch { /* keep previous value */ }
-                      e.currentTarget.closest('tr')?.classList.remove('opacity-60');
-                    }}
-                    className="text-xs font-medium rounded-md px-2 py-1 bg-aconso-50 text-aconso-700 border border-aconso-200 focus:outline-none focus:ring-2 focus:ring-aconso-500/20 cursor-pointer"
+                    onChange={(e) => handleTypeChange(p, e.target.value)}
+                    className="text-xs font-medium rounded-md px-2 py-1 bg-aconso-50 text-aconso-700 border border-aconso-200 focus:outline-none focus:ring-2 focus:ring-aconso-500/20 cursor-pointer max-w-[140px]"
                   >
-                    {Object.keys({ distribuidor: '', agente: '', referidor: '' }).map((k) => (
-                      <option key={k} value={k}>{t(`admin.partnerTypes.${k}`)}</option>
+                    {types.map((pt) => (
+                      <option key={pt.key} value={pt.key}>{pt.label}</option>
                     ))}
                   </select>
                 </td>
-                <td className="font-medium text-gray-900">{p.commission_rate}%</td>
+                <td onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      defaultValue={p.commission_rate}
+                      onBlur={(e) => handleRateBlur(p, e.target.value === '' ? null : parseFloat(e.target.value))}
+                      onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                      className="w-20 font-medium text-gray-900 text-right border border-transparent hover:border-gray-200 focus:border-aconso-500 focus:outline-none focus:ring-2 focus:ring-aconso-500/20 rounded-md px-2 py-1"
+                    />
+                    <span className="text-gray-400">%</span>
+                  </div>
+                </td>
               </tr>
             ))}
             {filteredPartners.length === 0 && (

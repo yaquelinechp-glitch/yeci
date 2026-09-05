@@ -17,6 +17,7 @@ import AdminLmsReport from './pages/Admin/LmsReport';
 import AdminConflicts from './pages/Admin/Conflicts';
 import AdminCostExport from './pages/Admin/CostExport';
 import AdminCourseAnalytics from './pages/Admin/CourseAnalytics';
+import AdminPartnerTypes from './pages/Admin/PartnerTypes';
 
 import PartnerDashboard from './pages/Partner/Dashboard';
 import PartnerCourses from './pages/Partner/Courses';
@@ -46,6 +47,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="solicitudes" element={<Navigate to="/admin/partners" replace />} />
           <Route path="partners" element={<PartnersOverview />} />
+<Route path="partner-types" element={<AdminPartnerTypes />} />
           <Route path="pipeline" element={<AdminPipeline />} />
           <Route path="courses" element={<AdminCourses />} />
           <Route path="reports" element={<AdminReports />} />
