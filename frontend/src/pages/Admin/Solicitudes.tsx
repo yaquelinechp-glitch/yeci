@@ -42,11 +42,6 @@ export default function Solicitudes() {
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.requests')}</h1>
-        <p className="text-gray-500 mt-1">{t('admin.solicitudesSubtitle')}</p>
-      </div>
-
       {solicitudes.length === 0 ? (
         <div className="card p-16 text-center">
           <div className="text-5xl mb-4"></div>

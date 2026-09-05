@@ -23,17 +23,13 @@ interface PartnerType {
   sort_order: number;
 }
 
-export default function PartnersList() {
+export default function PartnersList({ partners, filter }: { partners: User[]; filter: string }) {
   const { t } = useTranslation();
-  const [partners, setPartners] = useState<User[]>([]);
   const [types, setTypes] = useState<PartnerType[]>([]);
-  const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [selectedPartner, setSelectedPartner] = useState<User | null>(null);
   const [partnerProgress, setPartnerProgress] = useState<PartnerCourseProgress[]>([]);
   const [progressLoading, setProgressLoading] = useState(false);
-
-  useEffect(() => { partnersApi.list().then((r) => setPartners(r.data)); }, []);
 
   useEffect(() => { partnerTypesApi.list().then((r) => setTypes(r.data || [])).catch(() => {}); }, []);
 
@@ -98,40 +94,11 @@ export default function PartnersList() {
     return matchesFilter && matchesSearch;
   });
 
-  const statusCounts = {
-    all: partners.length,
-    activo: partners.filter((p) => p.status === 'activo').length,
-    solicitado: partners.filter((p) => p.status === 'solicitado').length,
-    en_revision: partners.filter((p) => p.status === 'en_revision').length,
-  };
-
   return (
     <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t('admin.allPartners')}</h1>
-        <p className="text-gray-500 mt-1">{t('admin.partnersSubtitle')}</p>
-      </div>
-
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="flex gap-2">
-          {[
-            { key: 'all', label: t('common.all') },
-            { key: 'activo', label: t('common.active') },
-            { key: 'solicitado', label: t('common.pending') },
-            { key: 'en_revision', label: t('common.review') },
-          ].map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filter === f.key
-                  ? 'bg-aconso-500 text-white shadow-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-aconso-300'
-              }`}
-            >
-              {f.label} ({statusCounts[f.key as keyof typeof statusCounts] || 0})
-            </button>
-          ))}
+        <div className="text-sm text-gray-500">
+          <span className="font-semibold text-gray-900">{filteredPartners.length}</span> de {partners.length} {t('admin.partners')}
         </div>
         <div className="flex-1"></div>
         <div className="relative">
@@ -140,9 +107,11 @@ export default function PartnersList() {
             placeholder={t('common.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 w-64"
+            className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 w-64"
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></span>
+          <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
       </div>
 
