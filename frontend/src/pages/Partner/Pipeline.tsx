@@ -419,12 +419,11 @@ export default function Pipeline() {
       </div>
 
       {view === 'board' ? (
-        <div className="overflow-x-auto pb-2 -mx-1 px-1">
-          <div className="flex gap-4 min-w-0">
-            {STAGES.map((stage) => {
+        <div className="grid grid-cols-6 gap-3">
+          {STAGES.map((stage) => {
               const stageOpps = opps.filter((o) => o.stage === stage);
               return (
-                <div key={stage} className={`w-72 shrink-0 rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
+                <div key={stage} className={`rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
                   {...(isAdmin ? {} : { onDragOver: (e: React.DragEvent) => onDragOver(e, stage), onDragLeave, onDrop: (e: React.DragEvent) => onDrop(e, stage) })}>
                   <div className="p-3 border-b border-gray-100 bg-white rounded-t-2xl flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
@@ -444,7 +443,12 @@ export default function Pipeline() {
                         className={`bg-white rounded-xl p-3 border ${isAdmin ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'} shadow-sm hover:shadow-md transition-all ${dragId === opp.id ? 'opacity-50 scale-95' : ''} ${opp.conflict ? 'border-red-300 ring-1 ring-red-200' : STAGE_BORDERS[stage]}`}>
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <span className="font-medium text-[13px] text-gray-900 truncate">{opp.company_name}</span>
-                          <span className="text-[11px] text-gray-400 shrink-0">{opp.probability}%</span>
+                          <span className="flex items-center gap-1.5 shrink-0">
+                            {!isAdmin && <button title={t('common.delete')} onClick={(e) => { e.stopPropagation(); setDeleteId(opp.id); }} className="w-5 h-5 flex items-center justify-center rounded-md text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.9 12.1A2 2 0 0116.1 21H7.9a2 2 0 01-2-1.9L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" /></svg>
+                            </button>}
+                            <span className="text-[11px] text-gray-400">{opp.probability}%</span>
+                          </span>
                         </div>
                         {isAdmin && opp.partner_name && <div className="text-[10px] text-gray-400 truncate mb-1">{opp.partner_name}</div>}
                         {opp.products_labels && opp.products_labels.length > 0 && (
@@ -468,10 +472,6 @@ export default function Pipeline() {
                             {new Date(opp.close_date).toLocaleDateString()} {isOverdue(opp.close_date) && '·'}
                           </div>
                         )}
-                        {!isAdmin && <div className="flex items-center gap-1 mt-2 pt-2 border-t border-gray-100">
-                          <button onClick={(e) => { e.stopPropagation(); openEdit(opp); }} className="text-[10px] text-gray-400 hover:text-aconso-600 transition-colors">{t('common.edit')}</button>
-                          <button onClick={(e) => { e.stopPropagation(); setDeleteId(opp.id); }} className="text-[10px] text-gray-400 hover:text-red-500 transition-colors">{t('common.delete')}</button>
-                        </div>}
                       </div>
                     ))}
                     {stageOpps.length === 0 && (
@@ -483,7 +483,6 @@ export default function Pipeline() {
                 </div>
               );
             })}
-          </div>
         </div>
       ) : (
         <div className="table-container">
