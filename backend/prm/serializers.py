@@ -19,7 +19,7 @@ class PartnerSerializer(serializers.ModelSerializer):
         model = Partner
         fields = [
             "id", "company_name", "email", "phone", "tax_id", "country", "contact_name",
-            "role", "training_track", "status", "commission_rate", "notes", "why_partner",
+            "role", "training_track", "status", "commission_rate", "partner_type", "notes", "why_partner",
             "sales_approach", "certification_date", "created_at",
         ]
 
@@ -43,6 +43,7 @@ class PartnerUpdateSerializer(serializers.Serializer):
     status = serializers.CharField(required=False)
     training_track = serializers.ChoiceField(choices=[c[0] for c in Partner.TRACK_CHOICES], required=False, allow_blank=True)
     commission_rate = serializers.FloatField(required=False)
+    partner_type = serializers.ChoiceField(choices=[c[0] for c in Partner.PARTNER_TYPE_CHOICES], required=False)
     notes = serializers.CharField(required=False)
 
 

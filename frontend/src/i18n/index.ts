@@ -120,6 +120,7 @@ const resources = {
       profile: {
         title: 'My Profile', firstName: 'First name', lastName: 'Last name', username: 'Username',
         changePhoto: 'Change photo', saved: 'Profile updated successfully', invalidImage: 'Please choose a valid image file',
+        partnerType: 'Partner type',
       },
       dash: {
         program: 'Partner Program',
@@ -160,6 +161,10 @@ const resources = {
           solicitado: 'Requested', en_revision: 'Under Review', aprobado: 'Approved',
           contrato_pendiente: 'Contract Pending', activo: 'Active', inactivo: 'Inactive',
         },
+        partnerTypes: {
+          distribuidor: 'Distributor', agente: 'Agent', referidor: 'Referrer',
+        },
+        partnerTypeLabel: 'Partner type',
       },
       partner: {
         title: 'Partner Dashboard', welcome: 'Welcome,', subtitle: 'Your partner portal — manage deals, learn the product, and track commissions.',
@@ -625,6 +630,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
       profile: {
         title: 'Mi Perfil', firstName: 'Nombre', lastName: 'Apellidos', username: 'Nombre de usuario',
         changePhoto: 'Cambiar foto', saved: 'Perfil actualizado correctamente', invalidImage: 'Elige un archivo de imagen válido',
+        partnerType: 'Tipo de partner',
       },
       dash: {
         program: 'Programa de Partners',
@@ -665,6 +671,10 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
           solicitado: 'Solicitado', en_revision: 'En Revisión', aprobado: 'Aprobado',
           contrato_pendiente: 'Contrato Pendiente', activo: 'Activo', inactivo: 'Inactivo',
         },
+        partnerTypes: {
+          distribuidor: 'Distribuidor', agente: 'Agente', referidor: 'Referidor',
+        },
+        partnerTypeLabel: 'Tipo de partner',
       },
       partner: {
         title: 'Panel de Partner', welcome: 'Bienvenido,', subtitle: 'Tu portal de partner — gestiona deals, aprende el producto y sigue tus comisiones.',
@@ -1131,6 +1141,7 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
       profile: {
         title: 'Mein Profil', firstName: 'Vorname', lastName: 'Nachname', username: 'Benutzername',
         changePhoto: 'Foto ändern', saved: 'Profil erfolgreich aktualisiert', invalidImage: 'Bitte eine gültige Bilddatei wählen',
+        partnerType: 'Partnertyp',
       },
       dash: {
         program: 'Partnerprogramm',
@@ -1171,6 +1182,10 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
           solicitado: 'Angefragt', en_revision: 'In Prüfung', aprobado: 'Genehmigt',
           contrato_pendiente: 'Vertrag ausstehend', activo: 'Aktiv', inactivo: 'Inaktiv',
         },
+        partnerTypes: {
+          distribuidor: 'Distributor', agente: 'Agent', referidor: 'Referrer',
+        },
+        partnerTypeLabel: 'Partnertyp',
       },
       partner: {
         title: 'Partner Dashboard', welcome: 'Willkommen,', subtitle: 'Ihr Partner-Portal — Deals verwalten, Produkt lernen und Provisionen verfolgen.',

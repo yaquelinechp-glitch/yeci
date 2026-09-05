@@ -88,7 +88,7 @@ def _make_user_response(user, member=None):
             "username": (member.username if member else user.username) or "",
             "avatar": (member.avatar if member else user.avatar) or "",
             "role": user.role, "status": user.status, "training_track": user.training_track,
-            "commission_rate": user.commission_rate,
+            "commission_rate": user.commission_rate, "partner_type": user.partner_type,
             "certification_date": user.certification_date.isoformat() if user.certification_date else None,
             "why_partner": user.why_partner or "", "sales_approach": user.sales_approach or "",
             "created_at": user.created_at.isoformat() if user.created_at else "",

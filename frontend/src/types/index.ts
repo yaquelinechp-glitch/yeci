@@ -14,6 +14,7 @@
   status: string;
   training_track: string;
   commission_rate: number;
+  partner_type: string;
   certification_date: string | null;
   why_partner: string;
   sales_approach: string;

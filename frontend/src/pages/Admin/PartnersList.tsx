@@ -118,6 +118,7 @@ export default function PartnersList() {
               <th>{t('common.contact')}</th>
               <th>{t('common.email')}</th>
               <th>{t('common.status')}</th>
+              <th>{t('admin.partnerTypeLabel')}</th>
               <th>{t('common.commission')}</th>
             </tr>
           </thead>
@@ -142,12 +143,32 @@ export default function PartnersList() {
                 <td>
                   <span className={`badge ${statusColor(p.status)}`}>{t(`admin.statuses.${p.status}`)}</span>
                 </td>
+                <td>
+                  <select
+                    value={p.partner_type}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={async (e) => {
+                      const next = e.target.value;
+                      e.currentTarget.closest('tr')?.classList.add('opacity-60');
+                      try {
+                        await partnersApi.update(p.id, { partner_type: next });
+                        setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: next } : x));
+                      } catch { /* keep previous value */ }
+                      e.currentTarget.closest('tr')?.classList.remove('opacity-60');
+                    }}
+                    className="text-xs font-medium rounded-md px-2 py-1 bg-aconso-50 text-aconso-700 border border-aconso-200 focus:outline-none focus:ring-2 focus:ring-aconso-500/20 cursor-pointer"
+                  >
+                    {Object.keys({ distribuidor: '', agente: '', referidor: '' }).map((k) => (
+                      <option key={k} value={k}>{t(`admin.partnerTypes.${k}`)}</option>
+                    ))}
+                  </select>
+                </td>
                 <td className="font-medium text-gray-900">{p.commission_rate}%</td>
               </tr>
             ))}
             {filteredPartners.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-gray-400">{t('common.noData')}</td>
+                <td colSpan={6} className="text-center py-12 text-gray-400">{t('common.noData')}</td>
               </tr>
             )}
           </tbody>

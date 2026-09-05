@@ -24,6 +24,12 @@ class Partner(models.Model):
         ("", "Sin asignar"),
     ]
 
+    PARTNER_TYPE_CHOICES = [
+        ("distribuidor", "Distribuidor"),
+        ("agente", "Agente"),
+        ("referidor", "Referidor"),
+    ]
+
     id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
     company_name = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
@@ -43,6 +49,7 @@ class Partner(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="solicitado")
     certification_date = models.DateTimeField(null=True, blank=True)
     commission_rate = models.FloatField(default=10.0)
+    partner_type = models.CharField(max_length=20, choices=PARTNER_TYPE_CHOICES, default="agente")
     mdf_budget_year = models.FloatField(default=5000.0)
     points_balance = models.IntegerField(default=0)
     points_earned = models.IntegerField(default=0)

@@ -179,6 +179,15 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
             {data?.company_name || user?.company_name} · {data?.email || user?.email}
           </div>
 
+          {user?.partner_type && (
+            <div className="bg-aconso-50 border border-aconso-200 rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-gray-600">{t('profile.partnerType')}</span>
+              <span className="badge bg-aconso-100 text-aconso-700 border border-aconso-200 font-medium">
+                {t(`admin.partnerTypes.${user.partner_type}`)}
+              </span>
+            </div>
+          )}
+
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">
               {t('common.cancel')}
