@@ -47,7 +47,7 @@ export const partnersApi = {
 
 export const partnerTypesApi = {
   list: () => api.get('/admin/partner-types'),
-  create: (data: { key: string; label: string; default_commission_rate: number; is_active?: boolean }) =>
+  create: (data: { label: string; default_commission_rate: number; is_active?: boolean }) =>
     api.post('/admin/partner-types', data),
   update: (key: string, data: any) => api.patch(`/admin/partner-types/${key}`, data),
   delete: (key: string) => api.delete(`/admin/partner-types/${key}`),

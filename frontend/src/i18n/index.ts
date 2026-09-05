@@ -167,7 +167,7 @@ const resources = {
         partnerTypeLabel: 'Partner type',
         partnerTypesPage: {
           title: 'Partner Types', subtitle: 'Define the sales models and the commission each partner keeps.',
-          newType: 'New partner type', typeName: 'Name', typeKey: 'Key (identifier)', typeKeyHint: 'Auto-generated from the name, e.g. "distributor-gold"',
+          newType: 'New partner type', typeName: 'Name',
           defaultRate: 'Default commission %', active: 'Active', created: 'Type created', updated: 'Type updated', deleted: 'Type deleted',
           deleteConfirm: 'Delete this type?', inUse: 'Cannot delete: partners use this type',
           reassignTitle: 'Reassign partners before deleting', inUseCount: '{{n}} partners use this type',
@@ -686,7 +686,7 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         partnerTypeLabel: 'Tipo de partner',
         partnerTypesPage: {
           title: 'Tipos de Partner', subtitle: 'Define los modelos de venta y el % que se queda cada partner.',
-          newType: 'Nuevo tipo de partner', typeName: 'Nombre', typeKey: 'Clave (identificador)', typeKeyHint: 'Se genera automáticamente desde el nombre, ej. "distribuidor-gold"',
+          newType: 'Nuevo tipo de partner', typeName: 'Nombre',
           defaultRate: '% por defecto', active: 'Activo', created: 'Tipo creado', updated: 'Tipo actualizado', deleted: 'Tipo eliminado',
           deleteConfirm: '¿Eliminar este tipo?', inUse: 'No se puede eliminar: hay partners usando este tipo',
           reassignTitle: 'Reasigna partners antes de eliminar', inUseCount: '{{n}} partners usan este tipo',
@@ -1206,7 +1206,7 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         partnerTypeLabel: 'Partnertyp',
         partnerTypesPage: {
           title: 'Partnertypen', subtitle: 'Verkaufsmodelle und die Provision definieren, die jeder Partner behält.',
-          newType: 'Neuer Partnertyp', typeName: 'Name', typeKey: 'Schlüssel (Identifikator)', typeKeyHint: 'Automatisch aus dem Namen erzeugt, z. B. „distributor-gold“',
+          newType: 'Neuer Partnertyp', typeName: 'Name',
           defaultRate: 'Standard-Provision %', active: 'Aktiv', created: 'Typ erstellt', updated: 'Typ aktualisiert', deleted: 'Typ gelöscht',
           deleteConfirm: 'Diesen Typ löschen?', inUse: 'Löschen nicht möglich: Partner nutzen diesen Typ',
           reassignTitle: 'Partner vor dem Löschen neu zuweisen', inUseCount: '{{n}} Partner nutzen diesen Typ',

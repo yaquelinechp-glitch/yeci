@@ -11,16 +11,12 @@ interface PartnerType {
   sort_order: number;
 }
 
-const slugify = (s: string) =>
-  s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-
 export default function PartnerTypes() {
   const { t } = useTranslation();
   const [types, setTypes] = useState<PartnerType[]>([]);
   const [partners, setPartners] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
-  const [keyInput, setKeyInput] = useState('');
   const [rate, setRate] = useState('10');
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -47,11 +43,6 @@ export default function PartnerTypes() {
 
   useEffect(load, []);
 
-  const handleNameChange = (v: string) => {
-    setName(v);
-    if (!keyInput || keyInput === slugify(name)) setKeyInput(slugify(v));
-  };
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) { setMsg({ ok: false, text: t('common.error') }); return; }
@@ -59,13 +50,12 @@ export default function PartnerTypes() {
     setMsg(null);
     try {
       await partnerTypesApi.create({
-        key: keyInput || slugify(name),
         label: name.trim(),
         default_commission_rate: parseFloat(rate) || 0,
       });
-      setName(''); setKeyInput(''); setRate('10');
+      setName(''); setRate('10');
       setMsg({ ok: true, text: t('admin.partnerTypesPage.created') });
-      load();
+      loadTypesOnly();
     } catch {
       setMsg({ ok: false, text: t('common.error') });
     } finally {
@@ -170,16 +160,10 @@ export default function PartnerTypes() {
 
       <form onSubmit={handleCreate} className="bg-white border border-gray-200 rounded-2xl p-5 mb-6">
         <h3 className="text-sm font-semibold text-gray-800 mb-4">{t('admin.partnerTypesPage.newType')}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.partnerTypesPage.typeName')}</label>
-            <input value={name} onChange={(e) => handleNameChange(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.partnerTypesPage.typeKey')}</label>
-            <input value={keyInput} onChange={(e) => setKeyInput(slugify(e.target.value))}
-              placeholder={t('admin.partnerTypesPage.typeKeyHint')}
+            <input value={name} onChange={(e) => setName(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500" />
           </div>
           <div>
@@ -199,7 +183,6 @@ export default function PartnerTypes() {
           <thead>
             <tr>
               <th>{t('admin.partnerTypesPage.typeName')}</th>
-              <th>{t('admin.partnerTypesPage.typeKey')}</th>
               <th>{t('admin.partnerTypesPage.defaultRate')}</th>
               <th>{t('admin.partnerTypesPage.active')}</th>
               <th>{t('common.actions')}</th>
@@ -211,9 +194,13 @@ export default function PartnerTypes() {
               return (
                 <tr key={pt.key}>
                   <td className="font-medium text-gray-900">
-                    {ed ? cell(pt, ed.label, (v) => setEditing((m) => ({ ...m, [pt.key]: { ...ed, label: v } }))) : pt.label}
+                    {ed ? cell(pt, ed.label, (v) => setEditing((m) => ({ ...m, [pt.key]: { ...ed, label: v } }))) : (
+                      <div>
+                        {pt.label}
+                        <div className="text-xs font-normal text-gray-400 font-mono">{pt.key}</div>
+                      </div>
+                    )}
                   </td>
-                  <td className="text-gray-500 font-mono text-sm">{pt.key}</td>
                   <td>
                     {ed ? (
                       <div className="flex items-center gap-1 max-w-[140px]">
@@ -265,7 +252,7 @@ export default function PartnerTypes() {
               );
             })}
             {!loading && types.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-12 text-gray-400">{t('common.noData')}</td></tr>
+              <tr><td colSpan={4} className="text-center py-12 text-gray-400">{t('common.noData')}</td></tr>
             )}
           </tbody>
         </table>
