@@ -269,7 +269,7 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <label className="text-xs text-gray-500">
               {t('checkpoints.timestamp')}
               <input type="number" min={0} value={form.timestamp_seconds}

@@ -145,7 +145,7 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.firstName')}</label>
               <input value={data?.first_name || ''} onChange={(e) => setData((d) => (d ? { ...d, first_name: e.target.value } : d))}

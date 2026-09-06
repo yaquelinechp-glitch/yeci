@@ -74,11 +74,12 @@ export default function ChatWidget() {
 
   const panelPos = () => {
     if (!pos || typeof window === 'undefined') return undefined;
-    let left = pos.x + BUBBLE / 2 - PANEL_W / 2;
-    left = Math.max(8, Math.min(left, window.innerWidth - PANEL_W - 8));
+    const w = Math.min(PANEL_W, window.innerWidth - 16);
+    let left = pos.x + BUBBLE / 2 - w / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
     let top = pos.y - PANEL_H - GAP;
     if (top < 8) top = Math.min(pos.y + BUBBLE + GAP, window.innerHeight - PANEL_H - 8);
-    return { left, top, width: PANEL_W, height: PANEL_H };
+    return { left, top, width: w, height: PANEL_H };
   };
 
   const send = async () => {

@@ -348,8 +348,8 @@ export default function PartnerCourses() {
                   return (
                     <div key={v.id}>
                       <div className={`rounded-xl border transition-all overflow-hidden ${done ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-gray-200 hover:border-aconso-300'}`}>
-                        <div className="flex items-center gap-4 p-4">
-                          <div className="w-48 h-28 bg-gray-900 rounded-lg overflow-hidden shrink-0 cursor-pointer relative group" onClick={() => openPlayer(v)}>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4">
+                          <div className="w-full sm:w-48 aspect-video sm:h-28 bg-gray-900 rounded-lg overflow-hidden shrink-0 cursor-pointer relative group" onClick={() => openPlayer(v)}>
                             <VideoThumb src={v.video_url} />
                             <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                               <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">

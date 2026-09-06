@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { pipelineApi, productsApi, calculatorApi } from '../../services/api';
 import type { Opportunity, PipelineStats, Product } from '../../types';
@@ -419,8 +419,9 @@ export default function Pipeline() {
       </div>
 
       {view === 'board' ? (
-        <div className="grid grid-cols-6 gap-3">
-          {STAGES.map((stage) => {
+        <div className="-mx-4 sm:mx-0 overflow-x-auto pb-2 -webkit-overflow-scrolling-touch">
+          <div className="grid grid-cols-6 gap-3 min-w-[560px] lg:min-w-0 px-4 sm:px-0">
+            {STAGES.map((stage) => {
               const stageOpps = opps.filter((o) => o.stage === stage);
               return (
                 <div key={stage} className={`rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
@@ -483,6 +484,7 @@ export default function Pipeline() {
                 </div>
               );
             })}
+          </div>
         </div>
       ) : (
         <div className="table-container">
@@ -577,7 +579,7 @@ export default function Pipeline() {
                     <input type="text" value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })}
                       className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">{t('pipeline.companySize')} *</label>
                       <input type="text" placeholder={t('pipeline.companySize')} value={form.company_size}
@@ -688,7 +690,7 @@ export default function Pipeline() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('pipeline.amountArr')}</label>
                   <input type="number" value={arrTotalR ? String(arrTotalR) : form.amount} readOnly
@@ -725,7 +727,7 @@ export default function Pipeline() {
           )}
           {wizardStep === 3 && (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('pipeline.deliveryQuarter')} *</label>
                   <select value={quarters.includes(form.delivery_quarter) || form.delivery_quarter === '' ? form.delivery_quarter : ''}
@@ -745,7 +747,7 @@ export default function Pipeline() {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('pipeline.probability')}</label>
                   <input type="number" min="0" max="100" value={form.probability} onChange={(e) => setForm({ ...form, probability: e.target.value })}
@@ -757,7 +759,7 @@ export default function Pipeline() {
                     className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('pipeline.opportunityType')}</label>
                   <select value={form.opportunity_type} onChange={(e) => setForm({ ...form, opportunity_type: e.target.value })}

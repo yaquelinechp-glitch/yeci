@@ -182,7 +182,7 @@ export default function AdminSecurity() {
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-aconso-500 focus:ring-2 focus:ring-aconso-500/20 outline-none text-sm" required minLength={12} />
                   <p className="text-xs text-gray-400 mt-1">{t('security.passwordHint')}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('security.contactName')}</label>
                     <input value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })}

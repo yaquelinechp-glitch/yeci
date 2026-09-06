@@ -116,7 +116,7 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
                     <button onClick={() => del(q.id)} className="text-[11px] text-gray-400 hover:text-red-500 px-1.5 py-0.5 rounded hover:bg-red-50">{t('common.delete')}</button>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-1.5 ml-7">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 ml-7">
                   {opts.map((opt: any, oi: number) => {
                     const text = typeof opt === 'string' ? opt : (opt?.en || opt?.es || opt?.de || '');
                     const isCorrect = oi === q.correct_index;

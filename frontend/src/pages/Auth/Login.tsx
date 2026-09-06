@@ -65,7 +65,7 @@ function LoginForm() {
             </div>
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-center p-12">
+        <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
           <div className="w-full max-w-md">
             <h2 className="text-2xl font-bold mb-2">{t('auth.loginTitle')}</h2>
             <p className="text-gray-500 mb-8">{t('auth.loginSubtitle')}</p>

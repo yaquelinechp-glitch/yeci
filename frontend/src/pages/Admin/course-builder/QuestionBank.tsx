@@ -173,7 +173,7 @@ export default function QuestionBank({ courseVideos, courseId, onRefresh }: Prop
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-semibold text-gray-500 mb-1">{t('quiz.questionType')}</label>
               <select value={form.question_type} onChange={e => setForm({ ...form, question_type: e.target.value })}

@@ -160,8 +160,8 @@ export default function AnimatedHero() {
               {t('landing.benefitsTitle')}
             </h2>
             <div className="flex justify-center">
-              <div className="flip-perspective w-96 h-64">
-                <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
+              <div className="flip-perspective w-full max-w-sm sm:max-w-md md:w-96 md:h-64">
+                <div className="relative w-full h-full" style={{ aspectRatio: '16/9', transformStyle: 'preserve-3d' }}>
                   {/* Current card exits while next enters */}
                   {cardTurn && (
                     <div className="absolute inset-0 cards-anim-out rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-8 flex flex-col items-center justify-center text-center">

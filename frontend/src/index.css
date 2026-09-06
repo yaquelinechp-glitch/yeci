@@ -269,12 +269,15 @@ body {
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   border: 1px solid #f1f5f9;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table-container table {
   width: 100%;
   font-size: 0.875rem;
+  min-width: 640px;
 }
 
 .table-container thead {

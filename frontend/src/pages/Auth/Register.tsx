@@ -270,7 +270,7 @@ function RegisterForm() {
           <p className="text-gray-500 mb-8">{t('auth.registerSubtitle')}</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">{t('auth.companyName')} *</label>
                 <input type="text" value={form.company_name}
@@ -287,7 +287,7 @@ function RegisterForm() {
                 {fieldErrors.contact_name && <p className="text-xs text-red-500 mt-1">{fieldErrors.contact_name}</p>}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">{t('auth.email')} *</label>
                 <input type="text" value={form.email}
@@ -329,7 +329,7 @@ function RegisterForm() {
                 {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">{t('auth.phone')}</label>
                 <input type="tel" value={form.phone}
