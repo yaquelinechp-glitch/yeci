@@ -223,7 +223,8 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             </button>
             <button
               onClick={logout}
-              className="hidden sm:block text-sm text-gray-400 hover:text-red-500 transition-colors"
+              className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+              title={t('nav.logout')}
             >
               {t('nav.logout')}
             </button>
