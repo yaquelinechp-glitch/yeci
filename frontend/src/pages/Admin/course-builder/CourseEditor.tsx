@@ -8,6 +8,7 @@ import VideoPanel from './VideoPanel';
 import QuestionBank from './QuestionBank';
 import ExamEditor from './ExamEditor';
 import CheckpointEditor from './CheckpointEditor';
+import { VideoThumb } from '../../../components/VideoPlayer';
 
 type View = 'info' | 'editor';
 type EditorView = 'video' | 'bank' | 'exam';
@@ -292,7 +293,7 @@ function DayContent({ course, phase, day, courseId, selectedVideoId, onSelectVid
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${isActive ? 'bg-aconso-50 ring-2 ring-aconso-500' : 'bg-gray-50 hover:bg-gray-100'}`}>
                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isActive ? 'bg-aconso-500 text-white' : 'bg-aconso-100 text-aconso-600'}`}>{i + 1}</span>
                 <div className="w-20 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0">
-                  <video className="w-full h-full object-cover" preload="metadata"><source src={v.video_url} /></video>
+                  <VideoThumb src={v.video_url} />
                 </div>
                 <span className="text-sm text-gray-700 truncate flex-1">
                   {typeof v.title === 'string' ? v.title : v.title?.en || v.title?.es || v.title?.de || t('courses.untitled')}

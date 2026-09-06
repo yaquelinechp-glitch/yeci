@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { coursesApi } from '../../services/api';
 import type { Course, CourseVideo, QuizQuestion, QuizResult, PhaseConfig, VideoCheckpoint } from '../../types';
 import { TRACKS } from '../../constants';
+import VideoPlayer, { VideoThumb, type VideoPlayerHandle } from '../../components/VideoPlayer';
 
 const TRACK_BADGE: Record<string, string> = {
   ventas: 'bg-aconso-100 text-aconso-700',
@@ -45,7 +46,7 @@ export default function PartnerCourses() {
   const [quizAttempts, setQuizAttempts] = useState<Record<string, number>>({});
   const [playingVideo, setPlayingVideo] = useState<CourseVideo | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<VideoPlayerHandle>(null);
   const [checkpoints, setCheckpoints] = useState<VideoCheckpoint[]>([]);
   const [activeCheckpoint, setActiveCheckpoint] = useState<VideoCheckpoint | null>(null);
   const [checkpointAnswer, setCheckpointAnswer] = useState<number | null>(null);
@@ -184,7 +185,7 @@ export default function PartnerCourses() {
           setCheckpointAnswer(null);
           setCheckpointFeedback(null);
           if (videoRef.current) {
-            videoRef.current.currentTime = jump_to || 0;
+            videoRef.current.seekTo(jump_to || 0);
             videoRef.current.play();
           }
         }, 1500);
@@ -194,9 +195,10 @@ export default function PartnerCourses() {
 
   const handleCheckpointTimeUpdate = () => {
     if (!videoRef.current || !checkpoints.length || activeCheckpoint) return;
-    const t = videoRef.current.currentTime;
+    if (!videoRef.current.isReady()) return;
+    const t = videoRef.current.getCurrentTime();
     for (const cp of checkpoints) {
-      if (cp.timestamp_seconds > 0 && Math.abs(t - cp.timestamp_seconds) < 0.4 && !checkpointDone.has(cp.id)) {
+      if (cp.timestamp_seconds > 0 && Math.abs(t - cp.timestamp_seconds) < 0.7 && !checkpointDone.has(cp.id)) {
         videoRef.current.pause();
         setActiveCheckpoint(cp);
         setCheckpointAnswer(null);
@@ -348,7 +350,7 @@ export default function PartnerCourses() {
                       <div className={`rounded-xl border transition-all overflow-hidden ${done ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-gray-200 hover:border-aconso-300'}`}>
                         <div className="flex items-center gap-4 p-4">
                           <div className="w-48 h-28 bg-gray-900 rounded-lg overflow-hidden shrink-0 cursor-pointer relative group" onClick={() => openPlayer(v)}>
-                            <video className="w-full h-full object-cover" preload="metadata"><source src={v.video_url} type="video/mp4" /></video>
+                            <VideoThumb src={v.video_url} />
                             <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                               <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
                                 <svg className="w-5 h-5 text-aconso-600 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
@@ -506,10 +508,15 @@ export default function PartnerCourses() {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
                 </div>
-                <video ref={videoRef} className="w-full" controls autoPlay onTimeUpdate={handleCheckpointTimeUpdate}>
-                  <source src={playingVideo.video_url} type="video/mp4" />
-                  {t('courses.videoNotSupported')}
-                </video>
+                <div className="aspect-video">
+                  <VideoPlayer
+                    ref={videoRef}
+                    src={playingVideo.video_url}
+                    controls
+                    autoPlay
+                    onTimeTick={handleCheckpointTimeUpdate}
+                  />
+                </div>
                 {playingVideo.description && (
                   <div className="px-6 py-3 bg-gray-900">
                     <p className="text-gray-400 text-sm">{getLocalized(playingVideo.description)}</p>

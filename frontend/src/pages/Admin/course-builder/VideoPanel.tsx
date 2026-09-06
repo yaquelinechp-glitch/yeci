@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { CourseVideo, QuizQuestion } from '../../../types';
 import { coursesApi } from '../../../services/api';
 import QuizEditor from './QuizEditor';
+import VideoPlayer from '../../../components/VideoPlayer';
 
 type Tab = 'info' | 'quiz';
 
@@ -61,9 +62,7 @@ export default function VideoPanel({ courseId, video, onRefresh, onClose }: Prop
         {tab === 'info' ? (
           <div className="space-y-4">
             <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden">
-              <video className="w-full h-full object-cover" preload="metadata" controls>
-                <source src={video.video_url} />
-              </video>
+              <VideoPlayer src={video.video_url} className="w-full h-full" controls />
             </div>
             <div className="p-3 bg-gray-50 rounded-xl text-xs text-gray-500 space-y-1.5">
               <div className="flex justify-between"><span>{t('courses.phase')}</span><span className="font-medium text-gray-700">{video.phase || 1}</span></div>

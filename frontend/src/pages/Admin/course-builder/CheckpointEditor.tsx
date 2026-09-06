@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { coursesApi } from '../../../services/api';
 import type { VideoCheckpoint } from '../../../types';
+import VideoPlayer, { type VideoPlayerHandle } from '../../../components/VideoPlayer';
 
 const LANGS = ['en', 'es', 'de'] as const;
 const LANG_LABELS: Record<string, string> = { en: 'EN', es: 'ES', de: 'DE' };
@@ -64,7 +65,8 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [duration, setDuration] = useState(0);
+  const videoRef = useRef<VideoPlayerHandle>(null);
 
   const load = async () => {
     setLoading(true);
@@ -86,7 +88,7 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
   };
 
   const handleAddAtCurrent = () => {
-    const ts = videoRef.current?.currentTime || 0;
+    const ts = videoRef.current?.getCurrentTime?.() || currentTime || 0;
     setEditing(null);
     setForm(emptyForm(ts, 0));
     setShowForm(true);
@@ -177,15 +179,14 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
     <div className="space-y-4">
       {/* Video player with timeline markers */}
       <div className="aspect-video bg-black rounded-xl overflow-hidden relative">
-        <video
+        <VideoPlayer
           ref={videoRef}
+          src={video.video_url}
           className="w-full h-full"
-          preload="metadata"
           controls
-          onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-        >
-          <source src={video.video_url} />
-        </video>
+          onTimeTick={(t) => setCurrentTime(t)}
+          onDuration={(d) => setDuration(d)}
+        />
         {/* Timeline markers */}
         <div className="absolute bottom-0 left-0 right-0 h-1 flex pointer-events-none">
           {checkpoints.map(cp => (
@@ -193,7 +194,7 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
               key={cp.id}
               title={`${fmtTime(cp.timestamp_seconds)} - ${questionText(cp.question)}`}
               className="absolute top-0 h-full w-0.5 bg-amber-400"
-              style={{ left: `${videoRef.current?.duration ? (cp.timestamp_seconds / videoRef.current.duration) * 100 : 0}%` }}
+              style={{ left: `${duration ? (cp.timestamp_seconds / duration) * 100 : 0}%` }}
             />
           ))}
         </div>
@@ -224,7 +225,7 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
                 </div>
               </div>
               <div className="flex items-center gap-1.5 ml-6 text-[11px] text-gray-400">
-                <span onClick={() => { if (videoRef.current) { videoRef.current.currentTime = cp.on_wrong_timestamp || 0; videoRef.current.play(); } }} className="cursor-pointer hover:text-amber-600">{t('checkpoints.onWrong')}: {fmtTime(cp.on_wrong_timestamp || 0)}</span>
+                <span onClick={() => { if (videoRef.current) { videoRef.current.seekTo(cp.on_wrong_timestamp || 0); videoRef.current.play(); } }} className="cursor-pointer hover:text-amber-600">{t('checkpoints.onWrong')}: {fmtTime(cp.on_wrong_timestamp || 0)}</span>
               </div>
             </div>
           ))}

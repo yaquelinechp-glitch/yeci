@@ -164,6 +164,7 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
                 <td onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center gap-1">
                     <input
+                      key={`${p.id}-${p.commission_rate}`}
                       type="number"
                       min="0"
                       step="0.5"
