@@ -114,7 +114,7 @@ export default function PartnersOverview() {
       </div>
 
       {tab === 'partners'
-        ? <PartnersList partners={partners} filter={filter} />
+        ? <PartnersList partners={partners} filter={filter} onPartnersChange={setPartners} />
         : <Solicitudes />}
     </div>
   );

@@ -1039,14 +1039,13 @@ export default function Pipeline() {
               {catalog.length === 0 ? (
                 <p className="text-gray-400 text-sm">{t('pipeline.manageNoProducts')}</p>
               ) : catalog.map((p) => (
-                <div key={p.key} className="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5">
+                <div key={p.key} onClick={() => openEditProduct(p)} className="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5 cursor-pointer hover:border-aconso-400 hover:shadow-sm transition-all">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${p.active !== false ? 'bg-emerald-500' : 'bg-gray-300'}`}></span>
                   <span className="flex-1 min-w-0">
                     <span className="text-sm font-medium text-gray-900">{productName(p)}</span>
                     {productPricesLabel(p) && <span className="text-xs font-semibold text-aconso-600 ml-2">{productPricesLabel(p)}</span>}
                   </span>
-                  <button onClick={() => openEditProduct(p)} className="text-xs text-gray-400 hover:text-aconso-600">{t('common.edit')}</button>
-                  <button onClick={() => setDelProductKey(p.key)} className="text-xs text-gray-400 hover:text-red-500">{t('common.delete')}</button>
+                  <button onClick={(e) => { e.stopPropagation(); setDelProductKey(p.key); }} className="text-xs text-red-500 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-md transition-colors shrink-0">{t('common.delete')}</button>
                 </div>
               ))}
             </div>

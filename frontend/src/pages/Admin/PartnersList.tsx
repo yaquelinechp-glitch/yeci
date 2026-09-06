@@ -23,7 +23,7 @@ interface PartnerType {
   sort_order: number;
 }
 
-export default function PartnersList({ partners, filter }: { partners: User[]; filter: string }) {
+export default function PartnersList({ partners, filter, onPartnersChange }: { partners: User[]; filter: string; onPartnersChange?: (ps: User[]) => void }) {
   const { t } = useTranslation();
   const [types, setTypes] = useState<PartnerType[]>([]);
   const [search, setSearch] = useState('');
@@ -66,11 +66,11 @@ export default function PartnersList({ partners, filter }: { partners: User[]; f
     const row = document.getElementById(`row-${p.id}`);
     row?.classList.add('opacity-60');
     const nextRate = pt ? pt.default_commission_rate : p.commission_rate;
-    setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: next, commission_rate: nextRate } : x));
+    onPartnersChange?.((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: next, commission_rate: nextRate } : x));
     try {
       await partnersApi.update(p.id, { partner_type: next, commission_rate: nextRate });
     } catch {
-      setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: p.partner_type, commission_rate: p.commission_rate } : x));
+      onPartnersChange?.((ps) => ps.map((x) => x.id === p.id ? { ...x, partner_type: p.partner_type, commission_rate: p.commission_rate } : x));
     }
     row?.classList.remove('opacity-60');
   };
@@ -78,11 +78,11 @@ export default function PartnersList({ partners, filter }: { partners: User[]; f
   const handleRateBlur = async (p: User, next: number | null) => {
     if (next === null || next === p.commission_rate) return;
     const prev = p.commission_rate;
-    setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, commission_rate: next } : x));
+    onPartnersChange?.((ps) => ps.map((x) => x.id === p.id ? { ...x, commission_rate: next } : x));
     try {
       await partnersApi.update(p.id, { commission_rate: next });
     } catch {
-      setPartners((ps) => ps.map((x) => x.id === p.id ? { ...x, commission_rate: prev } : x));
+      onPartnersChange?.((ps) => ps.map((x) => x.id === p.id ? { ...x, commission_rate: prev } : x));
     }
   };
 
