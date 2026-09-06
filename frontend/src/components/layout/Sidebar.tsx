@@ -78,11 +78,11 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
   return (
     <>
       {mobileOpen && (
-        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/50 z-40 md:hidden" onClick={onClose} />
+        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/50 z-40 lg:hidden" onClick={onClose} />
       )}
       <aside className={`w-64 bg-dark-800 text-white min-h-screen fixed left-0 top-16 bottom-0 overflow-y-auto scrollbar-thin z-50 transition-transform duration-300 ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0`}>
+      } lg:translate-x-0`}>
       <div className="p-6 text-center border-b border-white/10">
         <button onClick={() => setProfileOpen(true)} className="group mx-auto block" title={t('profile.title')}>
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-xl font-bold mx-auto mb-3 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">

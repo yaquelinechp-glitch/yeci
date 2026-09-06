@@ -15,7 +15,7 @@ export default function DashboardLayout() {
   }, [location.pathname]);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
+    const mq = window.matchMedia('(min-width: 1024px)');
     const onChange = () => setSidebarOpen(false);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
@@ -31,7 +31,7 @@ export default function DashboardLayout() {
       <Header onMenuClick={openSidebar} />
       <div className="flex pt-16">
         <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-        <main className="md:ml-64 flex-1 p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen md:min-h-[calc(100vh-4rem)] overflow-x-hidden">
+        <main className="lg:ml-64 flex-1 p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen lg:min-h-[calc(100vh-4rem)] overflow-x-hidden">
           <Outlet />
         </main>
       </div>

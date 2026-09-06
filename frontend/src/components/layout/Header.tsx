@@ -111,7 +111,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         {onMenuClick && (
           <button
             onClick={onMenuClick}
-            className="md:hidden text-gray-600 hover:text-aconso-500 p-1.5 rounded-lg hover:bg-gray-50"
+            className="lg:hidden text-gray-600 hover:text-aconso-500 p-1.5 rounded-lg hover:bg-gray-50"
             aria-label="menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

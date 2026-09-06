@@ -277,7 +277,6 @@ body {
 .table-container table {
   width: 100%;
   font-size: 0.875rem;
-  min-width: 640px;
 }
 
 .table-container thead {

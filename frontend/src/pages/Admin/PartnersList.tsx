@@ -137,15 +137,15 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
                 title={t('admin.doubleClickToView')}
               >
                 <td>
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 text-white flex items-center justify-center text-sm font-bold">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 text-white flex items-center justify-center text-sm font-bold shrink-0">
                       {p.company_name.slice(0, 2).toUpperCase()}
                     </div>
-                    <span className="font-medium text-gray-900">{p.company_name}</span>
+                    <span className="font-medium text-gray-900 truncate">{p.company_name}</span>
                   </div>
                 </td>
-                <td className="text-gray-600">{p.contact_name}</td>
-                <td className="text-gray-500">{p.email}</td>
+                <td className="text-gray-600 max-w-[150px] md:max-w-none truncate">{p.contact_name}</td>
+                <td className="text-gray-500 max-w-[170px] md:max-w-none truncate">{p.email}</td>
                 <td>
                   <span className={`badge ${statusColor(p.status)}`}>{t(`admin.statuses.${p.status}`)}</span>
                 </td>

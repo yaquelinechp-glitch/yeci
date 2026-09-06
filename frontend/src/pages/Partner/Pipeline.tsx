@@ -360,18 +360,18 @@ export default function Pipeline() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('pipeline.title')}</h1>
           <p className="text-gray-500 mt-1">{t('pipeline.subtitle')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button onClick={() => setView('board')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'board' ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500'}`}>{t('pipeline.board')}</button>
             <button onClick={() => setView('list')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'list' ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500'}`}>{t('pipeline.list')}</button>
           </div>
           {isAdmin && <button onClick={() => { setShowQuickAdd(true); setQformKey(null); setQform({ ...EMPTY_QFORM }); setQformError(''); }} className="btn-primary text-sm">{t('pipeline.manageQuickAdd')}</button>}
-          {!isAdmin && <button onClick={() => openCreate()} className="btn-primary">{t('pipeline.newOpportunity')}</button>}
+          {!isAdmin && <button onClick={() => openCreate()} className="btn-primary" style={{ fontSize: '0.875rem', padding: '0.45rem 0.9rem' }}>{t('pipeline.newOpportunity')}</button>}
         </div>
       </div>
 
@@ -419,12 +419,12 @@ export default function Pipeline() {
       </div>
 
       {view === 'board' ? (
-        <div className="-mx-4 sm:mx-0 overflow-x-auto pb-2 -webkit-overflow-scrolling-touch">
-          <div className="grid grid-cols-6 gap-3 min-w-[560px] lg:min-w-0 px-4 sm:px-0">
+        <div className="-mx-4 sm:mx-0 overflow-x-auto pb-4 snap-x snap-mandatory -webkit-overflow-scrolling-touch">
+          <div className="grid grid-cols-6 gap-3 min-w-[960px] lg:min-w-0 px-4 sm:px-0">
             {STAGES.map((stage) => {
               const stageOpps = opps.filter((o) => o.stage === stage);
               return (
-                <div key={stage} className={`rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
+                <div key={stage} className={`snap-start rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
                   {...(isAdmin ? {} : { onDragOver: (e: React.DragEvent) => onDragOver(e, stage), onDragLeave, onDrop: (e: React.DragEvent) => onDrop(e, stage) })}>
                   <div className="p-3 border-b border-gray-100 bg-white rounded-t-2xl flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
