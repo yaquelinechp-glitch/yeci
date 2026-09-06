@@ -83,20 +83,22 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
       <aside className={`w-64 bg-dark-800 text-white flex flex-col fixed left-0 top-16 bottom-0 z-50 transition-transform duration-300 ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}>
-      <div className="p-6 text-center border-b border-white/10 shrink-0">
-        <button onClick={() => setProfileOpen(true)} className="group mx-auto block" title={t('profile.title')}>
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-xl font-bold mx-auto mb-3 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
+      <div className="p-4 border-b border-white/10 shrink-0">
+        <button onClick={() => setProfileOpen(true)} className="group flex items-center gap-3 w-full text-left" title={t('profile.title')}>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-sm font-bold shrink-0 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
             {user?.avatar ? (
               <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
             ) : (
               profileInitials()
             )}
           </div>
-          <div className="font-semibold text-white group-hover:text-accent-300 transition-colors">
-            {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
-          </div>
-          <div className="text-xs text-dark-200 mt-0.5">
-            {([user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() && user?.username) ? user.username : (user?.contact_name || (isAdmin ? t('nav.admin') : ''))}
+          <div className="min-w-0">
+            <div className="font-semibold text-white group-hover:text-accent-300 transition-colors truncate">
+              {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
+            </div>
+            <div className="text-xs text-dark-200 mt-0.5 truncate">
+              {([user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() && user?.username) ? user.username : (user?.contact_name || (isAdmin ? t('nav.admin') : ''))}
+            </div>
           </div>
         </button>
       </div>
