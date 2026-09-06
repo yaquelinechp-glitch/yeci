@@ -2507,6 +2507,7 @@ def lms_report(request):
             "partner_id": p.id,
             "company_name": p.company_name,
             "track": p.training_track or "",
+            "courses_started": PartnerProgress.objects.filter(partner=p).exclude(progress_pct=0).count(),
             "courses_completed": PartnerProgress.objects.filter(partner=p, completed=True).count(),
             "certification": cert.level if cert else None,
             "cert_status": cert.status if cert else None,

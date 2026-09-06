@@ -148,6 +148,33 @@ export interface AdminStats {
   top_partners: { name: string; deals: number; revenue: number; id: string }[];
 }
 
+export interface LmsReportCourse {
+  course_id: string;
+  title: string;
+  track: string;
+  started: number;
+  completed: number;
+  completion_rate: number;
+  pass_rate: number;
+  pass_mark: number;
+  validity_months: number;
+}
+
+export interface LmsReportPartner {
+  partner_id: string;
+  company_name: string;
+  track: string;
+  courses_started: number;
+  courses_completed: number;
+  certification: string | null;
+  cert_status: string | null;
+}
+
+export interface LmsReport {
+  courses: LmsReportCourse[];
+  partners: LmsReportPartner[];
+}
+
 export interface PartnerStats {
   my_deals: number;
   active_deals: number;

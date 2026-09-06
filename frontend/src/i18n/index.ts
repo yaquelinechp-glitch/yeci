@@ -155,6 +155,9 @@ const resources = {
         goToRequests: 'Review Requests',
         statusOverview: 'Partner Status', trainingOverview: 'Training Overview',
         totalCourses: 'Courses', totalVideos: 'Videos',
+        trainingProgress: 'Training Progress', certified: 'Certified', inTraining: 'In Progress', notStarted: 'Not Started',
+        courseProgress: 'Course Progress', started: 'Started', completed: 'Completed', noCourses: 'No courses to show',
+        revenueByPartner: 'Revenue by Partner',
         attentionTitle: 'Needs your attention', attentionSubtitle: 'Items that require your action',
         allCaughtUp: 'All caught up',
         statuses: {
@@ -674,6 +677,9 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
         goToRequests: 'Revisar Solicitudes',
         statusOverview: 'Estado de Partners', trainingOverview: 'Resumen de Capacitación',
         totalCourses: 'Cursos', totalVideos: 'Videos',
+        trainingProgress: 'Avance de Formación', certified: 'Certificados', inTraining: 'En Curso', notStarted: 'Sin Empezar',
+        courseProgress: 'Avance por Curso', started: 'Empezados', completed: 'Completados', noCourses: 'No hay cursos para mostrar',
+        revenueByPartner: 'Ingresos por Partner',
         attentionTitle: 'Necesita tu atención', attentionSubtitle: 'Elementos que requieren tu acción',
         allCaughtUp: 'Todo al día',
         statuses: {
@@ -1194,6 +1200,9 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
         goToRequests: 'Anfragen prüfen',
         statusOverview: 'Partner-Status', trainingOverview: 'Schulungsübersicht',
         totalCourses: 'Kurse', totalVideos: 'Videos',
+        trainingProgress: 'Schulungsfortschritt', certified: 'Zertifiziert', inTraining: 'In Bearbeitung', notStarted: 'Nicht begonnen',
+        courseProgress: 'Fortschritt pro Kurs', started: 'Begonnen', completed: 'Abgeschlossen', noCourses: 'Keine Kurse zum Anzeigen',
+        revenueByPartner: 'Umsatz nach Partner',
         attentionTitle: 'Ihre Aufmerksamkeit erforderlich', attentionSubtitle: 'Punkte, die Ihre Aktion erfordern',
         allCaughtUp: 'Alles erledigt',
         statuses: {
