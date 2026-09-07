@@ -96,7 +96,19 @@ function RegisterForm() {
       fieldErrors[field] ? 'border-red-400 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-blue-500'
     }`;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const getErrorMsg = (err: any): string => {
+  const detail = err?.response?.data?.detail;
+  if (detail) return detail;
+  const fieldErrors = err?.response?.data;
+  if (fieldErrors && typeof fieldErrors === 'object') {
+    const first = Object.values(fieldErrors)[0];
+    if (Array.isArray(first)) return String(first[0]);
+    if (typeof first === 'string') return first;
+  }
+  return t('auth.registerError');
+};
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -117,7 +129,7 @@ function RegisterForm() {
         setRegistered(true);
         handleAuth(res.data.access_token, res.data.user);
       } catch (err: any) {
-        setError(err?.response?.data?.detail || t('auth.registerError'));
+        setError(getErrorMsg(err));
       } finally {
         setLoading(false);
       }
@@ -143,7 +155,7 @@ function RegisterForm() {
       setRegistered(true);
       handleAuth(res.data.access_token, res.data.user);
     } catch (err: any) {
-      setError(err?.response?.data?.detail || t('auth.registerError'));
+      setError(getErrorMsg(err));
     } finally {
       setLoading(false);
     }

@@ -37,12 +37,12 @@ class PartnerCreateSerializer(serializers.Serializer):
     company_name = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField()
-    phone = serializers.CharField(default="", required=False)
-    tax_id = serializers.CharField(default="", required=False)
-    country = serializers.CharField(default="", required=False)
-    contact_name = serializers.CharField(default="", required=False)
-    why_partner = serializers.CharField(default="", required=False)
-    sales_approach = serializers.CharField(default="", required=False)
+    phone = serializers.CharField(default="", required=False, allow_blank=True)
+    tax_id = serializers.CharField(default="", required=False, allow_blank=True)
+    country = serializers.CharField(default="", required=False, allow_blank=True)
+    contact_name = serializers.CharField(default="", required=False, allow_blank=True)
+    why_partner = serializers.CharField(default="", required=False, allow_blank=True)
+    sales_approach = serializers.CharField(default="", required=False, allow_blank=True)
 
 
 class PartnerUpdateSerializer(serializers.Serializer):
