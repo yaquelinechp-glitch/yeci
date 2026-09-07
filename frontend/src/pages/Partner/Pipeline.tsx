@@ -994,7 +994,7 @@ export default function Pipeline() {
       {showQuickAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowQuickAdd(false)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">{qformKey ? t('pipeline.manageEdit') : t('pipeline.manageQuickAdd')}</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">{qformKey ? t('pipeline.manageEdit') : t('pipeline.manageNew')}</h2>
             <p className="text-gray-500 text-sm mb-5">{t('pipeline.manageQuickAddHelp')}</p>
             <div className="rounded-xl border border-gray-200 p-4 mb-5">
               <div className="space-y-4">
