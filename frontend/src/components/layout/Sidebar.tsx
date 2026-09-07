@@ -4,21 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/auth';
 import { reportsApi, dealsApi } from '../../services/api';
 import type { Deal } from '../../types';
-import ProfileModal from '../ProfileModal';
 
 type NavLink = { to: string; label: string; badge?: number };
 
 type Props = {
   mobileOpen: boolean;
   onClose: () => void;
+  onProfile?: () => void;
 };
 
-export default function Sidebar({ mobileOpen, onClose }: Props) {
+export default function Sidebar({ mobileOpen, onClose, onProfile }: Props) {
   const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const location = useLocation();
   const isAdmin = user?.role === 'admin';
-  const [profileOpen, setProfileOpen] = useState(false);
   const [partnersBadge, setPartnersBadge] = useState(0);
   const [pipelineBadge, setPipelineBadge] = useState(0);
 
@@ -84,25 +83,27 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}>
       <div className="p-4 border-b border-white/10 shrink-0">
-        <button onClick={() => setProfileOpen(true)} className="group flex items-center gap-3 w-full text-left" title={t('profile.title')}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-sm font-bold shrink-0 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
-            {user?.avatar ? (
-              <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
-            ) : (
-              profileInitials()
-            )}
-          </div>
-          <div className="min-w-0">
-            <div className="font-semibold text-white group-hover:text-accent-300 transition-colors truncate">
-              {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
+        {onProfile && (
+          <button onClick={onProfile} className="group flex items-center gap-3 w-full text-left" title={t('profile.title')}>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-sm font-bold shrink-0 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
+              {user?.avatar ? (
+                <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
+              ) : (
+                profileInitials()
+              )}
             </div>
-            <div className="text-xs text-dark-200 mt-0.5 truncate">
-              {([user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() && user?.username) ? user.username : (user?.contact_name || (isAdmin ? t('nav.admin') : ''))}
+            <div className="min-w-0">
+              <div className="font-semibold text-white group-hover:text-accent-300 transition-colors truncate">
+                {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
+              </div>
+              <div className="text-xs text-dark-200 mt-0.5 truncate">
+                {([user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() && user?.username) ? user.username : (user?.contact_name || (isAdmin ? t('nav.admin') : ''))}
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
+        )}
       </div>
-      <nav className="flex-1 overflow-y-auto scrollbar-thin mt-4 px-3">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 mt-5">
         {links.map((link) => {
           const isActive = location.pathname === link.to;
           return (
@@ -130,7 +131,6 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
           {t('nav.logout')}
         </button>
       </div>
-      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
     </aside>
     </>
   );

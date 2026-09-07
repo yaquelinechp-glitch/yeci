@@ -3,12 +3,14 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import ProfileModal from '../ProfileModal';
 import ChatWidget from '../ChatWidget';
 
 export default function DashboardLayout() {
   const { user } = useAuthStore();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -28,13 +30,14 @@ export default function DashboardLayout() {
 
   return (
     <>
-      <Header onMenuClick={openSidebar} />
+      <Header onMenuClick={openSidebar} onProfile={() => setProfileOpen(true)} />
       <div className="flex pt-16">
-        <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
+        <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar} onProfile={() => setProfileOpen(true)} />
         <main className="lg:ml-64 flex-1 p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen lg:min-h-[calc(100vh-4rem)] overflow-x-hidden">
           <Outlet />
         </main>
       </div>
+      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
       <ChatWidget />
     </>
   );

@@ -4,16 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/auth';
 import { notificationsApi } from '../../services/api';
 import type { Notification } from '../../types';
-import ProfileModal from '../ProfileModal';
 
-export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
+export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () => void; onProfile?: () => void }) {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
 
   const [open, setOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [items, setItems] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
   const [annTitle, setAnnTitle] = useState('');
@@ -211,7 +209,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
               )}
             </div>
             <button
-              onClick={() => setProfileOpen(true)}
+              onClick={onProfile}
               className="w-8 h-8 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 text-white flex items-center justify-center text-xs font-bold ring-2 ring-gray-100 hover:ring-aconso-300 transition-all overflow-hidden"
               title={t('profile.title')}
             >
@@ -243,7 +241,6 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
           </div>
         )}
       </div>
-      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
     </header>
   );
 }
