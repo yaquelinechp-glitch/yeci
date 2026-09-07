@@ -68,6 +68,7 @@ export default function Pipeline() {
   const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'admin';
+  const approved = isAdmin || user?.status === 'activo';
 
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [opps, setOpps] = useState<Opportunity[]>([]);
@@ -357,6 +358,22 @@ export default function Pipeline() {
     setDelProductKey(null);
     productsApi.list().then((r) => setCatalog(r.data)).catch(() => { });
   };
+
+  if (!approved) {
+    return (
+      <div className="animate-fade-in">
+        <div className="card p-16 text-center">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-amber-100 flex items-center justify-center">
+            <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0-6h.01M11 3.3L2.6 18a2 2 0 001.7 3h15.4a2 2 0 001.7-3L13 3.3a2 2 0 00-3.4 0z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{t('pipeline.notApproved')}</h2>
+          <p className="text-gray-500 max-w-md mx-auto">{t('pipeline.notApprovedDesc')}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in">

@@ -12,7 +12,12 @@ interface ProfileData {
   contact_name: string;
   company_name: string;
   email: string;
+  phone: string;
+  tax_id: string;
   country: string;
+  role: string;
+  partner_type: string;
+  partner_type_label: string;
 }
 
 const AVATAR_SIZE = 256;
@@ -112,10 +117,26 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
     }
   };
 
+  const displayName = () => {
+    const fn = (data?.first_name || user?.first_name || '').trim();
+    const ln = (data?.last_name || user?.last_name || '').trim();
+    const full = [fn, ln].filter(Boolean).join(' ').trim();
+    if (full) return full;
+    return (data?.username || user?.username || data?.contact_name || user?.contact_name || user?.company_name || '').trim() || '—';
+  };
+
+  const displaySub = () => {
+    const uname = (data?.username || user?.username || '').trim();
+    if (uname && uname !== displayName()) return uname;
+    const contact = (data?.contact_name || user?.contact_name || '').trim();
+    if (contact && contact !== displayName()) return contact;
+    return (user?.role === 'admin' ? t('nav.admin') : t('profile.partnerType'));
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 animate-fade-in" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-slide-up text-gray-900" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-bold text-gray-900">{t('profile.title')}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -123,7 +144,7 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
         </div>
 
         {msg && (
-          <div className={`mb-4 px-4 py-3 rounded-xl text-sm ${msg.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+          <div className={`mb-4 mt-3 px-4 py-3 rounded-xl text-sm ${msg.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
             {msg.text}
           </div>
         )}
@@ -143,6 +164,10 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
             <button type="button" onClick={() => fileRef.current?.click()} className="text-sm text-aconso-600 hover:text-aconso-800 font-medium">
               {t('profile.changePhoto')}
             </button>
+            <div className="text-center w-full min-w-0 mt-1">
+              <div className="text-lg font-bold text-gray-900 truncate" title={displayName()}>{displayName()}</div>
+              <div className="text-sm text-gray-500 truncate" title={displaySub()}>{displaySub()}</div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -175,15 +200,42 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
             </select>
           </div>
 
-          <div className="pt-1 text-xs text-gray-400">
-            {data?.company_name || user?.company_name} · {data?.email || user?.email}
+          <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-2.5">
+            {data?.company_name && (
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-sm text-gray-500 shrink-0 pt-px">{t('auth.companyName')}</span>
+                <span className="text-sm font-semibold text-gray-900 text-right min-w-0 break-words">{data.company_name}</span>
+              </div>
+            )}
+            {data?.contact_name && (
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-sm text-gray-500 shrink-0 pt-px">{t('auth.contactName')}</span>
+                <span className="text-sm font-semibold text-gray-900 text-right min-w-0 break-words">{data.contact_name}</span>
+              </div>
+            )}
+            <div className="flex items-start justify-between gap-3">
+              <span className="text-sm text-gray-500 shrink-0 pt-px">{t('auth.email')}</span>
+              <span className="text-sm font-semibold text-gray-900 text-right min-w-0 break-all">{data?.email || user?.email}</span>
+            </div>
+            {data?.phone && (
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-sm text-gray-500 shrink-0 pt-px">{t('auth.phone')}</span>
+                <span className="text-sm font-semibold text-gray-900 text-right min-w-0 break-words">{data.phone}</span>
+              </div>
+            )}
+            {data?.tax_id && (
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-sm text-gray-500 shrink-0 pt-px">{t('auth.taxId')}</span>
+                <span className="text-sm font-semibold text-gray-900 text-right min-w-0 break-words">{data.tax_id}</span>
+              </div>
+            )}
           </div>
 
-          {user?.partner_type && (
-            <div className="bg-aconso-50 border border-aconso-200 rounded-xl px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-gray-600">{t('profile.partnerType')}</span>
-              <span className="badge bg-aconso-100 text-aconso-700 border border-aconso-200 font-medium">
-                {user.partner_type_label || t(`admin.partnerTypes.${user.partner_type}`) || user.partner_type}
+          {data?.partner_type && data?.role !== 'admin' && (
+            <div className="bg-aconso-50 border border-aconso-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+              <span className="text-sm text-gray-600 shrink-0">{t('profile.partnerType')}</span>
+              <span className="badge bg-aconso-100 text-aconso-700 border border-aconso-200 font-medium text-right min-w-0 break-words">
+                {data.partner_type_label || t(`admin.partnerTypes.${data.partner_type}`) || data.partner_type}
               </span>
             </div>
           )}

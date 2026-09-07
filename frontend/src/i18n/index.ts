@@ -385,6 +385,8 @@ const resources = {
       pipeline: {
         title: 'My Pipeline',
         subtitle: 'Manage your opportunities and track your sales progress',
+        notApproved: 'Access restricted',
+        notApprovedDesc: 'Your account must be approved before you can use the pipeline.',
         newOpportunity: 'New Opportunity',
         editOpportunity: 'Edit Opportunity',
         deleteOpportunity: 'Delete Opportunity',
@@ -907,6 +909,8 @@ steps: ['Incorporación', 'Formación y certificación', 'Registro de deals', 'G
       pipeline: {
         title: 'Mi Pipeline',
         subtitle: 'Gestiona tus oportunidades y rastrea tu progreso de ventas',
+        notApproved: 'Acceso restringido',
+        notApprovedDesc: 'Tu cuenta debe ser aprobada antes de poder usar el pipeline.',
         newOpportunity: 'Nueva Oportunidad',
         editOpportunity: 'Editar Oportunidad',
         deleteOpportunity: 'Eliminar Oportunidad',
@@ -1430,6 +1434,8 @@ registerTitle: 'Portalzugang anfordern', registerSubtitle: 'Erzählen Sie uns vo
       pipeline: {
         title: 'Meine Pipeline',
         subtitle: 'Verwalten Sie Ihre Opportunities und verfolgen Sie Ihren Verkaufsfortschritt',
+        notApproved: 'Zugriff eingeschränkt',
+        notApprovedDesc: 'Ihr Konto muss genehmigt werden, bevor Sie die Pipeline nutzen können.',
         newOpportunity: 'Neue Opportunity',
         editOpportunity: 'Opportunity bearbeiten',
         deleteOpportunity: 'Opportunity löschen',

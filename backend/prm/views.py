@@ -187,7 +187,15 @@ def profile(request):
             "contact_name": target.contact_name or "",
             "company_name": user.company_name or "",
             "email": user.email or "",
+            "phone": user.phone or "",
+            "tax_id": user.tax_id or "",
             "country": user.country or "",
+            "role": user.role or "",
+            "partner_type": user.partner_type or "",
+            "partner_type_label": (
+                PartnerType.objects.filter(key=user.partner_type).values_list("label", flat=True).first()
+                if user.partner_type else ""
+            ),
         })
 
     data = request.data or {}
@@ -2207,6 +2215,8 @@ def pipeline_list_or_create(request):
         if user.role == "admin":
             opps = Opportunity.objects.select_related("partner").all()
         else:
+            if user.status != "activo":
+                return Response({"detail": "Solo partners aprobados pueden ver el pipeline"}, status=403)
             opps = Opportunity.objects.filter(partner=user)
         stage = request.query_params.get("stage")
         if stage:
@@ -2273,6 +2283,8 @@ def opportunity_detail(request, opp_id):
 
     if user.role == "socio" and opp.partner_id != user.id:
         return Response({"detail": "Access denied"}, status=403)
+    if user.role == "socio" and user.status != "activo":
+        return Response({"detail": "Solo partners aprobados pueden ver el pipeline"}, status=403)
 
     if request.method == "GET":
         return Response(OpportunitySerializer(opp).data)
@@ -2347,6 +2359,8 @@ def opportunity_events(request, opp_id):
         return Response({"detail": "Opportunity not found"}, status=404)
     if user.role == "socio" and opp.partner_id != user.id:
         return Response({"detail": "Access denied"}, status=403)
+    if user.role == "socio" and user.status != "activo":
+        return Response({"detail": "Solo partners aprobados pueden ver el pipeline"}, status=403)
     events = OpportunityEvent.objects.filter(opportunity=opp)
     return Response(OpportunityEventSerializer(events, many=True).data)
 
@@ -2362,6 +2376,8 @@ def pipeline_stats(request):
     if user.role == "admin":
         opps = Opportunity.objects.all()
     else:
+        if user.status != "activo":
+            return Response({"detail": "Solo partners aprobados pueden ver el pipeline"}, status=403)
         opps = Opportunity.objects.filter(partner=user)
 
     total_value = opps.exclude(stage="perdida").aggregate(s=Sum("amount"))["s"] or 0
