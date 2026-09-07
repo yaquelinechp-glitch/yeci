@@ -122,6 +122,7 @@ export default function Pipeline() {
     return p ? productName(p) : tOpt(`pipeline.productChoices.${key}`, key);
   };
   const activeCatalog = catalog.filter((p) => p.active);
+  const boardStages = filterStage ? STAGES.filter((s) => s === filterStage) : STAGES;
 
   const docCount = parseWorkers(form.company_size);
   const nowYear = new Date().getFullYear();
@@ -437,8 +438,8 @@ export default function Pipeline() {
 
       {view === 'board' ? (
         <div className="-mx-4 sm:mx-0 overflow-x-auto pb-4 snap-x snap-mandatory -webkit-overflow-scrolling-touch">
-          <div className="grid grid-cols-6 gap-3 min-w-[960px] lg:min-w-0 px-4 sm:px-0">
-            {STAGES.map((stage) => {
+          <div className={`grid gap-3 px-4 sm:px-0 ${filterStage ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-6 min-w-[960px] lg:min-w-0'}`}>
+            {boardStages.map((stage) => {
               const stageOpps = opps.filter((o) => o.stage === stage);
               return (
                 <div key={stage} className={`snap-start rounded-2xl border transition-colors ${dragOver === stage ? 'border-aconso-400 bg-aconso-50' : 'border-gray-200 bg-gray-50'}`}
