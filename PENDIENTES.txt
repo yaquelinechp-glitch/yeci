@@ -1,0 +1,43 @@
+PENDIENTES
+==========
+
+Archivo de trabajo: aquí se anotan las tareas que quedan en espera.
+Instrucción: cuando el usuario diga "ponlos ahí" / "ponlo ahí", agregar la
+tarea nueva en la sección "Pendientes" con fecha y contexto.
+
+Última actualización: 2026-11-20
+
+
+PENDIENTES
+----------
+
+1) [2026-11-20] Errores de TypeScript (62)
+   - `npm run build` local falla porque el script incluye `tsc -b`.
+   - El deploy de Render NO se ve afectado: usa `build:prod` (solo Vite).
+   - Ver detalle con: cd frontend && npx tsc -b --force
+   - Grupos principales:
+     * i18n: "Property 'en' does not exist on type 'never'" y accesos
+       `objeto[lang]` sin firma de índice (CourseEditor, CourseInfoStep,
+       CourseSidebar, QuestionBank, VideoPanel, Courses, LmsReport,
+       Partner/Courses, Partner/Training).
+     * PartnersList.tsx: tipo de `onPartnersChange` debería ser
+       `Dispatch<SetStateAction<User[]>>` (hoy declara `(ps: User[]) => void`).
+     * Variables/imports sin usar (AnimatedHero, VideoPlayer, QuestionBank,
+       PartnerTypes, Partner/Courses).
+     * SVG con prop `title` (Partner/Courses.tsx) no válida en TS.
+     * vite.config.ts: faltan tipos de `@vitejs/plugin-react` y
+       `@tailwindcss/vite`.
+
+2) [2026-11-20] Archivos subidos en disco efímero
+   - `backend/uploads/` (videos, materiales) se pierde en cada deploy/reinicio
+     de Render.
+   - Opciones: disco persistente de Render (plan de pago) o S3/R2/Supabase
+     Storage. Requiere migrar uploads y servir por URL firmada o CDN.
+
+3) [2026-11-20] Render Postgres plan free caduca a los 30 días
+   - Creado el 2026-11-20; vence ~2026-12-20. Tras 14 días de gracia se borra.
+   - Antes: cambiar `plan: free` a `0.5c-1g` en render.yaml (pago) o usar
+     Neon/Supabase con DATABASE_URL manual.
+
+4) [2026-11-20] Cambiar credenciales demo antes de producción real
+   - admin@aconso.com / admin123 y todos los partners usan `admin123`.
