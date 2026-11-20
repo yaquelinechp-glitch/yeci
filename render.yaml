@@ -1,3 +1,14 @@
+# Base de datos gestionada por Render.
+# Nota: el plan "free" caduca a los 30 dias (límite de Render). Para producción,
+# cambia plan a "0.5c-1g" o elimina este bloque y define DATABASE_URL a mano
+# (Neon, Supabase, etc.).
+databases:
+  - name: yeci-db
+    plan: free
+    databaseName: yeci
+    user: yeci
+    region: oregon
+
 services:
   - type: web
     name: yeci
@@ -18,3 +29,7 @@ services:
         value: ".onrender.com,localhost,127.0.0.1"
       - key: AI_PROVIDER
         value: demo
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yeci-db
+          property: connectionString

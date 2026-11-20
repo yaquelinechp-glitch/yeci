@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 from pathlib import Path
 from datetime import timedelta
 
@@ -74,12 +75,49 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+def _database_from_url(url):
+    """Convierte DATABASE_URL (postgres://...) en la config de Django."""
+    parsed = urllib.parse.urlparse(url)
+    scheme = (parsed.scheme or "").lower()
+    if scheme not in ("postgres", "postgresql"):
+        raise ValueError(f"Esquema de DATABASE_URL no soportado: {scheme}")
+
+    query = dict(urllib.parse.parse_qsl(parsed.query))
+    options = {}
+    sslmode = query.pop("sslmode", None)
+    if sslmode:
+        options["sslmode"] = sslmode
+    elif parsed.hostname and parsed.hostname not in ("localhost", "127.0.0.1"):
+        # Render/Neon/Supabase requieren SSL en conexiones externas
+        options["sslmode"] = "require"
+
+    config = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": urllib.parse.unquote(parsed.path.lstrip("/")),
+        "USER": urllib.parse.unquote(parsed.username or ""),
+        "PASSWORD": urllib.parse.unquote(parsed.password or ""),
+        "HOST": parsed.hostname or "",
+        "PORT": str(parsed.port or ""),
+        "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "0")),
     }
-}
+    if options:
+        config["OPTIONS"] = options
+    return config
+
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+
+if DATABASE_URL:
+    # Producción: Render Postgres, Neon, Supabase, etc.
+    DATABASES = {"default": _database_from_url(DATABASE_URL)}
+else:
+    # Desarrollo local: SQLite (el filesystem de Render es efímero)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

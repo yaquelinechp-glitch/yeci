@@ -15,9 +15,27 @@ from prm.models import (
 
 
 class Command(BaseCommand):
-    help = "Seed database with realistic demo data (idempotent: wipes and recreates)"
+    help = (
+        "Seed database with realistic demo data. "
+        "Seeds only when the database is empty; use --reset to wipe and recreate."
+    )
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help="Borra los datos existentes antes de volver a sembrar (destructivo)",
+        )
 
     def handle(self, *args, **options):
+        reset = options["reset"]
+        if not reset and Partner.objects.exists():
+            self.stdout.write(
+                "La base de datos ya contiene datos; se omite el seed "
+                "(usa --reset para borrar y recrear)."
+            )
+            return
+
         # Wipe in dependency order
         Certification.objects.all().delete()
         TrainingResult.objects.all().delete()
