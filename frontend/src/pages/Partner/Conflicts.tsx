@@ -103,12 +103,12 @@ export default function PartnerConflicts() {
             <div>
               <label className="block text-sm font-medium mb-1">{t('conflicts.companyName')} *</label>
               <input type="text" required value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('conflicts.notes')}</label>
               <input type="text" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none" />
             </div>
           </div>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? t('common.loading') : t('conflicts.report')}</button>

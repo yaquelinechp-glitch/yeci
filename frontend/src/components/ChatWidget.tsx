@@ -48,7 +48,7 @@ export default function ChatWidget() {
   }, [msgs, typing, open]);
 
   const clampX = (x: number) => Math.min(Math.max(x, MARGIN), Math.max(MARGIN, window.innerWidth - BUBBLE - MARGIN));
-  const clampY = (y: number) => Math.min(Math.max(y, MARGIN), Math.max(MARGIN, window.innerHeight - BUBBLE - MARGIN));
+  const clampY = (y: number) => Math.min(Math.max(y, 72), Math.max(72, window.innerHeight - BUBBLE - MARGIN));
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!pos) return;
@@ -75,11 +75,13 @@ export default function ChatWidget() {
   const panelPos = () => {
     if (!pos || typeof window === 'undefined') return undefined;
     const w = Math.min(PANEL_W, window.innerWidth - 16);
+    const h = Math.max(280, Math.min(PANEL_H, window.innerHeight - 88));
     let left = pos.x + BUBBLE / 2 - w / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
-    let top = pos.y - PANEL_H - GAP;
-    if (top < 8) top = Math.min(pos.y + BUBBLE + GAP, window.innerHeight - PANEL_H - 8);
-    return { left, top, width: w, height: PANEL_H };
+    let top = pos.y - h - GAP;
+    if (top < 72) top = Math.min(pos.y + BUBBLE + GAP, window.innerHeight - h - 8);
+    top = Math.max(72, top);
+    return { left, top, width: w, height: h };
   };
 
   const send = async () => {
@@ -113,7 +115,7 @@ export default function ChatWidget() {
     <>
       {open && (
         <div style={panelPos()}
-          className="fixed z-[60] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+          className="fixed z-40 flex flex-col glass-strong rounded-2xl shadow-2xl border border-white/60 overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-aconso-600 to-aconso-500 text-white shrink-0">
             <div className="relative">
               <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg">🤖</div>
@@ -175,7 +177,7 @@ export default function ChatWidget() {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           style={{ left: pos.x, top: pos.y, width: BUBBLE, height: BUBBLE }}
-          className={`fixed z-[70] select-none touch-none rounded-full flex items-center justify-center shadow-xl cursor-grab active:cursor-grabbing transition-shadow hover:shadow-2xl ${open ? 'bg-gray-800' : 'bg-gradient-to-br from-aconso-600 to-aconso-400'} text-white`}
+          className={`fixed z-40 select-none touch-none rounded-full flex items-center justify-center shadow-xl cursor-grab active:cursor-grabbing transition-shadow hover:shadow-2xl ${open ? 'bg-gray-800' : 'bg-gradient-to-br from-aconso-600 to-aconso-400'} text-white`}
           title={t('chat.title')}
         >
           <span className="text-2xl pointer-events-none">💬</span>

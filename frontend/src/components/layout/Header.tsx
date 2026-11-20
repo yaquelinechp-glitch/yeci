@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/auth';
 import { notificationsApi } from '../../services/api';
+import { IconBell } from '../../components/icons';
 import type { Notification } from '../../types';
 
 export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () => void; onProfile?: () => void }) {
@@ -104,7 +105,7 @@ export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () =>
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-100 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 sm:px-6 shadow-sm gap-2">
+    <header className="h-16 glass border-b border-gray-200/70 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 sm:px-6 shadow-sm gap-2">
       <div className="flex items-center gap-2 min-w-0">
         {onMenuClick && (
           <button
@@ -118,7 +119,7 @@ export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () =>
           </button>
         )}
         <Link to="/" className="flex items-center gap-2 font-bold text-base sm:text-lg min-w-0">
-          <span className="text-aconso-500">aconso</span>
+          <span className="font-display text-aconso-500">aconso</span>
           <span className="font-normal text-gray-500 hidden xs:inline sm:inline">Partner Academy</span>
         </Link>
       </div>
@@ -156,7 +157,7 @@ export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () =>
                 )}
               </button>
               {open && (
-                <div className="absolute right-0 top-11 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="fixed inset-x-3 top-[4.5rem] z-[60] w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-11 sm:w-96 glass rounded-2xl shadow-xl border border-white/60 overflow-hidden max-h-[75dvh] flex flex-col">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <span className="font-semibold text-gray-900 text-sm"> {t('notifications.title')}</span>
                     <button onClick={markAll} className="text-xs text-aconso-600 hover:text-aconso-800">{t('notifications.markAll')}</button>
@@ -178,10 +179,10 @@ export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () =>
                       )}
                     </div>
                   )}
-                  <div className="max-h-80 overflow-y-auto">
+                  <div className="flex-1 min-h-0 overflow-y-auto">
                     {items.length === 0 ? (
                       <div className="px-4 py-10 text-center text-gray-400 text-sm">
-                        <div className="text-3xl mb-2"></div>
+                        <IconBell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                         {t('notifications.empty')}
                       </div>
                     ) : items.slice(0, 10).map((n) => (
@@ -208,24 +209,26 @@ export default function Header({ onMenuClick, onProfile }: { onMenuClick?: () =>
                 </div>
               )}
             </div>
-            <button
-              onClick={onProfile}
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 text-white flex items-center justify-center text-xs font-bold ring-2 ring-gray-100 hover:ring-aconso-300 transition-all overflow-hidden"
-              title={t('profile.title')}
-            >
-              {user?.avatar ? (
-                <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
-              ) : (
-                profileInitials()
-              )}
-            </button>
-            <button
-              onClick={logout}
-              className="text-sm text-gray-400 hover:text-red-500 transition-colors"
-              title={t('nav.logout')}
-            >
-              {t('nav.logout')}
-            </button>
+            <div className="flex items-center gap-1 rounded-3xl gradient-hero p-1 shadow-sm">
+              <button
+                onClick={onProfile}
+                className="w-8 h-8 rounded-full bg-white/15 text-white flex items-center justify-center text-xs font-bold ring-1 ring-white/40 hover:bg-white/25 transition-all overflow-hidden shrink-0"
+                title={t('profile.title')}
+              >
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
+                ) : (
+                  profileInitials()
+                )}
+              </button>
+              <button
+                onClick={logout}
+                className="text-[11px] sm:text-sm font-medium text-white/95 hover:text-white px-1.5 sm:px-3 py-1.5 rounded-full hover:bg-white/15 transition-colors whitespace-nowrap"
+                title={t('nav.logout')}
+              >
+                {t('nav.logout')}
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-2 sm:gap-3">

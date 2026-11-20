@@ -15,7 +15,7 @@ function fmtShort(n: number) {
 }
 
 const STAGE_COLORS: Record<string, string> = {
-  registrada: 'bg-blue-500', cualificada: 'bg-indigo-500',
+  registrada: 'bg-aconso-500', cualificada: 'bg-brand-blue',
   propuesta_enviada: 'bg-purple-500', negociacion: 'bg-orange-500',
   ganada: 'bg-emerald-500', perdida: 'bg-red-400',
 };
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
 
   const statusBadge: Record<string, string> = {
     activo: 'bg-emerald-100 text-emerald-700',
-    solicitado: 'bg-blue-100 text-blue-700',
+    solicitado: 'bg-aconso-100 text-aconso-700',
     en_revision: 'bg-amber-100 text-amber-700',
     contrato_pendiente: 'bg-purple-100 text-purple-700',
     inactivo: 'bg-red-100 text-red-700',
@@ -140,15 +140,15 @@ export default function AdminDashboard() {
   const maxStarted = Math.max(1, ...lmsCourses.map((c) => c.started));
 
   const trainingData = [
-    { name: t('admin.certified'), value: certified, color: '#10b981' },
-    { name: t('admin.inTraining'), value: inTraining, color: '#6366f1' },
-    { name: t('admin.notStarted'), value: Math.max(0, notStarted), color: '#e5e7eb' },
+    { name: t('admin.certified'), value: certified, color: '#46b38a' },
+    { name: t('admin.inTraining'), value: inTraining, color: '#359bd3' },
+    { name: t('admin.notStarted'), value: Math.max(0, notStarted), color: '#e8ecf3' },
   ];
 
   const kpis = [
     { icon: 'users', label: t('admin.totalPartners'), value: String(stats.total_partners), bg: 'bg-aconso-50', color: 'text-aconso-600' },
     { icon: 'activity', label: t('admin.activePartners'), value: String(stats.active_partners), bg: 'bg-emerald-50', color: 'text-emerald-600' },
-    { icon: 'briefcase', label: t('admin.totalDeals'), value: String(stats.total_deals), bg: 'bg-blue-50', color: 'text-blue-600' },
+    { icon: 'briefcase', label: t('admin.totalDeals'), value: String(stats.total_deals), bg: 'bg-aconso-50', color: 'text-aconso-600' },
     { icon: 'filter', label: t('admin.pipelineValue'), value: fmt(stats.total_pipeline_value), bg: 'bg-purple-50', color: 'text-purple-600', click: () => navigate('/admin/pipeline') },
     { icon: 'target', label: t('admin.activeOpportunities'), value: String(stats.active_opportunities), bg: 'bg-teal-50', color: 'text-teal-600', click: () => navigate('/admin/pipeline') },
     { icon: 'dollar', label: t('admin.pendingCommissions'), value: fmt(stats.pending_commissions), bg: 'bg-amber-50', color: 'text-amber-600' },
@@ -164,26 +164,26 @@ export default function AdminDashboard() {
       </div>
 
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-aconso-800 via-aconso-700 to-aconso-500 p-5 sm:p-8 text-white">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-aconso-500 via-brand-blue to-brand-green p-5 sm:p-8 text-white shadow-lg shadow-brand-blue/20">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3"></div>
         <div className="relative z-10">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">{t('admin.welcomeBack')}, {user?.first_name || user?.username || user?.company_name || ''}</h1>
-          <p className="text-aconso-200 text-base sm:text-lg">{t('admin.welcomeDashboardDesc')}</p>
+          <p className="text-white/80 text-base sm:text-lg">{t('admin.welcomeDashboardDesc')}</p>
           <div className="flex gap-6 mt-6 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold">{stats.total_partners}</span>
-              <span className="text-aconso-200 text-sm">{t('admin.totalPartners')}</span>
+              <span className="text-white/80 text-sm">{t('admin.totalPartners')}</span>
             </div>
             <div className="w-px bg-white/20"></div>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold">{stats.active_partners}</span>
-              <span className="text-aconso-200 text-sm">{t('admin.activePartners')}</span>
+              <span className="text-white/80 text-sm">{t('admin.activePartners')}</span>
             </div>
             <div className="w-px bg-white/20"></div>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold">{fmt(stats.total_revenue)}</span>
-              <span className="text-aconso-200 text-sm">{t('admin.totalRevenue')}</span>
+              <span className="text-white/80 text-sm">{t('admin.totalRevenue')}</span>
             </div>
           </div>
         </div>
@@ -193,7 +193,8 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         {kpis.map((card) => (
           <div key={card.label} onClick={card.click}
-            className={`card p-4 sm:p-5 ${card.click ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''} transition-all`}>
+            className={`card relative overflow-hidden bg-gradient-to-br from-white via-aconso-50/60 to-brand-green/10 p-4 sm:p-5 ${card.click ? 'cursor-pointer hover:shadow-lg hover:-translate-y-0.5' : ''} transition-all`}>
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-aconso-500 via-brand-blue to-brand-green" />
             <div className="flex items-center justify-between">
               <CardIcon name={card.icon} bg={card.bg} color={card.color} />
             </div>
@@ -211,12 +212,13 @@ export default function AdminDashboard() {
           <SectionHeader icon="dollar" bg="bg-emerald-100" color="text-emerald-600" title={t('admin.revenueByPartner')} />
           {partnerData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={partnerData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <BarChart data={partnerData} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} interval={0} />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#6b7280' }} axisLine={false} tickLine={false} interval="preserveStartEnd"
+                  angle={-25} textAnchor="end" height={52} tickFormatter={(v: string) => (v.length > 14 ? `${v.slice(0, 14)}…` : v)} />
                 <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => fmtShort(v)} />
-                <Tooltip cursor={{ fill: 'rgba(16,185,129,0.06)' }} formatter={(value: any) => [fmt(Number(value)), t('admin.totalRevenue')]} />
-                <Bar dataKey="revenue" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={42} />
+                <Tooltip cursor={{ fill: 'rgba(70,179,138,0.06)' }} formatter={(value: any) => [fmt(Number(value)), t('admin.totalRevenue')]} />
+                <Bar dataKey="revenue" fill="#46b38a" radius={[6, 6, 0, 0]} maxBarSize={42} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -230,7 +232,7 @@ export default function AdminDashboard() {
 
         {/* Training Progress */}
         <div className="card p-6">
-          <SectionHeader icon="cap" bg="bg-blue-100" color="text-blue-600" title={t('admin.trainingProgress')} action="/admin/courses" onAction={() => navigate('/admin/courses')} actionText={t('admin.goToCourses')} />
+          <SectionHeader icon="cap" bg="bg-aconso-100" color="text-aconso-600" title={t('admin.trainingProgress')} action="/admin/courses" onAction={() => navigate('/admin/courses')} actionText={t('admin.goToCourses')} />
           {lmsReport ? (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -327,7 +329,7 @@ export default function AdminDashboard() {
               { icon: 'users', label: t('admin.goToPartners'), sub: `${stats.total_partners} ${t('admin.totalPartners').toLowerCase()}`, bg: 'bg-aconso-50', hoverBg: 'hover:bg-aconso-100', color: 'text-aconso-600', path: '/admin/partners' },
               { icon: 'filter', label: t('admin.goToPipeline'), sub: t('admin.opportunitiesCount', { n: stats.active_opportunities }), bg: 'bg-purple-50', hoverBg: 'hover:bg-purple-100', color: 'text-purple-600', path: '/admin/pipeline' },
               { icon: 'cap', label: t('admin.goToCourses'), sub: `${courses.length} ${t('admin.totalCourses').toLowerCase()}`, bg: 'bg-emerald-50', hoverBg: 'hover:bg-emerald-100', color: 'text-emerald-600', path: '/admin/courses' },
-              { icon: 'dollar', label: t('admin.goToReports'), sub: t('admin.topPartnersCount', { n: stats.top_partners.length }), bg: 'bg-blue-50', hoverBg: 'hover:bg-blue-100', color: 'text-blue-600', path: '/admin/reports' },
+              { icon: 'dollar', label: t('admin.goToReports'), sub: t('admin.topPartnersCount', { n: stats.top_partners.length }), bg: 'bg-aconso-50', hoverBg: 'hover:bg-aconso-100', color: 'text-aconso-600', path: '/admin/reports' },
               { icon: 'shield', label: t('admin.goToSecurity'), sub: stats.failed_logins_24h > 0 ? t('admin.failedLoginsCount', { n: stats.failed_logins_24h }) : t('admin.noAlerts'), bg: 'bg-red-50', hoverBg: 'hover:bg-red-100', color: 'text-red-600', path: '/admin/security' },
             ].map((a) => (
               <button key={a.label} onClick={() => navigate(a.path)}

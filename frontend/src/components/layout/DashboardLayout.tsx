@@ -32,7 +32,7 @@ export default function DashboardLayout() {
     <>
       <Header onMenuClick={openSidebar} onProfile={() => setProfileOpen(true)} />
       <div className="flex pt-16">
-        <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar} onProfile={() => setProfileOpen(true)} />
+        <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
         <main className="lg:ml-64 flex-1 p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen lg:min-h-[calc(100vh-4rem)] overflow-x-hidden">
           <Outlet />
         </main>

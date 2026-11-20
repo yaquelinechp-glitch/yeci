@@ -238,7 +238,9 @@ export default function CourseInfoStep({ course, existingCourses, onCreated, onC
                 </div>
                 {phases.length > 1 && (
                   <button type="button" onClick={() => removePhase(pi)}
-                    className="text-gray-400 hover:text-red-500 px-1.5 py-1 rounded-lg hover:bg-red-50 transition-colors text-xs"></button>
+                    className="text-gray-400 hover:text-red-500 px-1.5 py-1 rounded-lg hover:bg-red-50 transition-colors" aria-label={t('common.delete')}>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" /></svg>
+                  </button>
                 )}
               </div>
             ))}

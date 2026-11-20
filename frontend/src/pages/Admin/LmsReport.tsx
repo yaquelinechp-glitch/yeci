@@ -68,12 +68,12 @@ export default function AdminLmsReport() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900"> {t('lms.reportTitle')}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('lms.reportTitle')}</h1>
             <p className="text-gray-500 mt-1">{t('lms.reportSubtitle')}</p>
           </div>
-          <button onClick={handleExport} disabled={exporting} className="btn-primary disabled:opacity-50">
+          <button onClick={handleExport} disabled={exporting} className="btn-primary disabled:opacity-50 self-start sm:self-auto">
             {exporting ? t('common.loading') : t('lms.exportExcel')}
           </button>
         </div>
@@ -85,7 +85,7 @@ export default function AdminLmsReport() {
           <p className="text-gray-400 text-sm">{t('courses.noCoursesYet')}</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[820px] text-sm">
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-200">
                   <th className="py-3 pr-4 font-semibold">{t('courses.courseTitle')}</th>
@@ -132,7 +132,7 @@ export default function AdminLmsReport() {
           <p className="text-gray-400 text-sm">{t('common.noData')}</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-200">
                   <th className="py-3 pr-4 font-semibold">{t('common.company')}</th>

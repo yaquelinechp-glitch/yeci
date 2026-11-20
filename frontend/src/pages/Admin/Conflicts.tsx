@@ -146,7 +146,7 @@ export default function AdminConflicts() {
           <div className="flex-1 min-w-[180px]">
             <label className="block text-xs text-gray-500 mb-1">{t('common.status')}</label>
             <select value={filter} onChange={(e) => setFilter(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 text-sm focus:border-blue-500 focus:outline-none bg-white">
+              className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 text-sm focus:border-aconso-500 focus:outline-none bg-white">
               <option value="">{t('common.all')}</option>
               {['abierto', 'en_resolucion', 'resuelto', 'cerrado'].map((s) => (
                 <option key={s} value={s}>{t(`conflicts.statuses.${s}`)}</option>
@@ -181,12 +181,12 @@ export default function AdminConflicts() {
             <div>
               <label className="block text-sm font-medium mb-1">{t('conflicts.companyName')} *</label>
               <input type="text" required value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('conflicts.notes')}</label>
               <input type="text" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none" />
             </div>
           </div>
           <button type="submit" disabled={saving} className="btn-primary">{saving ? t('common.loading') : t('conflicts.report')}</button>
@@ -250,7 +250,9 @@ export default function AdminConflicts() {
                       {(c.status === 'resuelto' || c.status === 'cerrado') && (
                         <button onClick={() => act(c, 'open')} disabled={acting === c.id} className="btn-secondary !py-1.5 text-xs">↩ {t('conflicts.reopen')}</button>
                       )}
-                      <button onClick={() => remove(c)} disabled={acting === c.id} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('common.delete')}></button>
+                      <button onClick={() => remove(c)} disabled={acting === c.id} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('common.delete')} aria-label={t('common.delete')}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" /></svg>
+                      </button>
                     </div>
                   </div>
                 </div>

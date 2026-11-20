@@ -54,7 +54,7 @@ function fmtTime(sec: number): string {
   return `${m}:${r.toString().padStart(2, '0')}`;
 }
 
-export default function CheckpointEditor({ courseId, video, onRefresh }: Props) {
+export default function CheckpointEditor({ courseId, video }: Props) {
   const { t } = useTranslation();
   const [checkpoints, setCheckpoints] = useState<VideoCheckpoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,12 +165,6 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
     return q.en || q.es || q.de || '';
   };
 
-  const optionText = (o: any) => {
-    if (!o) return '';
-    if (typeof o === 'string') return o;
-    return o.en || o.es || o.de || '';
-  };
-
   if (loading) {
     return <div className="text-center py-8 text-gray-400 text-sm">{t('common.loading')}</div>;
   }
@@ -211,21 +205,28 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
       {checkpoints.length > 0 && (
         <div className="space-y-2">
           {checkpoints.map((cp) => (
-            <div key={cp.id} className="p-3 bg-gray-50 rounded-xl border border-gray-100 group">
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{fmtTime(cp.timestamp_seconds)}</span>
-                  <span className="text-sm font-medium text-gray-900">{questionText(cp.question)}</span>
+            <div key={cp.id} className="p-3 bg-white rounded-xl border border-gray-200 group transition-colors hover:border-amber-200">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <div className="flex items-start gap-2 min-w-0">
+                  <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full shrink-0">{fmtTime(cp.timestamp_seconds)}</span>
+                  <span className="text-sm font-medium text-gray-900 truncate">{questionText(cp.question)}</span>
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => move(cp.id, -1)} className="text-gray-400 hover:text-gray-700 px-1">↑</button>
-                  <button onClick={() => move(cp.id, 1)} className="text-gray-400 hover:text-gray-700 px-1">↓</button>
+                <div className="flex items-center gap-0.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
+                  <button onClick={() => move(cp.id, -1)} className="w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:text-aconso-600 hover:bg-gray-50" aria-label={t('common.moveUp') || 'Subir'}>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6" /></svg>
+                  </button>
+                  <button onClick={() => move(cp.id, 1)} className="w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:text-aconso-600 hover:bg-gray-50" aria-label={t('common.moveDown') || 'Bajar'}>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
                   <button onClick={() => startEdit(cp)} className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded hover:bg-aconso-50">{t('common.edit')}</button>
                   <button onClick={() => setConfirmDelete(cp.id)} className="text-[11px] text-gray-400 hover:text-red-500 px-1.5 py-0.5 rounded hover:bg-red-50">{t('common.delete')}</button>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 ml-6 text-[11px] text-gray-400">
-                <span onClick={() => { if (videoRef.current) { videoRef.current.seekTo(cp.on_wrong_timestamp || 0); videoRef.current.play(); } }} className="cursor-pointer hover:text-amber-600">{t('checkpoints.onWrong')}: {fmtTime(cp.on_wrong_timestamp || 0)}</span>
+              <div className="flex items-center gap-1.5 ml-1 text-[11px] text-gray-400">
+                <span onClick={() => { if (videoRef.current) { videoRef.current.seekTo(cp.on_wrong_timestamp || 0); videoRef.current.play(); } }} className="cursor-pointer hover:text-amber-600 inline-flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                  {t('checkpoints.onWrong')}: {fmtTime(cp.on_wrong_timestamp || 0)}
+                </span>
               </div>
             </div>
           ))}
@@ -233,8 +234,9 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
       )}
 
       {checkpoints.length === 0 && !showForm && (
-        <div className="text-center py-6">
-          <p className="text-sm text-gray-400">{t('checkpoints.noCheckpointsHint')}</p>
+        <div className="text-center py-6 rounded-xl border border-dashed border-gray-200 bg-white">
+          <svg className="w-7 h-7 mx-auto text-gray-300" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+          <p className="mt-2 text-sm text-gray-500">{t('checkpoints.noCheckpointsHint')}</p>
         </div>
       )}
 
@@ -253,7 +255,7 @@ export default function CheckpointEditor({ courseId, video, onRefresh }: Props) 
 
       {/* Inline form */}
       {showForm && (
-        <div className="border-2 border-amber-200 rounded-xl p-4 space-y-3">
+        <div className="border border-amber-200 bg-white rounded-xl p-4 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-900">{editing ? t('checkpoints.editCheckpoint') : t('checkpoints.addCheckpoint')}</h4>
             <div className="flex items-center gap-2">

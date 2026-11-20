@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { partnerUsersApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth';
+import { IconCheck, IconShield } from '../../components/icons';
 import type { PartnerUser } from '../../types';
 
 const ROLE_ORDER = ['owner', 'admin', 'member'];
@@ -80,7 +81,7 @@ export default function PartnerUsers() {
   if (isMember) {
     return (
       <div className="card p-12 text-center">
-        <div className="text-5xl mb-4"></div>
+        <IconShield className="w-12 h-12 mx-auto mb-4 text-gray-300" />
         <p className="text-gray-500">{t('users.memberNoAccess')}</p>
       </div>
     );
@@ -91,7 +92,7 @@ export default function PartnerUsers() {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900"> {t('users.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('users.title')}</h1>
         <p className="text-gray-500 mt-1">{t('users.subtitle')}</p>
       </div>
 
@@ -118,7 +119,7 @@ export default function PartnerUsers() {
                   <div className="font-medium text-gray-900 text-sm">{user?.contact_name || user?.company_name}</div>
                   <div className="text-xs text-gray-500">{user?.email}</div>
                 </div>
-                <span className="badge bg-aconso-600 text-white border border-aconso-700"> {roleLabel('owner')}</span>
+                <span className="badge bg-aconso-600 text-white border border-aconso-700">{roleLabel('owner')}</span>
               </div>
               {sorted.map((m) => (
                 <div key={m.id} className="rounded-xl border border-gray-200 p-4 flex flex-wrap items-center gap-3">
@@ -147,11 +148,17 @@ export default function PartnerUsers() {
                   )}
                   <div className="flex items-center gap-1">
                     {m.status === 'activo' ? (
-                      <button onClick={() => updateMember(m, { status: 'desactivado' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.disable')}></button>
+                      <button onClick={() => updateMember(m, { status: 'desactivado' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.disable')} aria-label={t('users.disable')}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeWidth={2} d="M10 4v16M14 4v16" /></svg>
+                      </button>
                     ) : (
-                      <button onClick={() => updateMember(m, { status: 'activo' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.enable')}>▶</button>
+                      <button onClick={() => updateMember(m, { status: 'activo' })} className="btn-secondary !py-1.5 !px-2.5 text-xs" title={t('users.enable')} aria-label={t('users.enable')}>
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                      </button>
                     )}
-                    <button onClick={() => removeMember(m)} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('users.remove')}></button>
+                    <button onClick={() => removeMember(m)} className="btn-secondary !py-1.5 !px-2.5 text-xs hover:!border-red-400 hover:!text-red-600" title={t('users.remove')} aria-label={t('users.remove')}>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" /></svg>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -162,14 +169,14 @@ export default function PartnerUsers() {
 
         {/* Invite form */}
         <div className="card p-6 h-fit">
-          <h2 className="font-bold text-gray-900 mb-4"> {t('users.inviteTitle')}</h2>
+          <h2 className="font-bold text-gray-900 mb-4">{t('users.inviteTitle')}</h2>
           <form onSubmit={sendInvite} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">{t('auth.email')} *</label>
               <input
                 type="email" value={inviteEmail} required
                 onChange={(e) => setInviteEmail(e.target.value)}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none"
               />
             </div>
             <div>
@@ -177,12 +184,12 @@ export default function PartnerUsers() {
               <input
                 type="text" value={inviteName}
                 onChange={(e) => setInviteName(e.target.value)}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none"
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t('users.roleTitle')}</label>
-              <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)} className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white">
+              <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)} className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none bg-white">
                 <option value="admin">{roleLabel('admin')}</option>
                 <option value="member">{roleLabel('member')}</option>
               </select>
@@ -195,15 +202,15 @@ export default function PartnerUsers() {
 
           {inviteUrl && (
             <div className="mt-4 p-4 rounded-xl border border-emerald-200 bg-emerald-50">
-              <div className="text-sm font-semibold text-emerald-800 mb-2"> {t('users.inviteCreated')}</div>
+              <div className="text-sm font-semibold text-emerald-800 mb-2 flex items-center gap-1.5"><IconCheck className="w-4 h-4" /> {t('users.inviteCreated')}</div>
               <div className="flex gap-2">
                 <input
                   readOnly value={`${window.location.origin}${inviteUrl}`}
                   onFocus={(e) => e.target.select()}
                   className="flex-1 min-w-0 text-xs border border-emerald-200 rounded-lg px-3 py-2 bg-white text-gray-700"
                 />
-                <button type="button" onClick={copyInvite} className="btn-secondary !py-1.5 text-xs whitespace-nowrap">
-                  {copied ? '' : t('users.copy')}
+                <button type="button" onClick={copyInvite} className="btn-secondary !py-1.5 text-xs whitespace-nowrap inline-flex items-center gap-1">
+                  {copied ? <IconCheck className="w-3.5 h-3.5 text-emerald-600" /> : t('users.copy')}
                 </button>
               </div>
             </div>

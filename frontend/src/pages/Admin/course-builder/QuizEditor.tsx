@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { coursesApi } from '../../../services/api';
+import { IconBolt, IconClipboard } from '../../../components/icons';
 import type { QuizQuestion } from '../../../types';
 
 const LANGS = ['en', 'es', 'de'] as const;
@@ -105,13 +106,13 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
             const qText = (q.question as any)?.en || q.question as string || '';
             const opts: any[] = q.options || [];
             return (
-              <div key={q.id} className="p-3 bg-gray-50 rounded-xl border border-gray-100 group">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2">
+              <div key={q.id} className="p-3 bg-white rounded-xl border border-gray-200 group hover:border-aconso-200 transition-colors">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-start gap-2 min-w-0">
                     <span className="w-5 h-5 rounded-full bg-aconso-100 text-aconso-600 flex items-center justify-center text-[10px] font-bold shrink-0">{qi + 1}</span>
-                    <span className="text-sm font-medium text-gray-900">{qText}</span>
+                    <span className="text-sm font-medium text-gray-900 line-clamp-2">{qText}</span>
                   </div>
-                  <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-0.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
                     <button onClick={() => startEdit(q)} className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded hover:bg-aconso-50">{t('common.edit')}</button>
                     <button onClick={() => del(q.id)} className="text-[11px] text-gray-400 hover:text-red-500 px-1.5 py-0.5 rounded hover:bg-red-50">{t('common.delete')}</button>
                   </div>
@@ -141,36 +142,38 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
       )}
 
       {questions.length === 0 && !showForm && (
-        <div className="text-center py-6 mb-2">
-          <div className="text-3xl mb-2"></div>
-          <p className="text-sm font-medium text-gray-700 mb-1">{t('courses.createFirstQuestion') || 'Crea tu primera pregunta'}</p>
-          <p className="text-xs text-gray-400 mb-4">{t('courses.createFirstQuestionDesc') || 'Elige la respuesta correcta haciendo clic en la opción.'}</p>
+        <div className="rounded-xl border border-dashed border-gray-200 bg-white px-4 py-7 text-center">
+          <IconClipboard className="w-7 h-7 mx-auto text-gray-300" />
+          <p className="mt-2 text-sm font-medium text-gray-700">{t('courses.createFirstQuestion') || 'Crea tu primera pregunta'}</p>
+          <p className="text-xs text-gray-400 mt-0.5 mb-4">{t('courses.createFirstQuestionDesc') || 'Elige la respuesta correcta haciendo clic en la opción.'}</p>
           <button onClick={() => { setShowForm(true); setEditing(null); setForm(emptyForm()); }}
-            className="btn-primary text-sm px-6">
+            className="btn-primary text-sm">
             + {t('quiz.createQuestion')}
           </button>
         </div>
       )}
 
       {/* Generate from bank */}
-      <div className="flex flex-col items-center gap-3 p-5 bg-gradient-to-b from-aconso-50 to-white rounded-xl border border-aconso-100">
-        <div className="text-2xl"></div>
-        <p className="text-sm font-semibold text-gray-800 text-center">{t('courses.generateQuiz') || 'Generar desde el banco'}</p>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">{t('quiz.questionsCount') || 'Preguntas'}:</span>
-          <input type="number" min={1} max={10} value={genCount}
+      <div className="flex flex-col items-center gap-3 p-4 bg-gradient-to-b from-aconso-50 to-white rounded-xl border border-aconso-100">
+        <div className="flex items-center gap-2 text-aconso-700">
+          <IconBolt className="w-4 h-4" />
+          <p className="text-sm font-semibold text-center">{t('courses.generateQuiz') || 'Generar desde el banco'}</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <label className="text-xs text-gray-500" htmlFor="quiz-gen-count">{t('quiz.questions')}</label>
+          <input id="quiz-gen-count" type="number" min={1} max={10} value={genCount}
             onChange={e => setGenCount(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
             className="w-14 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none" />
           <button onClick={handleGenerate} disabled={generating}
-            className="btn-primary text-xs px-4 py-1.5">
-            {generating ? '...' : ' ' + (t('courses.generateQuiz') || 'Generar')}
+            className="btn-primary text-xs py-1.5 px-3 whitespace-nowrap disabled:opacity-50">
+            {generating ? '...' : t('quiz.generate')}
           </button>
         </div>
       </div>
 
       {/* Inline form */}
       {showForm ? (
-        <div className="border-2 border-aconso-200 rounded-xl p-4 space-y-3">
+        <div className="border border-aconso-200 bg-white rounded-xl p-4 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-900">{editing ? t('quiz.editQuestion') : t('quiz.createQuestion')}</h4>
             <div className="flex items-center gap-2">
@@ -183,7 +186,7 @@ export default function QuizEditor({ courseId, videoId, questions, onRefresh }: 
                 ))}
               </div>
               <button onClick={() => { setShowForm(false); setEditing(null); setForm(emptyForm()); }}
-                className="text-gray-400 hover:text-gray-600 text-sm"></button>
+                className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1" aria-label={t('common.cancel')}>×</button>
             </div>
           </div>
 

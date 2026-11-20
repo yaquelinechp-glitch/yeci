@@ -29,7 +29,7 @@ export default function PartnersOverview() {
     { key: 'all', label: t('admin.totalPartners'), grad: 'from-aconso-500 to-aconso-700', icon: '' },
     { key: 'activo', label: t('admin.activePartners'), grad: 'from-emerald-500 to-emerald-700', icon: '' },
     { key: 'solicitado', label: t('common.pending'), grad: 'from-amber-500 to-amber-600', icon: '' },
-    { key: 'en_revision', label: t('common.review'), grad: 'from-blue-500 to-blue-600', icon: '' },
+    { key: 'en_revision', label: t('common.review'), grad: 'from-aconso-500 to-aconso-600', icon: '' },
   ];
 
   return (

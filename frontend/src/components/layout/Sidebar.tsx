@@ -10,12 +10,11 @@ type NavLink = { to: string; label: string; badge?: number };
 type Props = {
   mobileOpen: boolean;
   onClose: () => void;
-  onProfile?: () => void;
 };
 
-export default function Sidebar({ mobileOpen, onClose, onProfile }: Props) {
+export default function Sidebar({ mobileOpen, onClose }: Props) {
   const { t } = useTranslation();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const location = useLocation();
   const isAdmin = user?.role === 'admin';
   const [partnersBadge, setPartnersBadge] = useState(0);
@@ -41,15 +40,6 @@ export default function Sidebar({ mobileOpen, onClose, onProfile }: Props) {
     window.addEventListener('admin:stats-changed', load);
     return () => { clearInterval(id); window.removeEventListener('admin:stats-changed', load); };
   }, [isAdmin]);
-
-  const profileInitials = () => {
-    const fn = (user?.first_name || '').trim();
-    const ln = (user?.last_name || '').trim();
-    if (fn && ln) return (fn[0] + ln[0]).toUpperCase();
-    if (fn) return fn.slice(0, 2).toUpperCase();
-    if (ln) return ln.slice(0, 2).toUpperCase();
-    return (user?.company_name || '?').slice(0, 2).toUpperCase();
-  };
 
   const links: NavLink[] = isAdmin
     ? [
@@ -77,33 +67,12 @@ export default function Sidebar({ mobileOpen, onClose, onProfile }: Props) {
   return (
     <>
       {mobileOpen && (
-        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/50 z-40 lg:hidden" onClick={onClose} />
+        <div className="fixed inset-y-0 left-0 right-0 top-16 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onClick={onClose} />
       )}
-      <aside className={`w-64 bg-dark-800 text-white flex flex-col fixed left-0 top-16 bottom-0 z-50 transition-transform duration-300 ${
+      <aside className={`w-64 bg-gradient-to-b from-[#1b4a6b] via-[#123a5c] to-[#0b2d47] text-[#bfe3f5] flex flex-col fixed left-0 top-16 bottom-0 z-50 border-r border-white/10 transition-transform duration-300 ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}>
-      <div className="p-4 border-b border-white/10 shrink-0">
-        {onProfile && (
-          <button onClick={onProfile} className="group flex items-center gap-3 w-full text-left" title={t('profile.title')}>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-sm font-bold shrink-0 ring-2 ring-white/20 overflow-hidden group-hover:ring-accent-500/60 transition-all">
-              {user?.avatar ? (
-                <img src={user.avatar} alt={t('profile.title')} className="w-full h-full object-cover" />
-              ) : (
-                profileInitials()
-              )}
-            </div>
-            <div className="min-w-0">
-              <div className="font-semibold text-white group-hover:text-accent-300 transition-colors truncate">
-                {[user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() || user?.username || user?.company_name}
-              </div>
-              <div className="text-xs text-dark-200 mt-0.5 truncate">
-                {([user?.first_name, user?.last_name].filter(Boolean).join(' ').trim() && user?.username) ? user.username : (user?.contact_name || (isAdmin ? t('nav.admin') : ''))}
-              </div>
-            </div>
-          </button>
-        )}
-      </div>
-      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 mt-5">
+      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col justify-evenly px-3 py-3">
         {links.map((link) => {
           const isActive = location.pathname === link.to;
           return (
@@ -111,10 +80,10 @@ export default function Sidebar({ mobileOpen, onClose, onProfile }: Props) {
               key={link.to}
               to={link.to}
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg mb-1 transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 ${
                 isActive
-                  ? 'bg-accent-500/15 text-accent-400 border-l-3 border-accent-500'
-                  : 'text-dark-200 hover:bg-white/5 hover:text-white'
+                  ? 'bg-gradient-to-r from-[#357fae] via-[#1b4a6b]/80 to-transparent text-white font-semibold shadow-[-8px_0_12px_-6px_rgba(0,0,0,0.28)]'
+                  : 'text-[#bfe3f5]/90 hover:bg-gradient-to-r hover:from-[#357fae] hover:via-[#1b4a6b]/80 hover:to-transparent hover:text-white'
               }`}
             >
               <span className={isActive ? 'font-medium' : ''}>{link.label}</span>
@@ -125,12 +94,6 @@ export default function Sidebar({ mobileOpen, onClose, onProfile }: Props) {
           );
         })}
       </nav>
-      <div className="shrink-0 border-t border-white/10 px-3">
-        <button onClick={() => { logout(); onClose(); }} className="w-full flex items-center gap-3 px-4 py-4 text-sm text-dark-200 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all duration-200 mt-2">
-          <span className="text-lg"></span>
-          {t('nav.logout')}
-        </button>
-      </div>
     </aside>
     </>
   );

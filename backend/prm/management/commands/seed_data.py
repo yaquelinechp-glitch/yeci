@@ -1,19 +1,21 @@
+from datetime import timedelta
+
 import bcrypt
 from django.core.management.base import BaseCommand
 from django.db.models import Sum
 from django.utils import timezone
 from prm.models import (
-    Partner, Course, CourseVideo, QuizQuestion, QuizBankQuestion, CourseAssignment,
-    CourseRating, Deal, Commission, Opportunity,
+    Partner, PartnerType, Course, CourseVideo, QuizQuestion, QuizBankQuestion,
+    CourseAssignment, CourseRating, Deal, Commission, Opportunity, Product,
     TokenBlacklist, LoginAttempt, OpportunityEvent, TrainingResult, Certification,
     PartnerProgress, PartnerOnboarding, PartnerUser, MdfRequest, Reward,
     RewardRedemption, PointTransaction, ChannelConflict,
-    Communication, CommunicationRecipient,
+    Communication, CommunicationRecipient, Notification,
 )
 
 
 class Command(BaseCommand):
-    help = "Seed database with demo data (idempotent: wipes and recreates)"
+    help = "Seed database with realistic demo data (idempotent: wipes and recreates)"
 
     def handle(self, *args, **options):
         # Wipe in dependency order
@@ -31,15 +33,18 @@ class Command(BaseCommand):
         Course.objects.all().delete()
         ChannelConflict.objects.all().delete()
         MdfRequest.objects.all().delete()
-        PointTransaction.objects.all().delete()
         RewardRedemption.objects.all().delete()
         Reward.objects.all().delete()
+        PointTransaction.objects.all().delete()
+        Notification.objects.all().delete()
         Communication.objects.all().delete()
         PartnerOnboarding.objects.all().delete()
         PartnerUser.objects.all().delete()
         PartnerProgress.objects.all().delete()
         TokenBlacklist.objects.all().delete()
         LoginAttempt.objects.all().delete()
+        Product.objects.all().delete()
+        PartnerType.objects.all().delete()
         Partner.objects.all().delete()
 
         def hpw(p):
@@ -47,36 +52,131 @@ class Command(BaseCommand):
 
         # Admin
         Partner.objects.create(
-            id="admin-001", company_name="aconso", email="admin@aconso.com",
-            password_hash=hpw("admin123"), contact_name="Admin",
+            id="admin-001", company_name="aconso AG", email="admin@aconso.com",
+            password_hash=hpw("admin123"), contact_name="Administrador aconso",
             role="admin", status="activo", commission_rate=0, training_track="",
+            country="de", partner_type="agente",
         )
 
-        # Partners (id, name, email, contact, status, rate, track, why, sales)
-        partners_data = [
-            ("partner-001", "Flexso", "flexso@demo.com", "contacto@flexso.com", "activo", 12.0, "ventas",
-             "Revendedores especializados en integraciones SAP", "Red de clientes enterprise en sector financiero y manufacturero"),
-            ("partner-002", "Deloitte Belgium", "deloitte@demo.com", "partner@deloitte.be", "activo", 15.0, "tecnica",
-             "Consultora global con práctica de RRHH digital", "Proyectos de transformación digital HR en grandes empresas"),
-            ("partner-003", "Entago AG", "entago@demo.com", "info@entago.ch", "activo", 10.0, "tecnica",
-             "Especialistas en implementación de software HR", "Clientes en sector salud y educación en Suiza"),
-            ("partner-004", "smahrt", "smahrt@demo.com", "hello@smahrt.de", "activo", 11.0, "ventas",
-             "Fintech con enfoque en automatización de procesos", "Startups y PYMES en Alemania"),
-            ("partner-005", "p78 (projekt0708)", "p78@demo.com", "p78@projekt0708.de", "en_revision", 10.0, "ventas", "", ""),
-            ("partner-006", "CloudBase Partners", "cloudbase@demo.com", "sales@cloudbase.io", "solicitado", 10.0, "", "", ""),
-        ]
-        country_for_pid = {
-            "partner-001": "be", "partner-002": "be",
-            "partner-003": "ch", "partner-004": "de",
-            "partner-005": "de", "partner-006": "us",
-        }
-        for pid, name, email, contact, st, rate, track, why, sales in partners_data:
-            Partner.objects.create(
-                id=pid, company_name=name, email=email, password_hash=hpw("admin123"),
-                contact_name=contact, role="socio", status=st, commission_rate=rate,
-                training_track=track, phone="+49 89 123456", tax_id=f"DE{pid[-3:]}",
-                why_partner=why, sales_approach=sales, country=country_for_pid.get(pid, ""),
+        # Partner types (catálogo de tipos de partner con comisión por defecto)
+        for key, label, rate, order in [
+            ("agente", "Agente comercial", 10.0, 1),
+            ("consultora", "Consultora de RRHH", 12.0, 2),
+            ("integrador", "Integrador técnico", 15.0, 3),
+            ("distribuidor", "Distribuidor regional", 18.0, 4),
+        ]:
+            PartnerType.objects.create(
+                key=key, label=label, default_commission_rate=rate, sort_order=order
             )
+
+        # Product catalog (precio por empleado y mes, en cada divisa)
+        products_data = [
+            ("dpa", {"en": "Digitale Personalakte (DPA)", "es": "Digitale Personalakte (DPA)", "de": "Digitale Personalakte (DPA)"},
+             {"en": "Digital personnel file with role-based access and retention rules",
+              "es": "Expediente digital de personal con acceso por roles y plazos de conservación",
+              "de": "Digitale Personalakte mit rollenbasiertem Zugriff und Aufbewahrungsfristen"},
+             2.40, 2.10, 2.60, "core", 1),
+            ("hr_doc_box", {"en": "HR Document Box", "es": "HR Document Box", "de": "HR Document Box"},
+             {"en": "Templates and automated workflows for HR document generation",
+              "es": "Plantillas y flujos automatizados para generar documentos de RRHH",
+              "de": "Vorlagen und automatisierte Workflows für die HR-Dokumenterstellung"},
+             1.20, 1.05, 1.30, "core", 2),
+            ("insights", {"en": "aconso Insights", "es": "aconso Insights", "de": "aconso Insights"},
+             {"en": "Analytics and dashboards for HR document processes",
+              "es": "Analítica y dashboards para procesos documentales de RRHH",
+              "de": "Analytik und Dashboards für HR-Dokumentenprozesse"},
+             0.90, 0.80, 1.00, "addon", 3),
+            ("scan_services", {"en": "Scan Services", "es": "Servicios de digitalización", "de": "Scan-Services"},
+             {"en": "Digitization of paper archives with certified quality controls",
+              "es": "Digitalización de archivos en papel con controles de calidad certificados",
+              "de": "Digitalisierung von Papierarchiven mit zertifizierten Qualitätskontrollen"},
+             0, 0, 0, "service", 4),
+        ]
+        for key, name, desc, price_eur, price_chf, price_usd, category, order in products_data:
+            Product.objects.create(
+                key=key, name=name, description=desc,
+                price_eur=price_eur, price_chf=price_chf, price_usd=price_usd,
+                category=category, sort_order=order,
+            )
+
+        # Partners (empresas ficticias verosímiles del ecosistema DACH)
+        partners_data = [
+            {
+                "id": "partner-001", "company_name": "Hanseatic HR Solutions GmbH",
+                "email": "l.brandt@hanseatic-hr.de", "contact_name": "Lena Brandt",
+                "first_name": "Lena", "last_name": "Brandt", "username": "lbrandt",
+                "phone": "+49 40 2286 4170", "tax_id": "DE815472963", "country": "de",
+                "status": "activo", "commission_rate": 12.0, "training_track": "ventas",
+                "partner_type": "consultora", "mdf_budget_year": 6000.0,
+                "why_partner": "Consultoría especializada en transformación de RRHH para el norte de Alemania.",
+                "sales_approach": "Ventas consultivas a dirección de RRHH en logística, sanidad y sector público.",
+                "certification_date": timezone.now() - timedelta(days=25),
+            },
+            {
+                "id": "partner-002", "company_name": "Alpenblick Consulting AG",
+                "email": "m.kessler@alpenblick-consulting.ch", "contact_name": "Martin Kessler",
+                "first_name": "Martin", "last_name": "Kessler", "username": "mkessler",
+                "phone": "+41 44 512 38 90", "tax_id": "CHE-114.873.652 MWST", "country": "ch",
+                "status": "activo", "commission_rate": 15.0, "training_track": "tecnica",
+                "partner_type": "integrador", "mdf_budget_year": 8000.0,
+                "why_partner": "Integrador SAP HCM con práctica propia de digitalización documental.",
+                "sales_approach": "Proyectos llave en mano para banca, seguros y sector sanitario en Suiza.",
+                "certification_date": timezone.now() - timedelta(days=68),
+            },
+            {
+                "id": "partner-003", "company_name": "Rheinwerk Digital GmbH",
+                "email": "s.vogt@rheinwerk-digital.de", "contact_name": "Sabine Vogt",
+                "first_name": "Sabine", "last_name": "Vogt", "username": "svogt",
+                "phone": "+49 221 4703 8820", "tax_id": "DE276438915", "country": "de",
+                "status": "activo", "commission_rate": 10.0, "training_track": "tecnica",
+                "partner_type": "consultora", "mdf_budget_year": 5000.0,
+                "why_partner": "Consultora regional con foco en administraciones públicas y educación.",
+                "sales_approach": "Licitaciones públicas y proyectos de digitalización de expedientes.",
+            },
+            {
+                "id": "partner-004", "company_name": "Nordlicht Process Automation GmbH",
+                "email": "j.petersen@nordlicht-pa.de", "contact_name": "Jonas Petersen",
+                "first_name": "Jonas", "last_name": "Petersen", "username": "jpetersen",
+                "phone": "+49 421 9605 4420", "tax_id": "DE193846275", "country": "de",
+                "status": "activo", "commission_rate": 11.0, "training_track": "ventas",
+                "partner_type": "distribuidor", "mdf_budget_year": 5000.0,
+                "why_partner": "Especialista en automatización de procesos para industria y retail.",
+                "sales_approach": "Venta directa a COO y dirección de operaciones en el norte de Alemania.",
+            },
+            {
+                "id": "partner-005", "company_name": "Campus HR Services GmbH",
+                "email": "t.reinhardt@campus-hr.de", "contact_name": "Tobias Reinhardt",
+                "first_name": "Tobias", "last_name": "Reinhardt", "username": "treinhardt",
+                "phone": "+49 89 4521 7780", "tax_id": "DE329184756", "country": "de",
+                "status": "en_revision", "commission_rate": 10.0, "training_track": "ventas",
+                "partner_type": "agente", "mdf_budget_year": 0.0,
+                "why_partner": "Servicios de RRHH para universidades y centros de formación.",
+                "sales_approach": "Red de contactos en universidades públicas del sur de Alemania.",
+            },
+            {
+                "id": "partner-006", "company_name": "Atlas Cloud Partners BV",
+                "email": "femke@atlascloud.nl", "contact_name": "Femke de Vries",
+                "first_name": "Femke", "last_name": "de Vries", "username": "fdevries",
+                "phone": "+31 20 808 4512", "tax_id": "", "country": "nl",
+                "status": "solicitado", "commission_rate": 10.0, "training_track": "",
+                "partner_type": "agente", "mdf_budget_year": 0.0,
+                "why_partner": "Partner cloud con cartera de PYMES en Países Bajos.",
+                "sales_approach": "Modelo de suscripción gestionada para PYMES.",
+            },
+            {
+                "id": "partner-007", "company_name": "Helvetia People Solutions AG",
+                "email": "c.gerber@helvetia-people.ch", "contact_name": "Claudia Gerber",
+                "first_name": "Claudia", "last_name": "Gerber", "username": "cgerber",
+                "phone": "+41 31 508 22 40", "tax_id": "CHE-289.451.037", "country": "ch",
+                "status": "activo", "commission_rate": 10.0, "training_track": "cumplimiento",
+                "partner_type": "consultora", "mdf_budget_year": 4000.0,
+                "why_partner": "Consultora de compliance y protección de datos para el sector financiero suizo.",
+                "sales_approach": "Proyectos de cumplimiento normativo y auditoría documental.",
+                "certification_date": timezone.now() - timedelta(days=10),
+            },
+        ]
+        for data in partners_data:
+            Partner.objects.create(password_hash=hpw("admin123"), role="socio", **data)
 
         # Courses (multi-language JSONField + LMS fields)
         courses_data = [
@@ -303,23 +403,35 @@ class Command(BaseCommand):
                 fill_answer=fill, question_type=qtype, track=track,
             )
 
-        # Assignments: course-006 (compliance) assigned to smahrt with deadline
-        CourseAssignment.objects.create(id="asg-001", course_id="course-006", partner_id="partner-004", deadline="2026-09-30")
+        # Assignments: course-006 (compliance) assigned to Campus HR with deadline
+        CourseAssignment.objects.create(id="asg-001", course_id="course-006", partner_id="partner-005", deadline="2027-01-31")
 
         # Ratings
-        CourseRating.objects.create(id="rate-001", course_id="course-001", partner_id="partner-001", stars=5, comment="Excellent introduction")
-        CourseRating.objects.create(id="rate-002", course_id="course-001", partner_id="partner-002", stars=4, comment="Very clear material")
+        CourseRating.objects.create(id="rate-001", course_id="course-001", partner_id="partner-001", stars=5,
+                                    comment="Contenido muy claro y bien estructurado; útil desde el primer día.")
+        CourseRating.objects.create(id="rate-002", course_id="course-001", partner_id="partner-002", stars=4,
+                                    comment="Buen material; echamos de menos más ejemplos de integración con SAP.")
 
-        # Deals
+        # Deals (registro comercial: acceso al entorno, implementación y cierre)
         deals_data = [
-            ("deal-001", "partner-001", "Deutsche Bank AG", "FinTech", 50000, "necesita_acceso", "Contacto con CTO, interesados en Digital Personnel File"),
-            ("deal-002", "partner-001", "Continental AG", "Manufacturing", 35000, "en_implementacion", "Ya tienen SAP, quieren integrar aconso"),
-            ("deal-003", "partner-001", "Siemens Healthineers", "Healthcare", 75000, "acceso_otorgado", "Proyecto piloto aprobado"),
-            ("deal-004", "partner-002", "BMW Group", "Automotive", 120000, "completado", "Implementación completa exitosa"),
-            ("deal-005", "partner-002", "Allianz SE", "Insurance", 95000, "necesita_acceso", "Reunión programada para demo"),
-            ("deal-006", "partner-003", "Nokia Networks", "Telecom", 40000, "en_revision", "En espera de aprobación interna"),
-            ("deal-007", "partner-004", "dm-drogerie markt", "Retail", 28000, "completado", "Contrato firmado, implementación completada"),
-            ("deal-008", "partner-004", "Lufthansa Systems", "Aviation", 62000, "acceso_otorgado", "En proceso de implementación"),
+            ("deal-001", "partner-001", "Elbe Logistics GmbH", "Transporte y logística", 78000, "acceso_otorgado",
+             "Pedido confirmado; alta en el entorno de pruebas completada."),
+            ("deal-002", "partner-001", "Norddeutsche Krankenkasse", "Seguros de salud", 187000, "necesita_acceso",
+             "Oportunidad cualificada; pendiente de alta en el portal de partners."),
+            ("deal-003", "partner-003", "Domstadt Stadtwerke GmbH", "Energía y utilities", 26000, "en_revision",
+             "Propuesta enviada; en revisión por el comité de empresa."),
+            ("deal-004", "partner-002", "Helveta Bank AG", "Banca", 181000, "completado",
+             "Implementación cerrada en tres olas; aceptación final firmada."),
+            ("deal-005", "partner-002", "Bergquell Versicherung AG", "Seguros", 167000, "necesita_acceso",
+             "Propuesta en revisión legal; pendiente de aprobación del comité."),
+            ("deal-006", "partner-003", "Kölner Bildungscampus gGmbH", "Educación", 26000, "en_implementacion",
+             "Migración de expedientes en curso; segunda sede prevista para enero."),
+            ("deal-007", "partner-004", "Weser Marine Systems GmbH", "Industria naval", 104000, "completado",
+             "Implementación y digitalización de archivo finalizadas."),
+            ("deal-008", "partner-004", "Nordwind Retail GmbH", "Retail", 89000, "acceso_otorgado",
+             "Acceso concedido; configuración inicial en curso."),
+            ("deal-009", "partner-007", "Aare Versicherungen AG", "Seguros", 55000, "en_revision",
+             "Negociación de contrato en curso."),
         ]
         deals = {}
         for did, pid, client, ind, val, st, notes in deals_data:
@@ -328,41 +440,155 @@ class Command(BaseCommand):
             d.save()
             deals[did] = d
 
-        # Commissions
-        Commission.objects.create(id="comm-001", partner_id="partner-002", deal=deals["deal-004"], amount=18000, status="pagada")
-        Commission.objects.create(id="comm-002", partner_id="partner-004", deal=deals["deal-007"], amount=3080, status="pagada")
-        Commission.objects.create(id="comm-003", partner_id="partner-001", deal=deals["deal-003"], amount=7500, status="pendiente")
-        Commission.objects.create(id="comm-004", partner_id="partner-004", deal=deals["deal-008"], amount=6820, status="pendiente")
+        # Commissions (coherentes con el % de cada partner)
+        Commission.objects.create(id="comm-001", partner_id="partner-002", deal=deals["deal-004"], amount=27150, status="pagada")
+        Commission.objects.create(id="comm-002", partner_id="partner-004", deal=deals["deal-007"], amount=11440, status="pagada")
+        Commission.objects.create(id="comm-003", partner_id="partner-001", deal=deals["deal-001"], amount=9360, status="pendiente")
+        Commission.objects.create(id="comm-004", partner_id="partner-004", deal=deals["deal-008"], amount=9790, status="pendiente")
+        Commission.objects.create(id="comm-005", partner_id="partner-003", deal=deals["deal-006"], amount=2600, status="pendiente")
 
-        # Opportunities (Pipeline — HubSpot-aligned fields)
-        # (id, partner, company, size, products, mode, stage, prob, amount, one_time, quarter, close, owner, cm, type, forecast, source, next_steps, notes, loss)
+        # Opportunities (pipeline coherente con tamaño, producto y divisa)
+        # Importes ARR calculados como empleados × precio del producto × 12 meses.
         opps_data = [
-            ("opp-001", "partner-001", "Banco Santander", ">5000", ["dpa"], "cloud", "negociacion", 75, 85000, 0, "T3/2026", "2026-08-15", "Carlos Ruiz", "Admin", "ampliacion", "best_case", "generada_partner", "Revisar propuesta con procurement", "Negociando renovación", ""),
-            ("opp-002", "partner-001", "Telefonica España", ">5000", ["dpa", "hr_doc_box"], "cloud", "cualificada", 30, 42000, 5000, "T4/2026", "2026-09-01", "Carlos Ruiz", "Admin", "nuevo", "pipeline", "asignada_aconso", "Programar demo con RRHH", "Reunión inicial agendada", ""),
-            ("opp-003", "partner-001", "BBVA Digital", ">5000", ["insights"], "cloud", "propuesta_enviada", 55, 120000, 0, "T3/2026", "2026-07-30", "Carlos Ruiz", "Admin", "cross_sell", "commit", "generada_partner", "Seguimiento con CFO", "Propuesta enviada, en revisión", ""),
-            ("opp-004", "partner-002", "ING Belgium", ">5000", ["dpa"], "on_premises", "propuesta_enviada", 55, 95000, 12000, "T3/2026", "2026-07-28", "Sofie Vandenberg", "Admin", "nuevo", "best_case", "recomendacion_cliente", "Esperando aprobación legal", "Propuesta enviada", ""),
-            ("opp-005", "partner-002", "KBC Group", ">5000", ["scan_services"], "cloud", "registrada", 10, 68000, 15000, "T4/2026", "2026-10-15", "Sofie Vandenberg", "Admin", "nuevo", "pipeline", "generada_partner", "Primera llamada de descubrimiento", "Contacto inicial via LinkedIn", ""),
-            ("opp-006", "partner-002", "Belfius Bank", ">5000", ["hr_doc_box"], "cloud", "cualificada", 30, 110000, 0, "T3/2026", "2026-08-20", "Sofie Vandenberg", "Admin", "nuevo", "best_case", "asignada_aconso", "Preparar demo técnica", "Demo programada", ""),
-            ("opp-007", "partner-004", "Allianz Germany", ">5000", ["dpa", "insights"], "cloud", "negociacion", 75, 75000, 0, "T4/2026", "2026-08-05", "Markus Schmidt", "Admin", "ampliacion", "commit", "generada_partner", "Cerrar términos de contrato", "Negociando términos", ""),
-            ("opp-008", "partner-004", "Deutsche Bank", ">5000", ["dpa"], "cloud", "cualificada", 30, 55000, 0, "T4/2026", "2026-09-10", "Markus Schmidt", "Admin", "nuevo", "pipeline", "generada_partner", "Calificar requisitos de seguridad", "Calificando requisitos", ""),
-            ("opp-009", "partner-001", "Repsol", "1000-5000", ["dpa", "hr_doc_box", "scan_services"], "cloud", "ganada", 100, 38000, 8000, "T3/2026", "2026-07-15", "Carlos Ruiz", "Admin", "nuevo", "commit", "recomendacion_cliente", "Onboarding del proyecto", "Contrato firmado", ""),
-            ("opp-010", "partner-002", "Ageas Insurance", "1000-5000", ["dpa"], "cloud", "perdida", 0, 45000, 0, "T3/2026", "2026-07-10", "Sofie Vandenberg", "Admin", "nuevo", "omitted", "asignada_aconso", "", "Eligió otra solución", "competencia"),
+            {
+                "id": "opp-001", "partner_id": "partner-001", "company_name": "Elbe Logistics GmbH",
+                "company_size": "1000-5000", "products": ["dpa", "hr_doc_box"], "operation_mode": "cloud",
+                "stage": "negociacion", "probability": 75, "amount": 78000, "scan_one_time_fee": 0,
+                "currency": "eur", "delivery_quarter": "T1/2027", "close_date": "2027-01-29",
+                "deal_owner": "Lena Brandt", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "commit", "lead_source": "generada_partner",
+                "next_steps": "Cierre de condiciones con dirección de RRHH y firma del contrato marco.",
+                "notes": "Piloto con 300 empleados validado; se amplía al grupo completo (1.800 empleados).",
+                "loss_reason": "", "protection_end_date": "2027-03-31",
+            },
+            {
+                "id": "opp-002", "partner_id": "partner-001", "company_name": "Norddeutsche Krankenkasse",
+                "company_size": ">5000", "products": ["dpa"], "operation_mode": "cloud",
+                "stage": "cualificada", "probability": 30, "amount": 187000, "scan_one_time_fee": 0,
+                "currency": "eur", "delivery_quarter": "T2/2027", "close_date": "2027-04-16",
+                "deal_owner": "Lena Brandt", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "pipeline", "lead_source": "asignada_aconso",
+                "next_steps": "Demo técnica con el comité de arquitectura y validación de la integración SAP HCM.",
+                "notes": "6.500 empleados; requisito de retención documental de 30 años.",
+                "loss_reason": "", "protection_end_date": "2027-04-30",
+            },
+            {
+                "id": "opp-003", "partner_id": "partner-002", "company_name": "Bergquell Versicherung AG",
+                "company_size": ">5000", "products": ["dpa", "scan_services"], "operation_mode": "on_premises",
+                "stage": "propuesta_enviada", "probability": 55, "amount": 167000, "scan_one_time_fee": 24000,
+                "currency": "chf", "delivery_quarter": "T1/2027", "close_date": "2027-02-12",
+                "deal_owner": "Martin Kessler", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "best_case", "lead_source": "recomendacion_cliente",
+                "next_steps": "Revisión legal de la propuesta y plan de digitalización del archivo histórico.",
+                "notes": "Digitalización de 1,8 millones de documentos incluida en el alcance.",
+                "loss_reason": "", "protection_end_date": "2027-03-15",
+            },
+            {
+                "id": "opp-004", "partner_id": "partner-002", "company_name": "Swissmed Kliniken AG",
+                "company_size": "1000-5000", "products": ["hr_doc_box"], "operation_mode": "cloud",
+                "stage": "registrada", "probability": 10, "amount": 28000, "scan_one_time_fee": 0,
+                "currency": "chf", "delivery_quarter": "T2/2027", "close_date": "2027-05-28",
+                "deal_owner": "Martin Kessler", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "pipeline", "lead_source": "generada_partner",
+                "next_steps": "Llamada de descubrimiento con la dirección de RRHH de las tres clínicas.",
+                "notes": "Contacto inicial en la feria Swiss HR Expo (octubre 2026).",
+                "loss_reason": "", "protection_end_date": "2027-05-31",
+            },
+            {
+                "id": "opp-005", "partner_id": "partner-003", "company_name": "Domstadt Stadtwerke GmbH",
+                "company_size": "250-1000", "products": ["dpa"], "operation_mode": "cloud",
+                "stage": "propuesta_enviada", "probability": 55, "amount": 26000, "scan_one_time_fee": 0,
+                "currency": "eur", "delivery_quarter": "T1/2027", "close_date": "2027-02-26",
+                "deal_owner": "Sabine Vogt", "channel_manager": "Markus Hensel", "opportunity_type": "nuevo",
+                "forecast_category": "best_case", "lead_source": "generada_partner",
+                "next_steps": "Aclarar requisitos de protección de datos con el comité de empresa.",
+                "notes": "Propuesta para 900 empleados enviada el 6 de noviembre.",
+                "loss_reason": "", "protection_end_date": "2027-02-28",
+            },
+            {
+                "id": "opp-006", "partner_id": "partner-003", "company_name": "Kölner Bildungscampus gGmbH",
+                "company_size": "250-1000", "products": ["dpa", "insights"], "operation_mode": "cloud",
+                "stage": "negociacion", "probability": 75, "amount": 26000, "scan_one_time_fee": 0,
+                "currency": "eur", "delivery_quarter": "T4/2026", "close_date": "2026-12-18",
+                "deal_owner": "Sabine Vogt", "channel_manager": "Markus Hensel", "opportunity_type": "ampliacion",
+                "forecast_category": "commit", "lead_source": "recomendacion_cliente",
+                "next_steps": "Firma del contrato antes del cierre de año.",
+                "notes": "Ampliación del expediente digital a dos sedes adicionales (650 empleados).",
+                "loss_reason": "", "protection_end_date": "2027-01-15",
+            },
+            {
+                "id": "opp-007", "partner_id": "partner-004", "company_name": "Weser Marine Systems GmbH",
+                "company_size": "1000-5000", "products": ["dpa", "hr_doc_box", "scan_services"], "operation_mode": "cloud",
+                "stage": "ganada", "probability": 100, "amount": 104000, "scan_one_time_fee": 18000,
+                "currency": "eur", "delivery_quarter": "T4/2026", "close_date": "2026-10-30",
+                "deal_owner": "Jonas Petersen", "channel_manager": "Markus Hensel", "opportunity_type": "nuevo",
+                "forecast_category": "commit", "lead_source": "generada_partner",
+                "next_steps": "Kick-off de implementación el 18 de noviembre.",
+                "notes": "Contrato firmado el 30 de octubre; digitalización de archivo incluida.",
+                "loss_reason": "", "protection_end_date": None,
+            },
+            {
+                "id": "opp-008", "partner_id": "partner-004", "company_name": "Nordwind Retail GmbH",
+                "company_size": "1000-5000", "products": ["dpa"], "operation_mode": "cloud",
+                "stage": "cualificada", "probability": 30, "amount": 89000, "scan_one_time_fee": 0,
+                "currency": "eur", "delivery_quarter": "T1/2027", "close_date": "2027-03-05",
+                "deal_owner": "Jonas Petersen", "channel_manager": "Markus Hensel", "opportunity_type": "nuevo",
+                "forecast_category": "pipeline", "lead_source": "asignada_aconso",
+                "next_steps": "Validar número de empleados y alcance por país (Alemania y Países Bajos).",
+                "notes": "3.100 empleados en 140 tiendas; interés en acceso por roles.",
+                "loss_reason": "", "protection_end_date": "2027-03-31",
+            },
+            {
+                "id": "opp-009", "partner_id": "partner-007", "company_name": "Aare Versicherungen AG",
+                "company_size": "1000-5000", "products": ["dpa", "insights"], "operation_mode": "on_premises",
+                "stage": "negociacion", "probability": 75, "amount": 55000, "scan_one_time_fee": 0,
+                "currency": "chf", "delivery_quarter": "T1/2027", "close_date": "2027-01-22",
+                "deal_owner": "Claudia Gerber", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "commit", "lead_source": "generada_partner",
+                "next_steps": "Negociación final de condiciones y calendario de migración.",
+                "notes": "Sustitución de una solución legacy de gestión documental.",
+                "loss_reason": "", "protection_end_date": "2027-02-15",
+            },
+            {
+                "id": "opp-010", "partner_id": "partner-001", "company_name": "Hamburg Port Services GmbH",
+                "company_size": "250-1000", "products": ["scan_services"], "operation_mode": "cloud",
+                "stage": "perdida", "probability": 0, "amount": 12000, "scan_one_time_fee": 12000,
+                "currency": "eur", "delivery_quarter": "T4/2026", "close_date": "2026-10-09",
+                "deal_owner": "Lena Brandt", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "omitted", "lead_source": "generada_partner",
+                "next_steps": "",
+                "notes": "El cliente pospone la digitalización del archivo a 2028.",
+                "loss_reason": "proyecto_aplazado", "protection_end_date": None,
+            },
+            {
+                "id": "opp-011", "partner_id": "partner-002", "company_name": "Helveta Bank AG",
+                "company_size": ">5000", "products": ["dpa", "insights"], "operation_mode": "on_premises",
+                "stage": "ganada", "probability": 100, "amount": 181000, "scan_one_time_fee": 0,
+                "currency": "chf", "delivery_quarter": "T3/2026", "close_date": "2026-09-25",
+                "deal_owner": "Martin Kessler", "channel_manager": "Anke Weber", "opportunity_type": "nuevo",
+                "forecast_category": "commit", "lead_source": "recomendacion_cliente",
+                "next_steps": "Comité de proyecto mensual; despliegue en tres olas hasta junio de 2027.",
+                "notes": "Proyecto adjudicado tras un piloto con 600 empleados.",
+                "loss_reason": "", "protection_end_date": None,
+            },
+            {
+                "id": "opp-012", "partner_id": "partner-003", "company_name": "Rheinische Kliniken gGmbH",
+                "company_size": "1000-5000", "products": ["dpa", "hr_doc_box"], "operation_mode": "cloud",
+                "stage": "registrada", "probability": 10, "amount": 86000, "scan_one_time_fee": 8000,
+                "currency": "eur", "delivery_quarter": "T2/2027", "close_date": "2027-06-11",
+                "deal_owner": "Sabine Vogt", "channel_manager": "Markus Hensel", "opportunity_type": "nuevo",
+                "forecast_category": "pipeline", "lead_source": "asignada_aconso",
+                "next_steps": "Primera reunión con el director de RRHH del grupo hospitalario.",
+                "notes": "Contacto facilitado por aconso tras una licitación pública.",
+                "loss_reason": "", "protection_end_date": "2027-06-30",
+            },
         ]
-        for oid, pid, company, size, products, mode, stage, prob, amount, one_time, qtr, cd, owner, cm, otype, forecast, source, next_steps, notes, loss in opps_data:
-            o = Opportunity(
-                id=oid, partner_id=pid, company_name=company, company_size=size,
-                products=products, operation_mode=mode, stage=stage, probability=prob,
-                amount=amount, scan_one_time_fee=one_time, delivery_quarter=qtr,
-                close_date=cd, deal_owner=owner, channel_manager=cm,
-                opportunity_type=otype, forecast_category=forecast, lead_source=source,
-                next_steps=next_steps, notes=notes, loss_reason=loss,
-                protection_end_date="2026-12-31",
-            )
-            o.save()
+        for data in opps_data:
+            Opportunity(**data).save()
 
         now = timezone.now()
 
-        # ─── Partner Progress (LMS demo data) ─────────────
+        # ─── Partner Progress (LMS) ───────────────────────
         PartnerProgress.objects.create(id="prog-001", partner_id="partner-001", course_id="course-001",
                                        completed=True, score=92, progress_pct=100, completed_at=now)
         PartnerProgress.objects.create(id="prog-002", partner_id="partner-001", course_id="course-007",
@@ -371,14 +597,50 @@ class Command(BaseCommand):
                                        completed=True, score=88, progress_pct=100, completed_at=now)
         PartnerProgress.objects.create(id="prog-004", partner_id="partner-003", course_id="course-001",
                                        completed=False, score=None, progress_pct=40, completed_videos=["vid-001"])
+        PartnerProgress.objects.create(id="prog-005", partner_id="partner-007", course_id="course-006",
+                                       completed=True, score=90, progress_pct=100, completed_at=now)
+
+        # ─── Training results & certifications ────────────
+        TrainingResult.objects.create(id="tr-001", partner_id="partner-001", course_id="course-001",
+                                      attempt_number=1, score=92, passed=True)
+        TrainingResult.objects.create(id="tr-002", partner_id="partner-001", course_id="course-007",
+                                      attempt_number=1, score=85, passed=True)
+        TrainingResult.objects.create(id="tr-003", partner_id="partner-002", course_id="course-001",
+                                      attempt_number=1, score=88, passed=True)
+        TrainingResult.objects.create(id="tr-004", partner_id="partner-007", course_id="course-006",
+                                      attempt_number=1, score=90, passed=True)
+        Certification.objects.create(id="cert-001", partner_id="partner-001", level="associate",
+                                     status="valid", valid_until=now + timedelta(days=340))
+        Certification.objects.create(id="cert-002", partner_id="partner-002", level="associate",
+                                     status="valid", valid_until=now + timedelta(days=297))
+        Certification.objects.create(id="cert-003", partner_id="partner-007", level="associate",
+                                     status="valid", valid_until=now + timedelta(days=355))
 
         # ─── Team members (PartnerUser) ───────────────────
-        PartnerUser.objects.create(id="pu-001", partner_id="partner-001", email="carlos@flexso.com",
-                                   password_hash=hpw("admin123"), contact_name="Carlos Ruiz", role="owner", status="activo")
-        PartnerUser.objects.create(id="pu-002", partner_id="partner-001", email="lucia@flexso.com",
-                                   password_hash=hpw("admin123"), contact_name="Lucia Gomez", role="member", status="activo")
-        PartnerUser.objects.create(id="pu-003", partner_id="partner-002", email="sofie@deloitte.be",
-                                   password_hash=hpw("admin123"), contact_name="Sofie Vandenberg", role="admin", status="activo")
+        PartnerUser.objects.create(id="pu-001", partner_id="partner-001", email="l.brandt@hanseatic-hr.de",
+                                   password_hash=hpw("admin123"), contact_name="Lena Brandt",
+                                   first_name="Lena", last_name="Brandt", username="lbrandt",
+                                   role="owner", status="activo")
+        PartnerUser.objects.create(id="pu-002", partner_id="partner-001", email="t.wohlt@hanseatic-hr.de",
+                                   password_hash=hpw("admin123"), contact_name="Tim Wohlt",
+                                   first_name="Tim", last_name="Wohlt", username="twohlt",
+                                   role="member", status="activo")
+        PartnerUser.objects.create(id="pu-003", partner_id="partner-002", email="m.kessler@alpenblick-consulting.ch",
+                                   password_hash=hpw("admin123"), contact_name="Martin Kessler",
+                                   first_name="Martin", last_name="Kessler", username="mkessler",
+                                   role="owner", status="activo")
+        PartnerUser.objects.create(id="pu-004", partner_id="partner-003", email="s.vogt@rheinwerk-digital.de",
+                                   password_hash=hpw("admin123"), contact_name="Sabine Vogt",
+                                   first_name="Sabine", last_name="Vogt", username="svogt",
+                                   role="owner", status="activo")
+        PartnerUser.objects.create(id="pu-005", partner_id="partner-004", email="j.petersen@nordlicht-pa.de",
+                                   password_hash=hpw("admin123"), contact_name="Jonas Petersen",
+                                   first_name="Jonas", last_name="Petersen", username="jpetersen",
+                                   role="owner", status="activo")
+        PartnerUser.objects.create(id="pu-006", partner_id="partner-007", email="c.gerber@helvetia-people.ch",
+                                   password_hash=hpw("admin123"), contact_name="Claudia Gerber",
+                                   first_name="Claudia", last_name="Gerber", username="cgerber",
+                                   role="owner", status="activo")
 
         # ─── Rewards catalog ──────────────────────────────
         rewards_data = [
@@ -402,58 +664,115 @@ class Command(BaseCommand):
             Reward.objects.create(id=rid, name=name, description=desc, category=cat,
                                   points_cost=cost, stock=stock)
 
+        # ─── Reward redemptions ───────────────────────────
+        RewardRedemption.objects.create(id="red-001", partner_id="partner-001", reward_id="reward-001",
+                                        points_spent=150, status="entregado",
+                                        admin_notes="Enviada por mensajería el 4 de noviembre.")
+        RewardRedemption.objects.create(id="red-002", partner_id="partner-002", reward_id="reward-003",
+                                        points_spent=500, status="solicitado")
+
         # ─── Points & transactions ────────────────────────
         PointTransaction.objects.create(id="pt-001", partner_id="partner-001", amount=100,
-                                        reason="onboarding", note="Onboarding completado", created_at=now)
+                                        reason="onboarding", note="Onboarding completado")
         PointTransaction.objects.create(id="pt-002", partner_id="partner-001", amount=250,
-                                        reason="deal_ganado", note="Oportunidad Repsol ganada",
-                                        source_type="opportunity", source_id="opp-009", created_at=now)
+                                        reason="deal_ganado", note="Oportunidad Elbe Logistics ganada",
+                                        source_type="opportunity", source_id="opp-001")
         PointTransaction.objects.create(id="pt-003", partner_id="partner-001", amount=150,
-                                        reason="certificacion", note="Certificación aconso Fundamentals",
-                                        created_at=now)
-        PointTransaction.objects.create(id="pt-004", partner_id="partner-002", amount=100,
-                                        reason="onboarding", note="Onboarding completado", created_at=now)
-        PointTransaction.objects.create(id="pt-005", partner_id="partner-002", amount=250,
-                                        reason="deal_ganado", note="Oportunidad BMW ganada",
-                                        source_type="opportunity", source_id="opp-004", created_at=now)
+                                        reason="certificacion", note="Certificación aconso Fundamentals")
+        PointTransaction.objects.create(id="pt-004", partner_id="partner-001", amount=-150,
+                                        reason="canje", note="Canje: sudadera aconso")
+        PointTransaction.objects.create(id="pt-005", partner_id="partner-002", amount=100,
+                                        reason="onboarding", note="Onboarding completado")
+        PointTransaction.objects.create(id="pt-006", partner_id="partner-002", amount=250,
+                                        reason="deal_ganado", note="Oportunidad Helveta Bank ganada",
+                                        source_type="opportunity", source_id="opp-011")
+        PointTransaction.objects.create(id="pt-007", partner_id="partner-002", amount=150,
+                                        reason="certificacion", note="Certificación aconso Fundamentals")
+        PointTransaction.objects.create(id="pt-008", partner_id="partner-002", amount=-500,
+                                        reason="canje", note="Canje: entrada aconso Summit")
+        PointTransaction.objects.create(id="pt-009", partner_id="partner-004", amount=100,
+                                        reason="onboarding", note="Onboarding completado")
+        PointTransaction.objects.create(id="pt-010", partner_id="partner-004", amount=250,
+                                        reason="deal_ganado", note="Oportunidad Weser Marine ganada",
+                                        source_type="opportunity", source_id="opp-007")
+        PointTransaction.objects.create(id="pt-011", partner_id="partner-007", amount=100,
+                                        reason="onboarding", note="Onboarding completado")
+        PointTransaction.objects.create(id="pt-012", partner_id="partner-007", amount=150,
+                                        reason="certificacion", note="Certificación Compliance & Datenschutz")
 
-        # ─── MDF requests (demo) ──────────────────────────
-        MdfRequest.objects.create(id="mdf-001", partner_id="partner-001", title="Webinar sobre Digital Personnel File",
-                                  campaign_type="campaña_online", description="Webinar de 45 minutos para el sector financiero",
-                                  requested_amount=2000, approved_amount=1500, status="aprobado",
-                                  start_date="2026-09-01", end_date="2026-09-30")
-        MdfRequest.objects.create(id="mdf-002", partner_id="partner-001", title="Stand en HR Summit Madrid",
-                                  campaign_type="trade_show", description="Stand conjunto en el HR Summit",
+        # ─── MDF requests ─────────────────────────────────
+        MdfRequest.objects.create(id="mdf-001", partner_id="partner-001",
+                                  title="Webinar: Digitale Personalakte für Logistikunternehmen",
+                                  campaign_type="campaña_online",
+                                  description="Webinar de 45 minutos para 80 responsables de RRHH del sector logístico.",
+                                  requested_amount=2000, approved_amount=1800, status="aprobado",
+                                  start_date="2027-02-01", end_date="2027-02-28")
+        MdfRequest.objects.create(id="mdf-002", partner_id="partner-001",
+                                  title="Stand en Norddeutsche HR-Tage 2026",
+                                  campaign_type="trade_show",
+                                  description="Stand compartido con aconso en el congreso de RRHH del norte de Alemania.",
                                   requested_amount=4500, approved_amount=4500, status="reportado",
-                                  start_date="2026-06-10", end_date="2026-06-12",
-                                  actual_spend=4380, report_notes="Lead stand generó 12 oportunidades",
+                                  start_date="2026-09-16", end_date="2026-09-17",
+                                  actual_spend=4380, report_notes="El stand generó 27 contactos y 12 oportunidades cualificadas.",
                                   reported_at=now)
-        MdfRequest.objects.create(id="mdf-003", partner_id="partner-002", title="Campaña LinkedIn Q3",
-                                  campaign_type="campaña_online", description="Campaña de contenidos en LinkedIn",
-                                  requested_amount=1800, status="en_revision", start_date="2026-08-01")
+        MdfRequest.objects.create(id="mdf-003", partner_id="partner-002",
+                                  title="Campaña LinkedIn Q1 2027",
+                                  campaign_type="campaña_online",
+                                  description="Campaña de contenidos dirigida a dirección de RRHH en banca y seguros.",
+                                  requested_amount=1800, status="en_revision", start_date="2027-01-15")
+        MdfRequest.objects.create(id="mdf-004", partner_id="partner-004",
+                                  title="Kundenworkshop Bremen",
+                                  campaign_type="evento",
+                                  description="Workshop presencial sobre digitalización de expedientes para 25 clientes.",
+                                  requested_amount=1200, status="solicitado", start_date="2027-03-10")
 
-        # ─── Channel conflicts (demo) ─────────────────────
+        # ─── Channel conflicts ────────────────────────────
         ChannelConflict.objects.create(
-            id="conflict-001", company_name="Telefonica España", opportunity_id="opp-002",
+            id="conflict-001", company_name="Nordwind Retail GmbH", opportunity_id="opp-008",
             conflicting_opportunity_id=None, reporter_id="partner-002", status="abierto",
-            notes="Deloitte reporta cobertura del mismo cliente", created_at=now)
+            notes="Alpenblick reporta un contacto previo con el mismo cliente; se revisa la protección de oportunidad.")
         ChannelConflict.objects.create(
-            id="conflict-002", company_name="KBC Group", opportunity_id="opp-005",
+            id="conflict-002", company_name="Aare Versicherungen AG", opportunity_id="opp-009",
             conflicting_opportunity_id=None, reporter_id="partner-001", status="resuelto",
-            notes="Smahrt reporta cobertura del mismo cliente",
-            resolution="Se asigna a Deloitte por registro previo",
-            winner_opportunity_id="opp-005", resolved_at=now, created_at=now)
+            notes="Hanseatic reporta cobertura del mismo cliente.",
+            resolution="Se asigna a Helvetia People Solutions por registro previo (opp-009).",
+            winner_opportunity_id="opp-009", resolved_at=now)
 
-        # ─── Communications (demo) ────────────────────────
+        # ─── Communications ───────────────────────────────
         comm = Communication.objects.create(
-            id="comm-001", subject="Bienvenido al programa de partners 2026",
-            body="Estamos encantados de empezar un nuevo año juntos. Revisa el nuevo catálogo de recompensas, "
-                 "tu plan de negocio y el calendario de formaciones.",
-            channel="in_app", audience="todos", sent_by_id="admin-001", created_at=now)
+            id="comm-001", subject="Actualización del programa de partners – Q4 2026",
+            body="Revisa las novedades del trimestre: nuevos precios del catálogo, el calendario de formación 2027 "
+                 "y el catálogo de recompensas actualizado. El equipo de Channel estará disponible en la sesión "
+                 "de preguntas del 3 de diciembre.",
+            channel="in_app", audience="todos", sent_by_id="admin-001")
         for p in Partner.objects.filter(status="activo"):
             CommunicationRecipient.objects.create(
                 id=f"rec-{p.id}", communication=comm, partner=p,
-                read=p.id in ("partner-001", "partner-002"), read_at=now if p.id in ("partner-001", "partner-002") else None)
+                read=p.id in ("partner-001", "partner-002"),
+                read_at=now if p.id in ("partner-001", "partner-002") else None)
+
+        # ─── Notifications ────────────────────────────────
+        Notification.objects.create(
+            id="notif-001", partner_id="partner-001", type="curso_nuevo",
+            title={"en": "New course available", "es": "Nuevo curso disponible", "de": "Neuer Kurs verfügbar"},
+            message={"en": "The Advanced Use Cases course is now available in your academy.",
+                     "es": "El curso de Casos de Uso Avanzados ya está disponible en tu academia.",
+                     "de": "Der Kurs „Fortgeschrittene Anwendungsfälle“ ist jetzt in Ihrer Academy verfügbar."},
+            link="/partner/courses")
+        Notification.objects.create(
+            id="notif-002", partner_id="partner-005", type="curso_asignado",
+            title={"en": "Mandatory training assigned", "es": "Formación obligatoria asignada", "de": "Pflichtschulung zugewiesen"},
+            message={"en": "Complete Compliance & Data Protection before 31 January 2027.",
+                     "es": "Completa Cumplimiento y Protección de Datos antes del 31 de enero de 2027.",
+                     "de": "Schließen Sie Compliance & Datenschutz bis zum 31. Januar 2027 ab."},
+            link="/partner/training")
+        Notification.objects.create(
+            id="notif-003", partner_id="partner-002", type="comunicacion",
+            title={"en": "Q4 partner update", "es": "Actualización de partners Q4", "de": "Partner-Update Q4"},
+            message={"en": "Read the latest program update from the aconso channel team.",
+                     "es": "Lee la última actualización del equipo de channel de aconso.",
+                     "de": "Lesen Sie das neueste Update des aconso-Channel-Teams."},
+            link="/partner/notifications")
 
         # ─── Points balance (after seeding transactions) ──
         for p in Partner.objects.filter(role="socio"):

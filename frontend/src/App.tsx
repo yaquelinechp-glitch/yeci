@@ -66,6 +66,8 @@ export default function App() {
 <Route path="conflicts" element={<PartnerConflicts />} />
 <Route path="notifications" element={<PartnerNotifications />} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

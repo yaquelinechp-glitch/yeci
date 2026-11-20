@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { partnersApi } from '../../services/api';
+import { IconUsers } from '../../components/icons';
 import type { User } from '../../types';
 
 const STATUS_FLOW = ['solicitado', 'en_revision', 'aprobado', 'contrato_pendiente', 'activo'] as const;
@@ -9,7 +10,7 @@ const STATUS_KEYS: Record<string, string> = {
   contrato_pendiente: 'admin.statuses.contrato_pendiente', activo: 'admin.statuses.activo', inactivo: 'admin.statuses.inactivo',
 };
 const STATUS_COLORS: Record<string, string> = {
-  solicitado: 'bg-blue-100 text-blue-700 border border-blue-200',
+  solicitado: 'bg-aconso-100 text-aconso-700 border border-aconso-200',
   en_revision: 'bg-amber-100 text-amber-700 border border-amber-200',
   aprobado: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
   contrato_pendiente: 'bg-purple-100 text-purple-700 border border-purple-200',
@@ -44,7 +45,7 @@ export default function Solicitudes() {
     <div className="animate-fade-in">
       {solicitudes.length === 0 ? (
         <div className="card p-16 text-center">
-          <div className="text-5xl mb-4"></div>
+          <IconUsers className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <div className="text-gray-400 text-lg">{t('common.noData')}</div>
           <div className="text-gray-400 text-sm mt-2">{t('admin.noPendingRequests')}</div>
         </div>

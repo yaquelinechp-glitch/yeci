@@ -83,7 +83,7 @@ export default function AnimatedHero() {
   const exitStyle = (delay: number) => ({ animationDelay: exiting ? `${delay * 0.12}s` : `${0.15 + delay * 0.15}s` });
 
   return (
-    <section className="gradient-hero relative overflow-hidden min-h-[calc(100vh-64px)] flex items-center justify-center">
+    <section id="program" className="gradient-hero relative overflow-hidden min-h-[calc(100dvh-64px)] flex items-center justify-center py-16 scroll-mt-16">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2Mmgxem0tMS0yNXYySDIzdi0yaDJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(0,0,0,0.25),transparent_60%)]" />
 
@@ -102,7 +102,7 @@ export default function AnimatedHero() {
               </p>
             </div>
             <div className={exitCls(2)} style={exitStyle(2)}>
-              <Link to="/login" className="inline-block btn-primary !bg-accent-500 !text-white text-lg !px-8 !py-3 shadow-lg shadow-accent-500/30">
+              <Link to="/login" className="inline-block btn-primary !bg-accent-500 !text-aconso-800 text-lg !px-8 !py-3 shadow-lg shadow-accent-500/30">
                 {t('landing.cta')}
               </Link>
             </div>
@@ -115,7 +115,6 @@ export default function AnimatedHero() {
                 <div key={i}
                   className={`bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 px-6 py-6 text-left ${exiting ? 'animate-blur-out' : 'animate-rise-in'}`}
                   style={{ animationDelay: exiting ? `${0.4 + i * 0.12}s` : `${1 + i * 0.25}s` }}>
-                  <div className="text-2xl mb-2">{['', '', ''][i]}</div>
                   <h3 className="text-white font-semibold text-base">{b.title}</h3>
                 </div>
               ))}
@@ -160,19 +159,17 @@ export default function AnimatedHero() {
               {t('landing.benefitsTitle')}
             </h2>
             <div className="flex justify-center">
-              <div className="flip-perspective w-full max-w-sm sm:max-w-md md:w-96 md:h-64">
-                <div className="relative w-full h-full" style={{ aspectRatio: '16/9', transformStyle: 'preserve-3d' }}>
+              <div className="flip-perspective w-full max-w-sm sm:max-w-md md:w-96">
+                <div className="relative w-full min-h-[16rem] md:h-64" style={{ transformStyle: 'preserve-3d' }}>
                   {/* Current card exits while next enters */}
                   {cardTurn && (
-                    <div className="absolute inset-0 cards-anim-out rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-8 flex flex-col items-center justify-center text-center">
-                      <div className="text-5xl mb-4">{['', '', ''][cardIdx]}</div>
+                    <div className="absolute inset-0 cards-anim-out rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 sm:p-8 flex flex-col items-center justify-center text-center overflow-hidden">
                       <h3 className="text-white text-xl font-bold mb-3">{benefits[cardIdx]?.title}</h3>
                       <p className="text-white/70 text-sm leading-relaxed">{benefits[cardIdx]?.desc}</p>
                     </div>
                   )}
                   <div key={cardTurn ? `in-${cardIdx}` : `cur-${cardIdx}`}
-                    className={`absolute inset-0 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-8 flex flex-col items-center justify-center text-center ${cardTurn ? 'cards-anim-in' : ''}`}>
-                    <div className="text-5xl mb-4">{['', '', ''][cardTurn ? nextCardIdx : cardIdx]}</div>
+                    className={`absolute inset-0 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 sm:p-8 flex flex-col items-center justify-center text-center overflow-hidden ${cardTurn ? 'cards-anim-in' : ''}`}>
                     <h3 className="text-white text-xl font-bold mb-3">{benefits[cardTurn ? nextCardIdx : cardIdx]?.title}</h3>
                     <p className="text-white/70 text-sm leading-relaxed">{benefits[cardTurn ? nextCardIdx : cardIdx]?.desc}</p>
                   </div>
@@ -203,7 +200,7 @@ export default function AnimatedHero() {
             </div>
             <div className="animate-blur-in" style={{ animationDelay: '0.45s' }}>
               <div className="flex flex-wrap gap-4 justify-center items-center">
-                <Link to="/login" className="btn-primary !bg-accent-500 !text-white text-lg !px-9 !py-3.5 shadow-lg shadow-accent-500/40">
+                <Link to="/login" className="btn-primary !bg-accent-500 !text-aconso-800 text-lg !px-9 !py-3.5 shadow-lg shadow-accent-500/40">
                   {t('landing.cta')}
                 </Link>
                 <Link to="/register" className="btn-secondary !border-white/30 !text-white hover:!bg-white/10 text-lg !px-9 !py-3.5">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { dealsApi } from '../../services/api';
+import { IconDollar } from '../../components/icons';
 import type { Commission } from '../../types';
 
 export default function Commissions() {
@@ -54,7 +55,7 @@ export default function Commissions() {
             {commissions.length === 0 ? (
               <tr>
                 <td colSpan={4} className="text-center py-16">
-                  <div className="text-4xl mb-3"></div>
+                  <IconDollar className="w-10 h-10 mx-auto mb-3 text-gray-300" />
                   <div className="text-gray-400 text-lg">{t('commissions.noCommissions')}</div>
                   <div className="text-gray-400 text-sm mt-2">{t('commissions.commissionsWillAppear')}</div>
                 </td>

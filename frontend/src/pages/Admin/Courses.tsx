@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { coursesApi, partnersApi } from '../../services/api';
 import type { Course, CourseAssignment } from '../../types';
 import CourseEditor from './course-builder/CourseEditor';
+import { IconBook, IconClock, IconPlay } from '../../components/icons';
 
 const CATEGORY_I18N: Record<string, string> = {
   fundamentals: 'courses.catFundamentals', document_management: 'courses.catDocumentManagement',
@@ -26,7 +27,7 @@ function courseDesc(c: Course) {
   return c.description?.en || c.description?.es || c.description?.de || '';
 }
 
-const PHASE_COLORS = ['from-aconso-500 to-aconso-700', 'from-emerald-500 to-emerald-700', 'from-amber-500 to-amber-700', 'from-purple-500 to-purple-700', 'from-red-500 to-red-700', 'from-blue-500 to-blue-700'];
+const PHASE_COLORS = ['from-aconso-500 to-aconso-700', 'from-emerald-500 to-emerald-700', 'from-amber-500 to-amber-700', 'from-purple-500 to-purple-700', 'from-red-500 to-red-700', 'from-brand-blue to-aconso-600'];
 
 export default function AdminCourses() {
   const { t } = useTranslation();
@@ -87,7 +88,7 @@ export default function AdminCourses() {
 
   if (showEditor) {
     return (
-      <div className="-m-8">
+      <div>
         <CourseEditor course={editingCourse} courses={courses} onBack={handleBack} onSaved={load} />
       </div>
     );
@@ -117,7 +118,7 @@ export default function AdminCourses() {
 
       {courses.length === 0 ? (
         <div className="card p-16 text-center">
-          <div className="text-5xl mb-4"></div>
+          <IconBook className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <p className="text-gray-500 text-lg mb-2">{t('courses.noCourses')}</p>
           <p className="text-gray-400 text-sm mb-6">{t('courses.createFirst')}</p>
           <button onClick={handleCreate} className="btn-primary">+ {t('courses.createCourse')}</button>
@@ -155,11 +156,11 @@ export default function AdminCourses() {
                       <div className="flex items-center justify-between">
                         <div className="flex gap-2 text-xs text-gray-400">
                           <span className="bg-gray-100 px-2 py-1 rounded-md">{(c.category && CATEGORY_I18N[c.category]) ? t(CATEGORY_I18N[c.category]) : t('courses.uncategorized')}</span>
-                          <span className="flex items-center gap-1"> {c.video_count} {t('courses.videos')}</span>
-                          {(c.total_duration || 0) > 0 && <span className="flex items-center gap-1"> {formatDuration(c.total_duration)}</span>}
+                          <span className="flex items-center gap-1"><IconPlay className="w-3.5 h-3.5" /> {c.video_count} {t('courses.videos')}</span>
+                          {(c.total_duration || 0) > 0 && <span className="flex items-center gap-1"><IconClock className="w-3.5 h-3.5" /> {formatDuration(c.total_duration)}</span>}
                         </div>
                       </div>
-                      <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
                         <button onClick={() => handleEdit(c)} className="flex-1 text-xs text-aconso-600 hover:bg-aconso-50 py-1.5 rounded-lg font-medium transition-colors">{t('courses.manageContent')}</button>
                         <button onClick={() => openAssign(c)} className="flex-1 text-xs text-aconso-600 hover:bg-aconso-50 py-1.5 rounded-lg font-medium transition-colors">{t('courses.assign')}</button>
                         <button onClick={() => handleDelete(c.id)} className="flex-1 text-xs text-red-500 hover:bg-red-50 py-1.5 rounded-lg font-medium transition-colors">{t('common.delete')}</button>

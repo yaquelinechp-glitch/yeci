@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { notificationsApi } from '../../services/api';
+import { IconBell } from '../../components/icons';
 import type { Notification } from '../../types';
 
 export default function Notifications() {
@@ -54,7 +55,7 @@ export default function Notifications() {
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900"> {t('notifications.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('notifications.title')}</h1>
           <p className="text-gray-500 mt-1">{t('notifications.subtitle')}</p>
         </div>
         {items.some((n) => !n.read) && (
@@ -64,7 +65,7 @@ export default function Notifications() {
 
       {items.length === 0 ? (
         <div className="card p-12 text-center text-gray-400">
-          <div className="text-5xl mb-4"></div>
+          <IconBell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <p>{t('notifications.empty')}</p>
         </div>
       ) : (

@@ -744,14 +744,3 @@ class CostExportSetting(models.Model):
 
     def __str__(self):
         return "CostExportSetting"
-
-
-class VideoWatchEvent(models.Model):
-    id = models.CharField(max_length=100, primary_key=True, default=gen_uuid)
-    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, related_name="watch_events")
-    video = models.ForeignKey(CourseVideo, on_delete=models.CASCADE, related_name="watch_events")
-    watch_seconds = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ("partner", "video")

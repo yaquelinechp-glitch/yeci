@@ -4,8 +4,8 @@ import { lmsApi } from '../../services/api';
 import type { LmsAnalytics } from '../../types';
 
 const FUNNEL_STEPS = [
-  { key: 'enrolled', color: 'bg-blue-500', labelKey: 'Enrolled' },
-  { key: 'started', color: 'bg-indigo-500', labelKey: 'Started' },
+  { key: 'enrolled', color: 'bg-aconso-500', labelKey: 'Enrolled' },
+  { key: 'started', color: 'bg-brand-blue', labelKey: 'Started' },
   { key: 'quiz_passed', color: 'bg-purple-500', labelKey: 'Quiz Passed' },
   { key: 'completed', color: 'bg-emerald-500', labelKey: 'Completed' },
   { key: 'exam_passed', color: 'bg-emerald-700', labelKey: 'Exam Passed' },
@@ -80,7 +80,7 @@ export default function CourseAnalytics() {
           <div className="card p-6">
             <h2 className="font-bold text-gray-900 mb-4">Per-Course Breakdown</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="text-left text-gray-500 border-b border-gray-200">
                     <th className="py-3 pr-4 font-semibold">Course</th>

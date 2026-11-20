@@ -9,6 +9,7 @@ import QuestionBank from './QuestionBank';
 import ExamEditor from './ExamEditor';
 import CheckpointEditor from './CheckpointEditor';
 import { VideoThumb } from '../../../components/VideoPlayer';
+import { IconBook, IconClipboard, IconFlag, IconPlay } from '../../../components/icons';
 
 type View = 'info' | 'editor';
 type EditorView = 'video' | 'bank' | 'exam';
@@ -152,46 +153,73 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
 
   const pc = course.phase_config?.length ? course.phase_config : [{ phase: 1, days: 3 }];
   const totalVideos = course.videos.length;
+  const showQuizPanel = editorView === 'video' && !!selectedVideo;
 
-  const showQuizPanel = editorView === 'video' && selectedVideo;
+  const statusLabel = course.status === 'publicado'
+    ? t('courses.statusPublished')
+    : course.status === 'archivado' ? t('courses.statusArchived') : t('courses.statusDraft');
+  const statusCls = course.status === 'publicado'
+    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+    : course.status === 'archivado'
+      ? 'bg-red-50 text-red-600 border border-red-200'
+      : 'bg-gray-100 text-gray-600 border border-gray-200';
+
+  const feedback = uploadMsg || msg;
 
   return (
-    <div className="animate-fade-in grid grid-rows-[auto_1fr] h-[calc(100vh-100px)]">
-      {/* Top bar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 transition-colors">← {t('common.back') || 'Volver'}</button>
-          <div className="h-5 w-px bg-gray-200" />
-          <div>
-            <h1 className="text-lg font-bold text-gray-900 truncate max-w-md">{courseTitle(course)}</h1>
-            <p className="text-xs text-gray-400">{totalVideos} {t('courses.videos')} · {pc.length} {t('courses.phases')}</p>
+    <div className="animate-fade-in flex flex-col gap-4 xl:h-[calc(100dvh-8.5rem)]">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <button onClick={onBack}
+            className="w-9 h-9 shrink-0 rounded-xl border border-gray-200 bg-white text-gray-500 hover:text-aconso-600 hover:border-aconso-200 hover:bg-aconso-50 transition-colors flex items-center justify-center"
+            aria-label={t('courses.backToCourses')}>
+            <IconArrowLeft className="w-4 h-4" />
+          </button>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{courseTitle(course)}</h1>
+              <span className={`shrink-0 hidden xs:inline-flex text-[11px] font-semibold px-2 py-0.5 rounded-full ${statusCls}`}>{statusLabel}</span>
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+              <span className="inline-flex items-center gap-1">
+                <IconPlay className="w-3.5 h-3.5 text-gray-400" />{totalVideos} {t('courses.videos')}
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <IconBook className="w-3.5 h-3.5 text-gray-400" />{pc.length} {t('courses.phases')}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {uploadMsg && <span className="text-sm text-emerald-600 font-medium animate-fade-in"> {uploadMsg}</span>}
-          {msg && <span className="text-sm text-emerald-600 font-medium animate-fade-in">{msg}</span>}
-          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-            course.status === 'publicado' ? 'bg-emerald-100 text-emerald-700' : course.status === 'archivado' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
-          }`}>
-            {course.status === 'publicado' ? t('courses.statusPublished') : course.status === 'archivado' ? t('courses.statusArchived') : t('courses.statusDraft')}
-          </span>
-          <button onClick={async () => { if (!confirm(t('courses.duplicate'))) return; await coursesApi.duplicate(course.id); onSaved(); }}
-            className="text-xs text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-             {t('courses.duplicate')}
+
+        <div className="flex flex-wrap items-center gap-2">
+          {feedback && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 animate-fade-in">
+              <IconCheck className="w-3.5 h-3.5" />{feedback}
+            </span>
+          )}
+          <button
+            onClick={async () => { if (!confirm(t('courses.duplicate'))) return; await coursesApi.duplicate(course.id); onSaved(); }}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-2 hover:border-aconso-200 hover:text-aconso-700 transition-colors">
+            <IconCopy className="w-3.5 h-3.5" />{t('courses.duplicate')}
           </button>
-          <button onClick={() => setView('info')} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-             {t('common.edit')}
+          <button onClick={() => setView('info')}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-2 hover:border-aconso-200 hover:text-aconso-700 transition-colors">
+            <IconPencil className="w-3.5 h-3.5" />{t('common.edit')}
           </button>
-          <button onClick={handleDone} disabled={saving} className="btn-primary text-sm">
-            {saving ? '...' : t('courses.done') + ' '}
+          <button onClick={handleDone} disabled={saving}
+            className="btn-primary text-sm whitespace-nowrap disabled:opacity-60">
+            {saving ? '...' : t('courses.done')}
           </button>
         </div>
       </div>
 
-      {/* Main layout: sidebar + content panel */}
-      <div className="grid min-h-0 overflow-hidden rounded-2xl border border-gray-200 bg-white"
-        style={{ gridTemplateColumns: showQuizPanel ? '288px 1fr 288px' : '288px 1fr' }}>
-        {/* Left sidebar */}
+      {/* Workspace: navigation + content (+ detail panel) */}
+      <div className={`flex-1 min-h-0 grid grid-cols-1 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[var(--shadow-card)] ${
+        showQuizPanel
+          ? 'lg:grid-cols-[290px_minmax(0,1fr)] xl:grid-cols-[290px_minmax(0,1fr)_320px]'
+          : 'lg:grid-cols-[290px_minmax(0,1fr)]'
+      }`}>
         <CourseSidebar
           course={course}
           selectedVideoId={selectedVideoId}
@@ -204,12 +232,9 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
           onAddDay={handleAddDay}
           onDeleteVideo={handleDeleteVideo}
           onReorderVideo={handleReorderVideo}
-          onUploadToDay={handleUploadVideo}
-          onUploadUrlToDay={handleUploadUrl}
         />
 
-        {/* Center content */}
-        <div className="overflow-y-auto p-6 min-w-0">
+        <div className="min-w-0 min-h-0 overflow-y-auto scrollbar-thin p-4 sm:p-6 bg-gray-50/40">
           {editorView === 'video' ? (
             <DayContent
               course={course}
@@ -217,42 +242,61 @@ export default function CourseEditor({ course: initialCourse, courses, onBack, o
               day={activeDay}
               courseId={course.id}
               selectedVideoId={selectedVideoId}
-              onSelectVideo={setSelectedVideoId}
+              onSelectVideo={(id) => setSelectedVideoId(id)}
               onUpload={handleUploadVideo}
               onUploadUrl={handleUploadUrl}
-              onRefresh={refresh}
             />
           ) : editorView === 'bank' ? (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-1"> {t('courses.questionBank')}</h2>
-              <p className="text-sm text-gray-500 mb-4">{t('courses.questionBankDesc') || 'Crea y gestiona preguntas. Asigna videos con un clic.'}</p>
+              <PanelHeader
+                icon={<IconClipboard className="w-4 h-4" />}
+                title={t('courses.questionBank')}
+                subtitle={t('courses.questionBankDesc') || 'Crea y gestiona preguntas. Asigna videos con un clic.'}
+              />
               <QuestionBank courseVideos={course.videos} courseId={course.id} onRefresh={refresh} />
             </>
           ) : (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-1"> {t('courses.examFinal')}</h2>
-              <p className="text-sm text-gray-500 mb-4">{t('courses.examDesc') || 'Vista previa del examen final. Las preguntas se generan desde el banco.'}</p>
+              <PanelHeader
+                icon={<IconFlag className="w-4 h-4" />}
+                title={t('courses.examFinal')}
+                subtitle={t('courses.examDesc') || 'Vista previa del examen final. Las preguntas se generan desde el banco.'}
+              />
               <ExamEditor courseId={course.id} examCount={course.exam_questions_count || 5} onRefresh={refresh} />
             </>
           )}
         </div>
 
-        {/* Right panel (quiz/info) — only when video selected */}
         {showQuizPanel && (
-          <VideoPanel courseId={course.id} video={selectedVideo!} onRefresh={refresh} onClose={() => setSelectedVideoId(null)} />
+          <div className="min-w-0 lg:col-span-2 lg:h-[70vh] xl:col-span-1 xl:h-auto">
+            <VideoPanel courseId={course.id} video={selectedVideo!} onClose={() => setSelectedVideoId(null)} />
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function DayContent({ course, phase, day, courseId, selectedVideoId, onSelectVideo, onUpload, onUploadUrl, onRefresh }: {
+function PanelHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
+  return (
+    <div className="flex items-start gap-3 mb-4">
+      <span className="w-8 h-8 rounded-lg bg-aconso-50 text-aconso-600 flex items-center justify-center shrink-0">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <h2 className="text-sm font-semibold text-gray-900 truncate">{title}</h2>
+        {subtitle && <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{subtitle}</p>}
+      </div>
+    </div>
+  );
+}
+
+function DayContent({ course, phase, day, courseId, selectedVideoId, onSelectVideo, onUpload, onUploadUrl }: {
   course: Course; phase: number; day: number; courseId: string;
   selectedVideoId: string | null;
-  onSelectVideo: (id: string) => void;
+  onSelectVideo: (id: string | null) => void;
   onUpload: (file: File, phase: number, day: number) => Promise<void>;
   onUploadUrl: (url: string, phase: number, day: number) => Promise<void>;
-  onRefresh: () => void;
 }) {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
@@ -276,66 +320,129 @@ function DayContent({ course, phase, day, courseId, selectedVideoId, onSelectVid
     try { await onUploadUrl(uploadUrl, phase, day); setUploadUrl(''); } catch { /* */ } finally { setUploading(false); }
   };
 
-  return (
-    <div>
-      <h3 className="text-sm font-semibold text-gray-900 mb-1">
-         {t('courses.phase')} {phase} · {t('courses.day')} {day}
-      </h3>
-      <p className="text-xs text-gray-400 mb-4">{dayVideos.length} {t('courses.videos')}</p>
+  const videoTitle = (v: CourseVideo) =>
+    typeof v.title === 'string' ? v.title : v.title?.en || v.title?.es || v.title?.de || t('courses.untitled');
 
-      {dayVideos.length > 0 && (
-        <div className="space-y-2 mb-4">
+  return (
+    <div className="space-y-4">
+      {/* Day context */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-aconso-700 bg-aconso-50 border border-aconso-100 px-2.5 py-1 rounded-full">
+            {t('courses.phase')} {phase}
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-full">
+            {t('courses.day')} {day}
+          </span>
+        </div>
+        <span className="text-xs text-gray-400">{dayVideos.length} {t('courses.videosForDay')}</span>
+      </div>
+
+      {/* Videos in this day */}
+      {dayVideos.length > 0 ? (
+        <div className="space-y-2">
           {dayVideos.map((v, i) => {
             const isActive = v.id === selectedVideoId;
             return (
-              <div key={v.id}
+              <button key={v.id} type="button"
                 onClick={() => onSelectVideo(isActive ? null : v.id)}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${isActive ? 'bg-aconso-50 ring-2 ring-aconso-500' : 'bg-gray-50 hover:bg-gray-100'}`}>
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isActive ? 'bg-aconso-500 text-white' : 'bg-aconso-100 text-aconso-600'}`}>{i + 1}</span>
-                <div className="w-20 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0">
+                aria-expanded={isActive}
+                className={`w-full flex items-center gap-3 p-2.5 rounded-xl border text-left transition-all ${
+                  isActive
+                    ? 'border-aconso-300 bg-white ring-1 ring-aconso-200 shadow-sm'
+                    : 'border-gray-200 bg-white hover:border-aconso-200 hover:bg-white/80'
+                }`}>
+                <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                  isActive ? 'bg-aconso-500 text-white' : 'bg-gray-100 text-gray-500'
+                }`}>{i + 1}</span>
+                <div className="w-24 h-14 rounded-lg overflow-hidden bg-gray-100 shrink-0 ring-1 ring-black/5">
                   <VideoThumb src={v.video_url} />
                 </div>
-                <span className="text-sm text-gray-700 truncate flex-1">
-                  {typeof v.title === 'string' ? v.title : v.title?.en || v.title?.es || v.title?.de || t('courses.untitled')}
-                </span>
-                {isActive && <span className="text-[11px] font-semibold text-aconso-600 shrink-0">{t('checkpoints.title')}</span>}
-              </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm truncate ${isActive ? 'font-semibold text-aconso-900' : 'font-medium text-gray-900'}`}>
+                    {videoTitle(v)}
+                  </p>
+                  {v.duration_seconds > 0 && (
+                    <p className="text-[11px] text-gray-400 mt-0.5">{Math.round(v.duration_seconds / 60)} min</p>
+                  )}
+                </div>
+                {isActive && (
+                  <span className="hidden sm:inline-flex items-center gap-1 shrink-0 text-[11px] font-semibold text-aconso-700 bg-aconso-50 border border-aconso-100 px-2 py-1 rounded-full">
+                    <IconClipboard className="w-3 h-3" />{t('checkpoints.title')}
+                  </span>
+                )}
+                <IconChevron className={`w-4 h-4 shrink-0 text-gray-400 transition-transform ${isActive ? 'rotate-180' : ''}`} />
+              </button>
             );
           })}
         </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-gray-200 bg-white px-4 py-7 text-center">
+          <IconPlay className="w-7 h-7 mx-auto text-gray-300" />
+          <p className="mt-2 text-sm font-medium text-gray-700">{t('courses.noVideos')}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{t('courses.noVideosHint')}</p>
+        </div>
       )}
 
-      <div className="border-2 border-dashed border-gray-200 rounded-xl p-4">
-        <p className="text-xs text-gray-400 mb-3">{t('courses.uploadVideo') || 'Subir video'} — {t('courses.phase')} {phase} · {t('courses.day')} {day}</p>
-        <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
-          className="w-full py-2.5 bg-aconso-500 text-white rounded-xl text-sm font-medium hover:bg-aconso-600 transition-colors disabled:opacity-50 mb-2">
-          {uploading ? '...' : ' ' + t('courses.uploadFromPc')}
-        </button>
+      {/* Add video */}
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="flex items-center gap-2.5 mb-3">
+          <span className="w-8 h-8 rounded-lg bg-aconso-50 text-aconso-600 flex items-center justify-center shrink-0">
+            <IconUpload className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900">{t('courses.uploadVideo')}</p>
+            <p className="text-[11px] text-gray-400">
+              {t('courses.phase')} {phase} · {t('courses.day')} {day}
+            </p>
+          </div>
+        </div>
+
         <input ref={fileRef} type="file" accept="video/mp4,video/webm,video/ogg" className="hidden"
           onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
-        <div className="flex gap-2">
-          <input value={uploadUrl} onChange={e => setUploadUrl(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none"
-            placeholder={t('courses.videoUrl') || 'URL del video'} />
-          <button onClick={handleUrl} disabled={uploading || !uploadUrl.trim()}
-            className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-xl font-medium transition-colors disabled:opacity-50">
-            {t('courses.add')}
+
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+            className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-aconso-500 text-white text-sm font-medium hover:bg-aconso-600 transition-colors disabled:opacity-50">
+            <IconUpload className="w-4 h-4" />
+            {uploading ? t('courses.uploading') : t('courses.uploadFromPc')}
           </button>
+
+          <div className="flex items-center gap-2">
+            <input value={uploadUrl} onChange={e => setUploadUrl(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleUrl(); }}
+              className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none"
+              placeholder={t('courses.videoUrl') || 'URL del video'} />
+            <button onClick={handleUrl} disabled={uploading || !uploadUrl.trim()}
+              className="shrink-0 text-xs font-medium px-3 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:border-aconso-200 hover:text-aconso-700 hover:bg-aconso-50 transition-colors disabled:opacity-50">
+              {t('courses.add')}
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Checkpoints for the selected video */}
       {selectedVideo && (
-        <div className="mt-4 p-4 bg-amber-50/30 border border-amber-200 rounded-xl">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-               {t('checkpoints.title')}
-              <span className="text-[11px] font-normal text-gray-400">
-                {typeof selectedVideo.title === 'string' ? selectedVideo.title : selectedVideo.title?.en || selectedVideo.title?.es || selectedVideo.title?.de || ''}
+        <div className="rounded-xl border border-amber-200 bg-amber-50/40 overflow-hidden">
+          <div className="flex items-start justify-between gap-3 px-4 py-3 border-b border-amber-100">
+            <div className="flex items-start gap-2.5 min-w-0">
+              <span className="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <IconClock className="w-3.5 h-3.5" />
               </span>
-            </h4>
-            <button onClick={() => onSelectVideo(null)} className="text-gray-400 hover:text-gray-600 text-sm">✕</button>
+              <div className="min-w-0">
+                <h4 className="text-sm font-semibold text-gray-900">{t('checkpoints.title')}</h4>
+                <p className="text-[11px] text-gray-500 truncate">{videoTitle(selectedVideo)}</p>
+              </div>
+            </div>
+            <button onClick={() => onSelectVideo(null)}
+              className="w-7 h-7 shrink-0 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-white transition-colors flex items-center justify-center"
+              aria-label={t('common.cancel')}>
+              <IconClose className="w-4 h-4" />
+            </button>
           </div>
-          <CheckpointEditor courseId={courseId} video={{ id: selectedVideo.id, video_url: selectedVideo.video_url, title: selectedVideo.title }} />
+          <div className="p-3 sm:p-4">
+            <CheckpointEditor courseId={courseId} video={{ id: selectedVideo.id, video_url: selectedVideo.video_url, title: selectedVideo.title }} />
+          </div>
         </div>
       )}
     </div>
@@ -345,4 +452,74 @@ function DayContent({ course, phase, day, courseId, selectedVideoId, onSelectVid
 function courseTitle(c: Course) {
   if (typeof c.title === 'string') return c.title;
   return c.title?.en || c.title?.es || c.title?.de || '';
+}
+
+/* Local icons */
+function IconArrowLeft({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+  );
+}
+
+function IconChevron({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function IconUpload({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function IconCopy({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function IconPencil({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z" />
+    </svg>
+  );
+}
+
+function IconCheck({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function IconClose({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function IconClock({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
 }

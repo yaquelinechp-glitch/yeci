@@ -14,7 +14,7 @@ export default function Landing() {
         <AnimatedHero />
 
         {/* CTA Section */}
-        <section className="py-14 bg-gradient-to-r from-accent-500 to-accent-600">
+        <section className="py-14 bg-gradient-to-r from-aconso-500 to-aconso-700">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <Reveal immediate>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">{t('landing.ctaTitle')}</h2>
@@ -24,7 +24,7 @@ export default function Landing() {
             </Reveal>
             <Reveal delay={2} immediate>
               <div className="flex flex-wrap gap-3 justify-center">
-                <Link to="/login" className="bg-white text-accent-600 px-6 py-3 rounded-[11px] font-bold text-base hover:bg-gray-100 transition shadow-lg">
+                <Link to="/login" className="bg-accent-500 text-aconso-800 px-6 py-3 rounded-[11px] font-bold text-base hover:bg-accent-600 transition shadow-lg">
                   {t('landing.ctaBtn')}
                 </Link>
                 <a href="#program" className="border-2 border-white text-white px-6 py-3 rounded-[11px] font-bold text-base hover:bg-white/10 transition">
@@ -41,7 +41,7 @@ export default function Landing() {
             <Reveal immediate>
               <div className="flex flex-col items-center text-center gap-5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold text-white">aconso</span>
+                  <span className="font-display text-xl font-bold text-white">aconso</span>
                   <span className="text-accent-400 font-normal">Partner Academy</span>
                 </div>
                 <p className="text-white/60 max-w-sm text-sm">{t('landing.footerTagline')}</p>

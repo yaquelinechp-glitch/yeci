@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { coursesApi } from '../../../services/api';
+import { IconClipboard } from '../../../components/icons';
 import type { QuizQuestion } from '../../../types';
 
 const LANGS = ['en', 'es', 'de'] as const;
@@ -16,7 +17,7 @@ interface ExamQ extends QuizQuestion {
   course_id?: string;
 }
 
-export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
+export default function ExamEditor({ courseId, onRefresh }: Props) {
   const { t } = useTranslation();
   const [questions, setQuestions] = useState<ExamQ[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,22 +127,25 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Header actions */}
-      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 font-medium">{t('courses.examCount')}:</span>
-            <span className="text-sm font-bold text-gray-900">{questions.length}</span>
+      {/* Summary + generate */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white border border-gray-200 rounded-xl">
+        <div className="flex items-center gap-2.5">
+          <span className="w-8 h-8 rounded-lg bg-aconso-50 text-aconso-600 flex items-center justify-center shrink-0">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" /></svg>
+          </span>
+          <div>
+            <p className="text-xs font-semibold text-gray-900">{t('courses.examCount')}</p>
+            <p className="text-[11px] text-gray-400">{questions.length} {t('quiz.questions')}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">+</span>
-          <input type="number" min={1} max={10} value={genCount}
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="text-[11px] font-medium text-gray-500" htmlFor="exam-gen-count">{t('quiz.questions')}</label>
+          <input id="exam-gen-count" type="number" min={1} max={10} value={genCount}
             onChange={e => setGenCount(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
             className="w-14 border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-center focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none" />
           <button onClick={handleGenerate} disabled={generating}
-            className="text-xs bg-aconso-500 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-aconso-600 transition-colors disabled:opacity-50">
-            {generating ? '...' : ' ' + (t('courses.generateQuiz') || 'Desde banco')}
+            className="btn-primary text-xs py-1.5 px-3 whitespace-nowrap disabled:opacity-50">
+            {generating ? '...' : t('quiz.generate')}
           </button>
         </div>
       </div>
@@ -153,17 +157,21 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
             const qText = (q.question as any)?.en || q.question as string || '';
             const opts: any[] = q.options || [];
             return (
-              <div key={q.id} className="p-3 bg-gray-50 rounded-xl border border-gray-100 group">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
+              <div key={q.id} className="p-3 bg-white rounded-xl border border-gray-200 group hover:border-aconso-200 transition-colors">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex items-start gap-2 min-w-0">
                     <span className="w-5 h-5 rounded-full bg-aconso-100 text-aconso-600 flex items-center justify-center text-[10px] font-bold shrink-0">{qi + 1}</span>
-                    <span className="text-sm font-medium text-gray-900 truncate">{qText}</span>
+                    <span className="text-sm font-medium text-gray-900 line-clamp-2">{qText}</span>
                   </div>
-                  <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-0.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
                     <button onClick={() => moveQuestion(qi, -1)} disabled={qi === 0}
-                      className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded disabled:opacity-30">▲</button>
+                      className="w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:text-aconso-600 hover:bg-gray-50 disabled:opacity-30" aria-label={t('common.moveUp') || 'Subir'}>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6" /></svg>
+                    </button>
                     <button onClick={() => moveQuestion(qi, 1)} disabled={qi === questions.length - 1}
-                      className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded disabled:opacity-30">▼</button>
+                      className="w-6 h-6 rounded flex items-center justify-center text-gray-400 hover:text-aconso-600 hover:bg-gray-50 disabled:opacity-30" aria-label={t('common.moveDown') || 'Bajar'}>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                    </button>
                     <button onClick={() => startEdit(q)} className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded hover:bg-aconso-50">{t('common.edit')}</button>
                     <button onClick={() => del(q.id)} className="text-[11px] text-gray-400 hover:text-red-500 px-1.5 py-0.5 rounded hover:bg-red-50">{t('common.delete')}</button>
                   </div>
@@ -194,12 +202,12 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
 
       {/* Empty state */}
       {questions.length === 0 && !showForm && (
-        <div className="text-center py-8">
-          <div className="text-3xl mb-2"></div>
-          <p className="text-sm font-medium text-gray-700 mb-1">{t('courses.noExamQuestions') || 'No hay preguntas en el examen'}</p>
-          <p className="text-xs text-gray-400 mb-4">{t('courses.createFirstQuestion') || 'Crea una pregunta o genera desde el banco.'}</p>
+        <div className="rounded-xl border border-dashed border-gray-200 bg-white px-4 py-7 text-center">
+          <IconClipboard className="w-7 h-7 mx-auto text-gray-300" />
+          <p className="mt-2 text-sm font-medium text-gray-700">{t('courses.noExamQuestions') || 'No hay preguntas en el examen'}</p>
+          <p className="text-xs text-gray-400 mt-0.5 mb-4">{t('quiz.noQuestionsHint') || 'Añade preguntas para evaluar a los partners'}</p>
           <button onClick={() => { setShowForm(true); setEditing(null); setForm(emptyForm()); }}
-            className="btn-primary text-sm px-6">
+            className="btn-primary text-sm">
             + {t('quiz.createQuestion')}
           </button>
         </div>
@@ -207,7 +215,7 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
 
       {/* Inline form */}
       {showForm ? (
-        <div className="border-2 border-aconso-200 rounded-xl p-4 space-y-3">
+        <div className="border border-aconso-200 bg-white rounded-xl p-4 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-900">{editing ? t('quiz.editQuestion') : t('quiz.createQuestion')}</h4>
             <div className="flex items-center gap-2">
@@ -220,7 +228,7 @@ export default function ExamEditor({ courseId, examCount, onRefresh }: Props) {
                 ))}
               </div>
               <button onClick={() => { setShowForm(false); setEditing(null); setForm(emptyForm()); }}
-                className="text-gray-400 hover:text-gray-600 text-sm"></button>
+                className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1" aria-label={t('common.cancel')}>×</button>
             </div>
           </div>
 

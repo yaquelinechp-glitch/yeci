@@ -1,40 +1,54 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Asap:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
+/* Paleta oficial de aconso.com (2026) */
 @theme {
-  --color-aconso-50: #eff8ff;
-  --color-aconso-100: #dbeefe;
-  --color-aconso-200: #bfe3fe;
-  --color-aconso-300: #93d3fd;
-  --color-aconso-400: #60b9fa;
-  --color-aconso-500: #0070ad;
-  --color-aconso-600: #005a8c;
-  --color-aconso-700: #004a73;
-  --color-aconso-800: #003d5f;
-  --color-aconso-900: #002d47;
+  /* Azul corporativo principal: #144384 */
+  --color-aconso-50: #eef4fb;
+  --color-aconso-100: #dbe7f5;
+  --color-aconso-200: #b9cfeb;
+  --color-aconso-300: #8fb0dc;
+  --color-aconso-400: #5d8bc9;
+  --color-aconso-500: #144384;
+  --color-aconso-600: #113a72;
+  --color-aconso-700: #0d2f5c;
+  --color-aconso-800: #0a2447;
+  --color-aconso-900: #071a33;
 
-  --color-accent-50: #fffbeb;
-  --color-accent-100: #fef3c7;
-  --color-accent-200: #fde68a;
-  --color-accent-300: #fcd34d;
-  --color-accent-400: #fbbf24;
-  --color-accent-500: #f59e0b;
-  --color-accent-600: #d97706;
-  --color-accent-700: #b45309;
+  /* Amarillo de acento / CTA: #f9d162 */
+  --color-accent-50: #fffbea;
+  --color-accent-100: #fef4c8;
+  --color-accent-200: #fce79a;
+  --color-accent-300: #fbdd7c;
+  --color-accent-400: #fad76c;
+  --color-accent-500: #f9d162;
+  --color-accent-600: #e2b441;
+  --color-accent-700: #b8860b;
 
-  --color-dark-50: #f3f4f6;
-  --color-dark-100: #d1d5db;
-  --color-dark-200: #9ca3af;
-  --color-dark-300: #6b7280;
-  --color-dark-400: #4b5563;
-  --color-dark-500: #374151;
-  --color-dark-600: #2d3748;
-  --color-dark-700: #1f2937;
-  --color-dark-800: #1c2123;
-  --color-dark-900: #111827;
+  /* Grises y texto del sitio: #4e5a69 / #1e2a35 / #e8ecf3 */
+  --color-dark-50: #f4f6f8;
+  --color-dark-100: #e8ecf3;
+  --color-dark-200: #cbd3de;
+  --color-dark-300: #a3aeba;
+  --color-dark-400: #6f7c8c;
+  --color-dark-500: #4e5a69;
+  --color-dark-600: #3b4654;
+  --color-dark-700: #2a3440;
+  --color-dark-800: #1e2a35;
+  --color-dark-900: #131c24;
 
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Colores secundarios de marca vistos en aconso.com */
+  --color-brand-navy: #144384;
+  --color-brand-blue: #359bd3;
+  --color-brand-green: #46b38a;
+  --color-brand-yellow: #f9d162;
+  --color-brand-text: #4e5a69;
+  --color-brand-dark: #1e2a35;
+  --color-brand-light: #e8ecf3;
+
+  --font-sans: 'Open Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Asap', 'Open Sans', system-ui, -apple-system, sans-serif;
 
   --breakpoint-xs: 480px;
 
@@ -53,6 +67,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -64,8 +82,8 @@ body {
 }
 
 @keyframes pulse-amber {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 209, 98, 0.5); }
+  50% { box-shadow: 0 0 0 12px rgba(249, 209, 98, 0); }
 }
 
 .animate-fade-in {
@@ -179,8 +197,9 @@ body {
   perspective: 1200px;
 }
 
+@layer components {
 .card {
-  background: white;
+  background-color: white;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   border: 1px solid #f1f5f9;
@@ -198,7 +217,7 @@ body {
 
 .btn-primary {
   background: var(--color-accent-500);
-  color: white;
+  color: var(--color-aconso-800);
   border-radius: var(--radius-button);
   font-weight: 600;
   padding: 10px 24px;
@@ -209,12 +228,13 @@ body {
 
 .btn-primary:hover {
   background: var(--color-accent-600);
+  color: var(--color-aconso-900);
   transform: scale(1.02);
 }
 
 .btn-secondary {
   background: transparent;
-  color: var(--color-accent-600);
+  color: var(--color-aconso-700);
   border: 2px solid var(--color-accent-500);
   border-radius: var(--radius-button);
   font-weight: 600;
@@ -252,7 +272,7 @@ body {
 }
 
 .kpi-card {
-  background: white;
+  background-color: white;
   border-radius: var(--radius-card);
   padding: 20px;
   box-shadow: var(--shadow-card);
@@ -307,13 +327,57 @@ body {
   border-bottom: none;
 }
 
+@media (max-width: 640px) {
+  .table-container th,
+  .table-container td {
+    padding: 10px 8px;
+  }
+}
+}
+
 .dark-section {
   background: var(--color-dark-800);
   color: white;
 }
 
 .gradient-hero {
-  background: linear-gradient(135deg, var(--color-aconso-800) 0%, var(--color-aconso-600) 50%, var(--color-aconso-500) 100%);
+  background: linear-gradient(103deg, var(--color-aconso-500) 22%, var(--color-brand-blue) 62%, var(--color-brand-green) 95%);
+}
+
+/* Glass surfaces — usadas con moderación en navegación y overlays */
+.glass {
+  background-color: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.glass-strong {
+  background-color: rgba(255, 255, 255, 0.93);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.glass-dark {
+  background-color: rgba(30, 42, 53, 0.86);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background-color: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  backdrop-filter: blur(10px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background-color: rgba(255, 255, 255, 0.97); }
+  .glass-strong { background-color: #ffffff; }
+  .glass-dark { background-color: var(--color-dark-800); }
+  .glass-card { background-color: #ffffff; }
 }
 
 .scrollbar-thin::-webkit-scrollbar {

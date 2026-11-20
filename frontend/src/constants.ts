@@ -8,19 +8,19 @@ export const STAGE_PROB: Record<string, number> = {
 };
 
 export const STAGE_COLORS: Record<string, string> = {
-  registrada: 'bg-blue-500', cualificada: 'bg-indigo-500',
+  registrada: 'bg-aconso-500', cualificada: 'bg-brand-blue',
   propuesta_enviada: 'bg-purple-500', negociacion: 'bg-orange-500',
   ganada: 'bg-emerald-500', perdida: 'bg-red-400',
 };
 
 export const STAGE_BORDERS: Record<string, string> = {
-  registrada: 'border-blue-200', cualificada: 'border-indigo-200',
+  registrada: 'border-aconso-200', cualificada: 'border-brand-blue/30',
   propuesta_enviada: 'border-purple-200', negociacion: 'border-orange-200',
   ganada: 'border-emerald-200', perdida: 'border-red-200',
 };
 
 export const STAGE_BADGE_TEXT: Record<string, string> = {
-  registrada: 'text-blue-600', cualificada: 'text-indigo-600',
+  registrada: 'text-aconso-600', cualificada: 'text-brand-blue',
   propuesta_enviada: 'text-purple-600', negociacion: 'text-orange-600',
   ganada: 'text-emerald-600', perdida: 'text-red-500',
 };

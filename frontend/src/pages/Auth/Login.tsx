@@ -53,8 +53,8 @@ function LoginForm() {
   return (
     <>
       <Header />
-      <div className="pt-16 min-h-screen flex">
-        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-blue-600 to-blue-800 text-white items-center justify-center p-12">
+      <div className="pt-16 min-h-[calc(100dvh-4rem)] flex">
+        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-aconso-600 to-aconso-800 text-white items-center justify-center p-12">
           <div className="max-w-md">
             <h1 className="text-3xl font-bold mb-4">{t('auth.welcomeBack')}</h1>
             <p className="opacity-80 mb-8">{t('auth.welcomeDesc')}</p>
@@ -77,16 +77,16 @@ function LoginForm() {
                 <input type="text" value={email}
                   onInput={(e) => handleEmailInput((e.target as HTMLInputElement).value)}
                   onBlur={(e) => handleEmailBlur(e.target.value)}
-                  className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition-colors ${emailError ? 'border-red-400 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-blue-500'}`}
+                  className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition-colors ${emailError ? 'border-red-400 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-aconso-500'}`}
                   placeholder={t('auth.emailPlaceholder')} required />
                 {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">{t('auth.password')}</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-blue-500 focus:outline-none" placeholder="••••••••" required />
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:border-aconso-500 focus:outline-none" placeholder="••••••••" required />
               </div>
               {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm"> {error}</div>}
-              <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">{loading ? '...' : t('auth.loginBtn')}</button>
+              <button type="submit" disabled={loading} className="w-full bg-aconso-600 text-white py-3 rounded-lg font-semibold hover:bg-aconso-700 transition disabled:opacity-50">{loading ? '...' : t('auth.loginBtn')}</button>
             </form>
 
             {/* Demo accounts */}
@@ -94,25 +94,25 @@ function LoginForm() {
               <p className="text-xs text-gray-400 text-center mb-3">{t('auth.demoLabel')}</p>
               <div className="flex flex-col gap-2">
                 <button type="button" onClick={() => { setEmail('admin@aconso.com'); setPassword('admin123'); setError(''); }}
-                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors text-sm">
+                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-aconso-400 hover:bg-aconso-50 transition-colors text-sm">
                   <span className="font-medium text-gray-700">{t('auth.demoAdmin')}</span>
                   <span className="text-gray-400 text-xs">admin@aconso.com</span>
                 </button>
                 <button type="button" onClick={() => { setEmail('flexso@demo.com'); setPassword('admin123'); setError(''); }}
-                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors text-sm">
+                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-aconso-400 hover:bg-aconso-50 transition-colors text-sm">
                   <span className="font-medium text-gray-700">{t('auth.demoFlexso')}</span>
                   <span className="text-gray-400 text-xs">flexso@demo.com</span>
                 </button>
                 <button type="button" onClick={() => { setEmail('deloitte@demo.com'); setPassword('admin123'); setError(''); }}
-                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors text-sm">
+                  className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-aconso-400 hover:bg-aconso-50 transition-colors text-sm">
                   <span className="font-medium text-gray-700">{t('auth.demoDeloitte')}</span>
                   <span className="text-gray-400 text-xs">deloitte@demo.com</span>
                 </button>
               </div>
             </div>
 
-            <p className="text-center text-sm text-gray-500 mt-8">{t('auth.noAccount')} <Link to="/register" className="text-blue-600 font-medium">{t('auth.register')}</Link></p>
-            <p className="text-center mt-2"><Link to="/" className="text-sm text-gray-400 hover:text-blue-600">{t('auth.backToSite')}</Link></p>
+            <p className="text-center text-sm text-gray-500 mt-8">{t('auth.noAccount')} <Link to="/register" className="text-aconso-600 font-medium">{t('auth.register')}</Link></p>
+            <p className="text-center mt-2"><Link to="/" className="text-sm text-gray-400 hover:text-aconso-600">{t('auth.backToSite')}</Link></p>
           </div>
         </div>
       </div>

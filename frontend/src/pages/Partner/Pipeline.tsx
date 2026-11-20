@@ -389,7 +389,7 @@ export default function Pipeline() {
             <button onClick={() => setView('list')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${view === 'list' ? 'bg-white text-aconso-600 shadow-sm' : 'text-gray-500'}`}>{t('pipeline.list')}</button>
           </div>
           {isAdmin && <button onClick={() => { setShowQuickAdd(true); setQformKey(null); setQform({ ...EMPTY_QFORM }); setQformError(''); }} className="btn-primary text-sm">{t('pipeline.manageQuickAdd')}</button>}
-          {!isAdmin && <button onClick={() => openCreate()} className="btn-primary" style={{ fontSize: '0.875rem', padding: '0.45rem 0.9rem' }}>{t('pipeline.newOpportunity')}</button>}
+          {!isAdmin && <button onClick={() => openCreate()} className="btn-primary text-sm">{t('pipeline.newOpportunity')}</button>}
         </div>
       </div>
 
@@ -438,7 +438,7 @@ export default function Pipeline() {
 
       {view === 'board' ? (
         <div className="-mx-4 sm:mx-0 overflow-x-auto pb-4 snap-x snap-mandatory -webkit-overflow-scrolling-touch">
-          <div className={`grid gap-3 px-4 sm:px-0 ${filterStage ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-6 min-w-[960px] lg:min-w-0'}`}>
+          <div className={`grid gap-3 px-4 sm:px-0 ${filterStage ? 'grid-cols-1 max-w-2xl mx-auto' : 'grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-6'}`}>
             {boardStages.map((stage) => {
               const stageOpps = opps.filter((o) => o.stage === stage);
               return (
@@ -506,7 +506,7 @@ export default function Pipeline() {
         </div>
       ) : (
         <div className="table-container">
-          <table>
+          <table className="min-w-[760px]">
             <thead>
               <tr>
                 <th>{t('pipeline.companyName')}</th>
@@ -571,7 +571,7 @@ export default function Pipeline() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setShowForm(false)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-gray-900 mb-4">{editOpp ? t('pipeline.editOpportunity') : t('pipeline.newOpportunity')}</h2>
             {/* Wizard stepper */}
@@ -580,7 +580,7 @@ export default function Pipeline() {
                 <div key={s} className="flex items-center gap-2 flex-1">
                   <button type="button" onClick={() => s < wizardStep && setWizardStep(s)}
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${wizardStep === s ? 'bg-aconso-600 text-white' : wizardStep > s ? 'bg-emerald-500 text-white cursor-pointer' : 'bg-gray-200 text-gray-500'}`}>
-                    {wizardStep > s ? '' : s}
+                    {wizardStep > s ? '✓' : s}
                   </button>
                   <span className={`text-xs font-medium ${wizardStep >= s ? 'text-gray-900' : 'text-gray-400'}`}>
                     {t(`common.step${s}`)}
@@ -637,7 +637,7 @@ export default function Pipeline() {
                             className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition-colors ${
                               checked ? 'bg-aconso-600 text-white border-aconso-600' : 'bg-white text-gray-700 border-gray-200 hover:border-aconso-400'
                             }`}>
-                            {checked ? ' ' : ''}{productName(p)}
+                            {checked ? '✓ ' : ''}{productName(p)}
                           </button>
                         );
                       })}
@@ -648,7 +648,7 @@ export default function Pipeline() {
                           <span key={k} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-aconso-50 text-aconso-700 border border-aconso-200">
                             {productLabel(k)}
                             <button type="button" onClick={() => setForm({ ...form, products: form.products.filter((x) => x !== k) })}
-                              className="text-aconso-400 hover:text-aconso-700"></button>
+                              className="text-aconso-400 hover:text-aconso-700 text-sm leading-none" aria-label={t('common.delete')}>×</button>
                           </span>
                         ))}
                       </div>
@@ -671,8 +671,8 @@ export default function Pipeline() {
                   </div>
                 </div>
                 {arrRows.length > 0 ? (
-                  <div className="bg-white rounded-lg border border-gray-100 overflow-hidden">
-                    <table className="w-full text-sm">
+                  <div className="bg-white rounded-lg border border-gray-100 overflow-x-auto">
+                    <table className="w-full min-w-[520px] text-sm">
                       <thead className="bg-gray-50 text-xs text-gray-500">
                         <tr>
                           <th className="text-left font-medium px-3 py-2">{t('pipeline.products')}</th>
@@ -856,7 +856,7 @@ export default function Pipeline() {
       )}
 
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDeleteId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setDeleteId(null)}>
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-gray-900 mb-2">{t('pipeline.deleteOpportunity')}</h2>
             <p className="text-gray-500 text-sm mb-6">{t('pipeline.deleteConfirm')}</p>
@@ -869,7 +869,7 @@ export default function Pipeline() {
       )}
 
       {detailOpp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDetailOpp(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setDetailOpp(null)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <div>
@@ -993,7 +993,7 @@ export default function Pipeline() {
       )}
 
       {showQuickAdd && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowQuickAdd(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setShowQuickAdd(false)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-gray-900 mb-1">{qformKey ? t('pipeline.manageEdit') : t('pipeline.manageNew')}</h2>
             <p className="text-gray-500 text-sm mb-5">{t('pipeline.manageQuickAddHelp')}</p>
@@ -1075,7 +1075,7 @@ export default function Pipeline() {
       )}
 
       {delProductKey && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDelProductKey(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setDelProductKey(null)}>
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-gray-900 mb-2">{t('pipeline.manageDeleteTitle')}</h2>
             <p className="text-gray-500 text-sm mb-6">{t('pipeline.manageDeleteConfirm')}</p>

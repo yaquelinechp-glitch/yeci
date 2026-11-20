@@ -4,10 +4,11 @@ import { coursesApi } from '../../services/api';
 import type { Course, CourseVideo, QuizQuestion, QuizResult, PhaseConfig, VideoCheckpoint } from '../../types';
 import { TRACKS } from '../../constants';
 import VideoPlayer, { VideoThumb, type VideoPlayerHandle } from '../../components/VideoPlayer';
+import { IconBook, IconCheck, IconClipboard, IconPlay } from '../../components/icons';
 
 const TRACK_BADGE: Record<string, string> = {
   ventas: 'bg-aconso-100 text-aconso-700',
-  tecnica: 'bg-indigo-100 text-indigo-700',
+  tecnica: 'bg-brand-blue/15 text-brand-blue',
   cumplimiento: 'bg-amber-100 text-amber-700',
   todas: 'bg-gray-100 text-gray-600',
 };
@@ -291,7 +292,7 @@ export default function PartnerCourses() {
               )}
               {(selected.rating_count || 0) > 0 && (
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">
-                  <span className="text-amber-400"></span> {selected.rating_avg} ({selected.rating_count})
+                  <span className="text-amber-400">★</span> {selected.rating_avg} ({selected.rating_count})
                 </span>
               )}
             </div>
@@ -324,7 +325,7 @@ export default function PartnerCourses() {
                       'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
-                    {done ? '' : !unlocked ? '' : ''} {t('courses.phase')} {p.phase}
+                    {done ? '✓ ' : ''}{t('courses.phase')} {p.phase}
                   </button>
                 );
               })}
@@ -377,7 +378,7 @@ export default function PartnerCourses() {
                               </div>
                             ) : quizQuestions.length === 0 ? (
                               <div className="text-center py-8">
-                                <div className="text-3xl mb-2"></div>
+                                <IconClipboard className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                                 <p className="text-sm text-gray-400">{t('quiz.noQuestions')}</p>
                               </div>
                             ) : !quizResult ? (
@@ -442,7 +443,7 @@ export default function PartnerCourses() {
               </div>
             ) : (
               <div className="text-center py-12 text-gray-400">
-                <div className="text-4xl mb-3"></div>
+                <IconBook className="w-10 h-10 mx-auto mb-3 text-gray-300" />
                 <p>{t('courses.noContentYet')}</p>
               </div>
             )}
@@ -450,7 +451,7 @@ export default function PartnerCourses() {
             {selected.materials?.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
                 <div className="p-4 bg-gray-50 rounded-xl">
-                    <h4 className="font-semibold text-sm text-gray-800 mb-3 flex items-center gap-2"> {t('courses.materials')}</h4>
+                    <h4 className="font-semibold text-sm text-gray-800 mb-3 flex items-center gap-2"><IconClipboard className="w-4 h-4 text-aconso-500" /> {t('courses.materials')}</h4>
                     <ul className="space-y-1.5">
                       {selected.materials.map((m: any, mi: number) => (
                         <li key={m.id || mi}>
@@ -467,12 +468,12 @@ export default function PartnerCourses() {
             {/* Rating */}
             <div className="mt-8 border-t border-gray-100 pt-6">
               <h4 className="font-semibold text-sm text-gray-800 mb-3 flex items-center gap-2">
-                 {t('courses.rating')}
+                <span className="text-amber-400">★</span> {t('courses.rating')}
                 {(ratingInfo?.rating_count || 0) > 0 && <span className="text-xs font-normal text-gray-400">({ratingInfo.rating_avg} · {ratingInfo.rating_count})</span>}
               </h4>
               <div className="flex items-center gap-1 mb-3">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} onClick={() => setRatingStars(s)} className={`text-2xl transition-colors ${s <= ratingStars ? 'text-amber-400' : 'text-gray-300 hover:text-amber-300'}`}></button>
+                  <button key={s} onClick={() => setRatingStars(s)} aria-label={`${s} / 5`} className={`text-2xl leading-none transition-colors ${s <= ratingStars ? 'text-amber-400' : 'text-gray-300 hover:text-amber-300'}`}>{s <= ratingStars ? '★' : '☆'}</button>
                 ))}
                 {ratingStars < 1 && <span className="text-xs text-gray-400 ml-2">{t('courses.yourRating')}</span>}
               </div>
@@ -486,7 +487,7 @@ export default function PartnerCourses() {
                     <div key={r.id} className="p-3 bg-gray-50 rounded-xl">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-gray-700">{r.partner_name}</span>
-                        <span className="text-amber-400 text-xs">{''.repeat(r.stars)}<span className="text-gray-300">{''.repeat(5 - r.stars)}</span></span>
+                        <span className="text-amber-400 text-xs">{'★'.repeat(r.stars)}<span className="text-gray-300">{'☆'.repeat(5 - r.stars)}</span></span>
                       </div>
                       {r.comment && <p className="text-sm text-gray-500 mt-1">{r.comment}</p>}
                     </div>
@@ -501,7 +502,7 @@ export default function PartnerCourses() {
 
           {playingVideo && (
             <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-fade-in" onClick={closePlayer}>
-              <div className="bg-black rounded-2xl overflow-hidden max-w-4xl w-full shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-black rounded-2xl overflow-y-auto max-h-[90dvh] max-w-4xl w-full shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-6 py-4 bg-gray-900">
                   <h3 className="text-white font-semibold text-sm">{getLocalized(playingVideo.title)}</h3>
                   <button onClick={closePlayer} className="text-gray-400 hover:text-white transition-colors">
@@ -526,7 +527,7 @@ export default function PartnerCourses() {
                 {/* Checkpoint quiz overlay */}
                 {activeCheckpoint && (
                   <div className="absolute inset-0 bg-black/90 flex items-center justify-center p-6">
-                    <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl">
+                    <div className="bg-white rounded-2xl p-6 max-w-lg w-full max-h-[85%] overflow-y-auto shadow-2xl">
                       <div className="flex items-center gap-2 mb-3">
                         <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                         <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">{t('courses.exam') || t('checkpoints.title')}</span>
@@ -574,7 +575,7 @@ export default function PartnerCourses() {
             <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 animate-fade-in" onClick={() => setExamOpen(false)}>
               <div className="bg-white rounded-2xl overflow-hidden max-w-2xl w-full shadow-2xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                  <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2"> {t('courses.exam')}</h3>
+                  <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2"><IconClipboard className="w-4 h-4 text-aconso-500" /> {t('courses.exam')}</h3>
                   <button onClick={() => setExamOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
@@ -587,7 +588,7 @@ export default function PartnerCourses() {
                     </div>
                   ) : examQuestions.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="text-3xl mb-2"></div>
+                      <IconClipboard className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                       <p className="text-sm text-gray-400">{t('quiz.noQuestions')}</p>
                     </div>
                   ) : !examResult ? (
@@ -657,7 +658,7 @@ export default function PartnerCourses() {
       </div>
       {courses.length === 0 ? (
         <div className="card p-16 text-center">
-          <div className="text-5xl mb-4"></div>
+          <IconBook className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <p className="text-gray-500 text-lg">{t('courses.noCoursesYet')}</p>
         </div>
       ) : (
@@ -675,7 +676,7 @@ export default function PartnerCourses() {
               if (!groups.has(p)) groups.set(p, []);
               groups.get(p)!.push(c);
             }
-            const PHASE_GRADIENTS = ['from-aconso-500 to-aconso-700', 'from-emerald-500 to-emerald-700', 'from-amber-500 to-amber-700', 'from-purple-500 to-purple-700', 'from-red-500 to-red-700', 'from-blue-500 to-blue-700'];
+            const PHASE_GRADIENTS = ['from-aconso-500 to-aconso-700', 'from-emerald-500 to-emerald-700', 'from-amber-500 to-amber-700', 'from-purple-500 to-purple-700', 'from-red-500 to-red-700', 'from-brand-blue to-aconso-600'];
             return Array.from(groups.entries()).map(([phaseNum, phaseCourses]) => (
               <div key={phaseNum} className="mb-8 last:mb-0">
                 <div className="flex items-center gap-3 mb-4">
@@ -703,13 +704,18 @@ export default function PartnerCourses() {
                           <div className="absolute top-3 left-3 text-xs text-white font-bold bg-aconso-800/60 px-3 py-1 rounded-full">{t('courses.phase')} {phaseNum}</div>
                           <div className={`absolute top-3 right-3 text-[11px] font-bold px-2.5 py-1 rounded-full ${TRACK_BADGE[track]}`}>{TRACKS[track]?.[i18n.language] || track}</div>
                           {c.completed && (
-                            <div className="absolute top-11 right-3"><span className="badge bg-emerald-500 text-white border border-emerald-600"></span></div>
+                            <div className="absolute top-11 right-3"><span className="badge bg-emerald-500 text-white border border-emerald-600 gap-1"><IconCheck className="w-3 h-3" /> {t('courses.completed')}</span></div>
                           )}
                         </div>
                         <div className="p-5">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className={`font-semibold text-gray-900 ${locked ? 'line-through' : ''}`}>{getLocalized(c.title)}</h3>
-                            {locked && <span className="text-lg" title={t('lms.prerequisitesNotMet')}></span>}
+                            {locked && (
+                              <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" title={t('lms.prerequisitesNotMet')}>
+                                <rect x="4" y="11" width="16" height="10" rx="2" strokeWidth={2} />
+                                <path strokeWidth={2} d="M8 11V7a4 4 0 118 0v4" />
+                              </svg>
+                            )}
                           </div>
                           <p className="text-sm text-gray-500 line-clamp-2 mb-3">{getLocalized(c.description) || t('courses.noDescription')}</p>
                           {locked && c.prerequisite && (
@@ -718,9 +724,9 @@ export default function PartnerCourses() {
                             </p>
                           )}
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-400 flex items-center gap-1"> {c.video_count} {t('courses.videos')}</span>
+                            <span className="text-gray-400 flex items-center gap-1"><IconPlay className="w-3.5 h-3.5" /> {c.video_count} {t('courses.videos')}</span>
                             {c.completed ? (
-                              <span className="text-emerald-600 font-medium"> {t('courses.completed')}</span>
+                              <span className="text-emerald-600 font-medium flex items-center gap-1"><IconCheck className="w-3.5 h-3.5" /> {t('courses.completed')}</span>
                             ) : (
                               <span className="text-aconso-600 font-medium group-hover:text-aconso-700 transition-colors">{locked ? t('courses.locked') : t('courses.startLearning')} →</span>
                             )}

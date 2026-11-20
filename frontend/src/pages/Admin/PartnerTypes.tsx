@@ -259,8 +259,8 @@ export default function PartnerTypes() {
       </div>
 
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => !deleting && setDeleteTarget(null)}>
-          <div className="bg-white w-full max-w-lg max-h-[80vh] overflow-hidden border border-gray-200 rounded-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in" onClick={() => !deleting && setDeleteTarget(null)}>
+          <div className="bg-white w-full max-w-lg max-h-[calc(100dvh-2rem)] flex flex-col rounded-2xl border border-gray-200 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">{t('admin.partnerTypesPage.reassignTitle')} “{deleteTarget.label}”</h3>
@@ -271,7 +271,7 @@ export default function PartnerTypes() {
               </button>
             </div>
 
-            <div className="p-5 overflow-y-auto max-h-[45vh]">
+            <div className="p-5 flex-1 min-h-0 overflow-y-auto">
               <div className="mb-4">
                 <select
                   value={moveTo}

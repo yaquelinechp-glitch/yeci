@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { reportsApi } from '../../services/api';
 import type { AdminStats } from '../../types';
 
-const COLORS = ['#0070ad', '#f59e0b', '#8b5cf6', '#10b981', '#ef4444'];
+const COLORS = ['#144384', '#359bd3', '#46b38a', '#f9d162', '#e2b441'];
 
 const DEAL_STATUS_KEYS: Record<string, string> = {
   necesita_acceso: 'deals.statuses.necesita_acceso',
@@ -80,12 +80,13 @@ export default function AdminReports() {
         <div className="card p-6">
           <h3 className="font-bold text-gray-900 mb-4">{t('reports.revenueByPartner')}</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={partnerData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+            <BarChart data={partnerData} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#6b7280' }} axisLine={false} tickLine={false} interval="preserveStartEnd"
+                angle={-25} textAnchor="end" height={52} tickFormatter={(v: string) => (v.length > 14 ? `${v.slice(0, 14)}…` : v)} />
+              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
               <Tooltip />
-              <Bar dataKey="revenue" fill="#0070ad" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="revenue" fill="#144384" radius={[6, 6, 0, 0]} maxBarSize={42} />
             </BarChart>
           </ResponsiveContainer>
         </div>

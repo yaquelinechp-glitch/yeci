@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { reportsApi, conflictsApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth';
+import { IconBook, IconChart } from '../../components/icons';
 import type { PartnerStats, ConflictStats } from '../../types';
 
 export default function PartnerDashboard() {
@@ -23,7 +24,7 @@ export default function PartnerDashboard() {
     { label: t('partner.completedDeals'), value: stats.closed_deals, color: 'border-emerald-500' },
     { label: t('partner.totalRevenue'), value: `$${stats.total_revenue.toLocaleString()}`, color: 'border-purple-500' },
     { label: t('partner.commissionsEarned'), value: `$${stats.commissions_earned.toLocaleString()}`, color: 'border-orange-500' },
-    { label: t('partner.coursesEnrolled'), value: stats.courses_enrolled, color: 'border-indigo-500' },
+    { label: t('partner.coursesEnrolled'), value: stats.courses_enrolled, color: 'border-brand-blue' },
     { label: t('partner.completionRate'), value: `${stats.completion_rate}%`, color: 'border-accent-500' },
   ];
 
@@ -54,7 +55,9 @@ export default function PartnerDashboard() {
 
       {/* Program KPIs */}
       <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-        <span className="w-8 h-8 rounded-lg bg-aconso-100 flex items-center justify-center text-sm"></span>
+        <span className="w-8 h-8 rounded-lg bg-aconso-100 flex items-center justify-center">
+          <IconChart className="w-4 h-4 text-aconso-600" />
+        </span>
         {t('dash.program')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
@@ -73,7 +76,7 @@ export default function PartnerDashboard() {
       {/* Pending Commission Alert */}
       {stats.pending_commissions > 0 && (
         <div className="card p-5 mb-6 border-l-4 border-amber-500 bg-amber-50">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="font-semibold text-amber-800">{t('partner.pendingCommission')}</div>
               <div className="text-amber-700 text-2xl font-bold mt-1">${stats.pending_commissions.toLocaleString()}</div>
@@ -88,8 +91,8 @@ export default function PartnerDashboard() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link to="/partner/courses" className="card card-interactive p-6 text-center group">
-          <div className="w-12 h-12 rounded-xl bg-accent-100 text-accent-600 flex items-center justify-center text-2xl mx-auto mb-3 group-hover:bg-accent-200 transition-colors">
-            
+          <div className="w-12 h-12 rounded-xl bg-accent-100 text-accent-700 flex items-center justify-center mx-auto mb-3 group-hover:bg-accent-200 transition-colors">
+            <IconBook className="w-6 h-6" />
           </div>
           <div className="font-semibold text-gray-800">{t('nav.courses')}</div>
           <div className="text-sm text-gray-500 mt-1">{t('partner.continueLearning')}</div>

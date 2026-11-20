@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Header from '../../components/layout/Header';
 import { adminApi } from '../../services/api';
 
 interface LoginAttempt {
@@ -25,7 +24,7 @@ export default function AdminSecurity() {
   const [error, setError] = useState('');
 
   const [form, setForm] = useState({ company_name: '', email: '', password: '', contact_name: '', phone: '', tax_id: '' });
-  const [registerMsg, setRegisterMsg] = useState('');
+  const [registerMsg, setRegisterMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [registerLoading, setRegisterLoading] = useState(false);
 
   useEffect(() => {
@@ -42,24 +41,22 @@ export default function AdminSecurity() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRegisterMsg('');
+    setRegisterMsg(null);
     setRegisterLoading(true);
     try {
       const res = await adminApi.registerAdmin(form);
-      setRegisterMsg(` ${t('security.adminCreated', { name: res.data.company_name })}`);
+      setRegisterMsg({ ok: true, text: t('security.adminCreated', { name: res.data.company_name }) });
       setForm({ company_name: '', email: '', password: '', contact_name: '', phone: '', tax_id: '' });
     } catch (err: any) {
-      setRegisterMsg(` ${err?.response?.data?.detail || t('common.error')}`);
+      setRegisterMsg({ ok: false, text: err?.response?.data?.detail || t('common.error') });
     } finally {
       setRegisterLoading(false);
     }
   };
 
   return (
-    <>
-      <Header />
-      <div className="pt-24 pb-12 px-8">
-        <div className="max-w-6xl mx-auto">
+    <div className="animate-fade-in">
+      <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-500 text-xl">&#128737;</div>
             <div>
@@ -161,9 +158,11 @@ export default function AdminSecurity() {
               <h2 className="font-semibold text-gray-900 mb-1">{t('security.createAdmin')}</h2>
               <p className="text-sm text-gray-500 mb-6">{t('security.createAdminDesc')}</p>
               {registerMsg && (
-                <div className={`mb-5 px-4 py-3 rounded-xl text-sm ${
-                  registerMsg.startsWith('') ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
-                }`}>{registerMsg}</div>
+                <div className={`mb-5 px-4 py-3 rounded-xl text-sm border ${
+                  registerMsg.ok
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-red-50 text-red-700 border-red-200'
+                }`}>{registerMsg.text}</div>
               )}
               <form onSubmit={handleRegister} className="space-y-4">
                 <div>
@@ -206,8 +205,7 @@ export default function AdminSecurity() {
               </form>
             </div>
           )}
-        </div>
       </div>
-    </>
+    </div>
   );
 }

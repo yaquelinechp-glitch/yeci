@@ -134,8 +134,8 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-slide-up text-gray-900" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/40 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto animate-fade-in" onClick={onClose}>
+      <div className="glass-strong rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto my-auto p-4 sm:p-6 animate-slide-up text-gray-900" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-bold text-gray-900">{t('profile.title')}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -150,9 +150,9 @@ export default function ProfileModal({ open, onClose }: { open: boolean; onClose
         )}
 
         <form onSubmit={handleSave} className="space-y-4">
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-2 sm:gap-3">
             <button type="button" onClick={() => fileRef.current?.click()} className="relative group" title={t('profile.changePhoto')}>
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-2xl font-bold text-white ring-2 ring-aconso-100">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-gradient-to-br from-aconso-500 to-aconso-700 flex items-center justify-center text-xl sm:text-2xl font-bold text-white ring-2 ring-aconso-100">
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" />
                 ) : (

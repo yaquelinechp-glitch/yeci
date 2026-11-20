@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { authApi, partnerUsersApi } from '../../services/api';
 import { useAuthStore } from '../../store/auth';
 import Header from '../../components/layout/Header';
+import { IconAlert, IconUsers } from '../../components/icons';
 import { COUNTRIES } from '../../constants';
 import type { InviteInfo } from '../../types';
 
@@ -93,7 +94,7 @@ function RegisterForm() {
 
   const fieldClass = (field: string) =>
     `w-full border-2 rounded-lg px-4 py-2.5 text-sm focus:outline-none transition-colors ${
-      fieldErrors[field] ? 'border-red-400 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-blue-500'
+      fieldErrors[field] ? 'border-red-400 focus:border-red-500 bg-red-50/50' : 'border-gray-200 focus:border-aconso-500'
     }`;
 
   const getErrorMsg = (err: any): string => {
@@ -182,14 +183,14 @@ const handleSubmit = async (e: React.FormEvent) => {
     return (
       <>
         <Header />
-        <div className="pt-16 min-h-screen flex items-center justify-center p-8">
+        <div className="pt-16 min-h-[calc(100dvh-4rem)] flex items-center justify-center p-8">
           <div className="w-full max-w-md text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
-              <span className="text-3xl"></span>
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center text-red-500">
+              <IconAlert className="w-9 h-9" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth.inviteInvalid')}</h2>
             <p className="text-gray-500 mb-8">{t('auth.inviteInvalidDesc')}</p>
-            <Link to="/register" className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition inline-block">
+            <Link to="/register" className="bg-aconso-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-aconso-700 transition inline-block">
               {t('auth.registerTitle')}
             </Link>
           </div>
@@ -202,10 +203,12 @@ const handleSubmit = async (e: React.FormEvent) => {
     return (
       <>
         <Header />
-        <div className="pt-16 min-h-screen flex items-center justify-center p-8">
+        <div className="pt-16 min-h-[calc(100dvh-4rem)] flex items-center justify-center p-8">
           <div className="w-full max-w-md">
             <div className="mb-8 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-aconso-100 flex items-center justify-center text-3xl"></div>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-aconso-100 flex items-center justify-center text-aconso-600">
+                <IconUsers className="w-9 h-9" />
+              </div>
               <h2 className="text-2xl font-bold text-gray-900">{t('auth.inviteTitle')}</h2>
               <p className="text-gray-500 mt-1">{t('auth.inviteSubtitle', { partner: invite.partner_name })}</p>
             </div>
@@ -239,7 +242,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {fieldErrors.password && <p className="text-xs text-red-500 mt-1">{fieldErrors.password}</p>}
               </div>
               {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{error}</div>}
-              <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">{loading ? '...' : t('auth.inviteBtn')}</button>
+              <button type="submit" disabled={loading} className="w-full bg-aconso-600 text-white py-3 rounded-lg font-semibold hover:bg-aconso-700 transition disabled:opacity-50">{loading ? '...' : t('auth.inviteBtn')}</button>
             </form>
           </div>
         </div>
@@ -250,7 +253,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
       <>
         <Header />
-        <div className="pt-16 min-h-screen flex items-center justify-center p-8">
+        <div className="pt-16 min-h-[calc(100dvh-4rem)] flex items-center justify-center p-8">
           <div className="w-full max-w-md text-center">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-100 flex items-center justify-center">
               <svg className="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,7 +262,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth.registerSuccessTitle')}</h2>
             <p className="text-gray-500 mb-8">{t('auth.registerSuccessDesc')}</p>
-            <button onClick={() => navigate('/partner')} className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            <button onClick={() => navigate('/partner')} className="bg-aconso-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-aconso-700 transition">
               {t('auth.registerSuccessBtn')}
             </button>
           </div>
@@ -271,7 +274,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <>
       <Header />
-      <div className="pt-16 min-h-screen flex items-center justify-center p-8">
+      <div className="pt-16 min-h-[calc(100dvh-4rem)] flex items-center justify-center p-8">
         <div className="w-full max-w-lg">
           <h2 className="text-2xl font-bold mb-2">{t('auth.registerTitle')}</h2>
           <p className="text-gray-500 mb-8">{t('auth.registerSubtitle')}</p>
@@ -339,7 +342,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <div>
               <label className="block text-sm font-medium mb-1">{t('auth.country')}</label>
               <select value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none bg-white">
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-aconso-500 focus:outline-none bg-white">
                 <option value="">{t('auth.countryAuto')}</option>
                 {COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.name}</option>
@@ -348,9 +351,9 @@ const handleSubmit = async (e: React.FormEvent) => {
               <p className="text-xs text-gray-400 mt-1">{t('auth.countryHint')}</p>
             </div>
             {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{error}</div>}
-            <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">{loading ? '...' : t('auth.registerBtn')}</button>
+            <button type="submit" disabled={loading} className="w-full bg-aconso-600 text-white py-3 rounded-lg font-semibold hover:bg-aconso-700 transition disabled:opacity-50">{loading ? '...' : t('auth.registerBtn')}</button>
           </form>
-          <p className="text-center text-sm text-gray-500 mt-6">{t('auth.hasAccount')} <Link to="/login" className="text-blue-600 font-medium">{t('auth.login')}</Link></p>
+          <p className="text-center text-sm text-gray-500 mt-6">{t('auth.hasAccount')} <Link to="/login" className="text-aconso-600 font-medium">{t('auth.login')}</Link></p>
         </div>
       </div>
     </>

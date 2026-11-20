@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { partnersApi, coursesApi, partnerTypesApi } from '../../services/api';
+import { IconBook } from '../../components/icons';
 import type { User } from '../../types';
 
 interface PartnerCourseProgress {
@@ -57,7 +58,7 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
   const statusColor = (s: string) => {
     if (s === 'activo') return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
     if (s === 'solicitado') return 'bg-amber-100 text-amber-700 border border-amber-200';
-    if (s === 'en_revision') return 'bg-blue-100 text-blue-700 border border-blue-200';
+    if (s === 'en_revision') return 'bg-aconso-100 text-aconso-700 border border-aconso-200';
     return 'bg-gray-100 text-gray-600 border border-gray-200';
   };
 
@@ -120,8 +121,8 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
           <thead>
             <tr>
               <th>{t('common.company')}</th>
-              <th>{t('common.contact')}</th>
-              <th>{t('common.email')}</th>
+              <th className="hidden xl:table-cell">{t('common.contact')}</th>
+              <th className="hidden xl:table-cell">{t('common.email')}</th>
               <th>{t('common.status')}</th>
               <th>{t('admin.partnerTypeLabel')}</th>
               <th>{t('common.commission')}</th>
@@ -141,11 +142,16 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 text-white flex items-center justify-center text-sm font-bold shrink-0">
                       {p.company_name.slice(0, 2).toUpperCase()}
                     </div>
-                    <span className="font-medium text-gray-900 truncate">{p.company_name}</span>
+                    <div className="min-w-0 max-w-[220px]">
+                      <span className="font-medium text-gray-900 truncate block" title={p.company_name}>{p.company_name}</span>
+                      <span className="xl:hidden text-xs text-gray-500 truncate block">
+                        {p.contact_name}{p.email ? ` · ${p.email}` : ''}
+                      </span>
+                    </div>
                   </div>
                 </td>
-                <td className="text-gray-600 max-w-[150px] md:max-w-none truncate">{p.contact_name}</td>
-                <td className="text-gray-500 max-w-[170px] md:max-w-none truncate">{p.email}</td>
+                <td className="hidden xl:table-cell text-gray-600 max-w-[140px] truncate" title={p.contact_name}>{p.contact_name}</td>
+                <td className="hidden xl:table-cell text-gray-500 max-w-[190px] truncate" title={p.email}>{p.email}</td>
                 <td>
                   <span className={`badge ${statusColor(p.status)}`}>{t(`admin.statuses.${p.status}`)}</span>
                 </td>
@@ -188,8 +194,8 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
       </div>
 
       {selectedPartner && (
-        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => setSelectedPartner(null)}>
-          <div className="bg-white w-full max-w-2xl max-h-[85vh] overflow-y-auto border border-gray-200 mt-16" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in" onClick={() => setSelectedPartner(null)}>
+          <div className="bg-white w-full max-w-2xl max-h-[calc(100dvh-2rem)] overflow-y-auto border border-gray-200 rounded-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-aconso-500 to-aconso-700 text-white flex items-center justify-center font-bold text-lg">
@@ -212,7 +218,7 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
                 </div>
               ) : partnerProgress.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="text-4xl mb-3"></div>
+                  <IconBook className="w-10 h-10 mx-auto mb-3 text-gray-300" />
                   <p className="text-gray-400">{t('courses.noCourses')}</p>
                 </div>
               ) : (() => {
@@ -247,7 +253,7 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
                       <div className="relative w-28 h-28 shrink-0">
                         <svg className="w-28 h-28 -rotate-90" viewBox="0 0 36 36">
                           <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                          <circle cx="18" cy="18" r="15.5" fill="none" stroke={overallPct >= 70 ? '#059669' : overallPct >= 40 ? '#f59e0b' : '#0070AD'} strokeWidth="3" strokeDasharray={`${overallPct} ${100 - overallPct}`} strokeLinecap="round" className="transition-all duration-700" />
+                          <circle cx="18" cy="18" r="15.5" fill="none" stroke={overallPct >= 70 ? '#059669' : overallPct >= 40 ? '#f9d162' : '#144384'} strokeWidth="3" strokeDasharray={`${overallPct} ${100 - overallPct}`} strokeLinecap="round" className="transition-all duration-700" />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center">
@@ -313,7 +319,7 @@ export default function PartnersList({ partners, filter, onPartnersChange }: { p
                                 </div>
                               </div>
                             </div>
-                            <div className="p-4 bg-gray-25">
+                            <div className="p-4 bg-gray-50">
                               <div className="relative pl-8 space-y-0">
                                 {phaseConfig.map((pc, idx) => {
                                   const phaseVids = (course.videos || []).filter((v) => (v.phase || 1) === pc.phase);

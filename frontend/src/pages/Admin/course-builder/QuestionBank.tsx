@@ -104,12 +104,15 @@ export default function QuestionBank({ courseVideos, courseId, onRefresh }: Prop
   return (
     <div className="space-y-4">
       {/* Search + filter */}
-      <div className="flex gap-2">
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none"
-          placeholder={t('courses.searchQuestions') || 'Buscar...'} />
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1 min-w-0">
+          <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.35-4.35" /></svg>
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm focus:ring-2 focus:ring-aconso-500/20 focus:border-aconso-500 outline-none"
+            placeholder={t('courses.searchQuestions') || 'Buscar...'} />
+        </div>
         <select value={filterType} onChange={e => setFilterType(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-aconso-500">
+          className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-aconso-500 bg-white sm:w-48">
           <option value="">{t('courses.allTypes') || 'Todos'}</option>
           {QUESTION_TYPES.map(qt => <option key={qt.key} value={qt.key}>{t(qt.i18n)}</option>)}
         </select>
@@ -120,44 +123,47 @@ export default function QuestionBank({ courseVideos, courseId, onRefresh }: Prop
         {filtered.map((q, qi) => {
           const qText = q.question?.en || q.question?.es || q.question?.de || '';
           return (
-            <div key={q.id} className="p-3 bg-gray-50 rounded-xl border border-gray-100 group">
-              <div className="flex items-start justify-between mb-1.5">
-                <div className="flex items-center gap-2">
+            <div key={q.id} className="p-3 bg-white rounded-xl border border-gray-200 group hover:border-aconso-200 transition-colors">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <div className="flex items-start gap-2 min-w-0">
                   <span className="w-5 h-5 rounded-full bg-aconso-100 text-aconso-600 flex items-center justify-center text-[10px] font-bold shrink-0">{qi + 1}</span>
-                  <span className="text-sm font-medium text-gray-900">{qText}</span>
+                  <span className="text-sm font-medium text-gray-900 line-clamp-2">{qText}</span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-200 text-gray-600">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
                     {t((QUESTION_TYPES.find(qt => qt.key === (q.question_type || 'single'))?.i18n || 'quiz.typeSingle') as any)}
                   </span>
-                  <button onClick={() => startEdit(q)} className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded hover:bg-aconso-50 opacity-0 group-hover:opacity-100 transition-opacity">{t('common.edit')}</button>
-                  <button onClick={() => delBank(q.id)} className="text-[11px] text-gray-400 hover:text-red-500 px-1.5 py-0.5 rounded hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity">{t('common.delete')}</button>
+                  <button onClick={() => startEdit(q)} className="text-[11px] text-gray-400 hover:text-aconso-600 px-1.5 py-0.5 rounded hover:bg-aconso-50 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">{t('common.edit')}</button>
+                  <button onClick={() => delBank(q.id)} className="text-[11px] text-gray-400 hover:text-red-500 px-1.5 py-0.5 rounded hover:bg-red-50 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">{t('common.delete')}</button>
                 </div>
               </div>
-              <div className="flex items-center gap-2 ml-7">
-                <span className="text-[10px] text-gray-400">{t('courses.bankTrack')}: {q.track || 'todas'}</span>
+              <div className="flex flex-wrap items-center gap-2 ml-7">
+                <span className="text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">{t('courses.bankTrack')}: {q.track || 'todas'}</span>
                 <div className="flex-1" />
                 <select value={assignVideoId} onChange={e => setAssignVideoId(e.target.value)}
-                  className="border border-gray-200 rounded-lg px-2 py-1 text-[11px] outline-none max-w-[200px] opacity-0 group-hover:opacity-100 transition-opacity">
+                  className="border border-gray-200 rounded-lg px-2 py-1 text-[11px] outline-none max-w-[200px] bg-white">
                   <option value="">{t('courses.selectVideoQuiz')}</option>
                   {courseVideos.map(v => <option key={v.id} value={v.id}>{getVideoLabel(v)}</option>)}
                 </select>
                 <button onClick={() => handleAssign(q.id)} disabled={!assignVideoId || assigning}
-                  className="text-[11px] text-aconso-600 hover:text-aconso-700 font-medium px-2 py-1 rounded hover:bg-aconso-50 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50">
-                  → {t('courses.assignToVideo') || 'Asignar'}
+                  className="text-[11px] text-aconso-600 hover:text-aconso-700 font-medium px-2 py-1 rounded-lg border border-aconso-100 hover:bg-aconso-50 transition-colors disabled:opacity-50">
+                  {t('courses.assignToVideo') || 'Asignar'}
                 </button>
               </div>
             </div>
           );
         })}
         {filtered.length === 0 && (
-          <div className="text-center py-6 text-gray-400 text-sm">{t('quiz.noQuestions')}</div>
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white px-4 py-7 text-center">
+            <svg className="w-7 h-7 mx-auto text-gray-300" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" /></svg>
+            <p className="mt-2 text-sm text-gray-500">{t('quiz.noQuestions')}</p>
+          </div>
         )}
       </div>
 
       {/* Inline form */}
       {showForm ? (
-        <div className="border-2 border-aconso-200 rounded-xl p-4 space-y-3">
+        <div className="border border-aconso-200 bg-white rounded-xl p-4 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-900">{editing ? t('quiz.editQuestion') : t('courses.addToBank')}</h4>
             <div className="flex items-center gap-2">
@@ -169,7 +175,7 @@ export default function QuestionBank({ courseVideos, courseId, onRefresh }: Prop
                   </button>
                 ))}
               </div>
-              <button onClick={() => { setShowForm(false); setEditing(null); }} className="text-gray-400 hover:text-gray-600 text-sm"></button>
+              <button onClick={() => { setShowForm(false); setEditing(null); }} className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1" aria-label={t('common.cancel')}>×</button>
             </div>
           </div>
 

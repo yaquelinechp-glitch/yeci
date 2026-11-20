@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { lmsApi } from '../../services/api';
 import type { LmsOverview, TrainingResult, OnboardingSnapshot } from '../../types';
 import { TRACKS, CERT_LEVELS, CERT_STATUS_COLORS } from '../../constants';
+import { IconAlert, IconCheck, IconClock, IconPlay, IconRocket, IconTrophy } from '../../components/icons';
 
 const TRACK_ORDER = ['cumplimiento', 'ventas', 'tecnica'];
 
@@ -75,7 +76,7 @@ export default function PartnerTraining() {
   if (!data) {
     return (
       <div className="card p-16 text-center">
-        <div className="text-5xl mb-4"></div>
+        <IconAlert className="w-12 h-12 mx-auto mb-4 text-gray-300" />
         <p className="text-gray-500">{t('common.error')}</p>
       </div>
     );
@@ -89,17 +90,17 @@ export default function PartnerTraining() {
     resultsByCourse.get(r.course_id)!.push(r);
   }
 
-  let phaseStart = 0;
-  const phasesWithRange = (onboarding?.phases || []).map((p) => {
-    const start = phaseStart + 1;
-    phaseStart = p.days;
-    return { ...p, start, end: p.days };
-  });
+  const phasesWithRange = (onboarding?.phases || [])
+    .reduce<Array<{ start: number; end: number }>>((acc, p) => {
+      const start = acc.length ? acc[acc.length - 1].end + 1 : 1;
+      return [...acc, { start, end: start + p.days - 1 }];
+    }, [])
+    .map((range, i) => ({ ...onboarding!.phases[i], ...range }));
 
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900"> {t('lms.title')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('lms.title')}</h1>
         <p className="text-gray-500 mt-1">{t('lms.subtitle')}</p>
       </div>
 
@@ -111,15 +112,17 @@ export default function PartnerTraining() {
 
       {/* Onboarding checklist */}
       <div className="card mb-6 p-6">
-        <h2 className="font-bold text-gray-900 mb-1"> {t('lms.onboardingTitle')}</h2>
+        <h2 className="font-bold text-gray-900 mb-1">{t('lms.onboardingTitle')}</h2>
         <p className="text-sm text-gray-500 mb-4">{t('lms.onboardingSubtitle')}</p>
 
         {!onboarding || !onboarding.started ? (
           <div className="flex flex-col items-center py-6 text-center">
-            <div className="text-4xl mb-3"></div>
+            <div className="w-14 h-14 rounded-2xl bg-aconso-50 flex items-center justify-center mb-3">
+              <IconRocket className="w-7 h-7 text-aconso-500" />
+            </div>
             <p className="text-gray-500 text-sm max-w-md mb-4">{t('lms.onboardingSubtitle')}</p>
-            <button onClick={startOnboarding} disabled={starting} className="btn-primary">
-              {starting ? t('common.loading') : '▶ ' + t('lms.startOnboarding')}
+            <button onClick={startOnboarding} disabled={starting} className="btn-primary inline-flex items-center gap-2">
+              {starting ? t('common.loading') : <><IconPlay className="w-4 h-4" /> {t('lms.startOnboarding')}</>}
             </button>
           </div>
         ) : (
@@ -135,21 +138,22 @@ export default function PartnerTraining() {
                 </div>
               </div>
               {onboarding.next_milestone && (
-                <div className="text-xs text-gray-500 bg-aconso-50 border border-aconso-100 rounded-lg px-3 py-1.5">
-                   {t('lms.nextMilestone', { n: onboarding.next_milestone.days_left })}
+                <div className="text-xs text-gray-500 bg-aconso-50 border border-aconso-100 rounded-lg px-3 py-1.5 inline-flex items-center gap-1.5">
+                  <IconClock className="w-3.5 h-3.5" />
+                  {t('lms.nextMilestone', { n: onboarding.next_milestone.days_left })}
                 </div>
               )}
             </div>
 
             {onboarding.completed && (
-              <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-emerald-50 text-emerald-700 border border-emerald-200">
-                 {t('lms.onboardingDone')} {t('lms.onboardingDoneSub')}
+              <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-2">
+                <IconCheck className="w-4 h-4 shrink-0" /> {t('lms.onboardingDone')} {t('lms.onboardingDoneSub')}
               </div>
             )}
 
             {onboarding.reminders.length > 0 && (
               <div className="mb-4 px-4 py-3 rounded-xl text-sm bg-amber-50 text-amber-800 border border-amber-200">
-                <div className="font-semibold mb-1"> {t('lms.remindersTitle')}</div>
+                <div className="font-semibold mb-1 flex items-center gap-1.5"><IconAlert className="w-4 h-4" /> {t('lms.remindersTitle')}</div>
                 <ul className="list-disc list-inside space-y-0.5">
                   {onboarding.reminders.map((r) => <li key={r}>{r}</li>)}
                 </ul>
@@ -172,7 +176,7 @@ export default function PartnerTraining() {
                       <div key={step.key} className={`flex items-start gap-2.5 rounded-lg p-2 -mx-2 ${step.overdue ? 'bg-red-50' : ''}`}>
                         {step.auto ? (
                           <span className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${step.done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                            {step.done ? '' : '·'}
+                            {step.done ? '✓' : '·'}
                           </span>
                         ) : (
                           <button
@@ -180,13 +184,13 @@ export default function PartnerTraining() {
                             disabled={toggling === step.key}
                             className={`mt-0.5 w-5 h-5 rounded border-2 shrink-0 flex items-center justify-center text-[11px] font-bold transition-colors ${step.done ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-300 text-transparent hover:border-aconso-400'}`}
                           >
-                            
+                            {step.done ? '✓' : ''}
                           </button>
                         )}
                         <div className="min-w-0">
                           <div className={`text-sm ${step.done ? 'text-gray-500 line-through' : 'text-gray-800'}`}>{step.label}</div>
                           <div className="flex flex-wrap gap-1.5 mt-1">
-                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${step.auto ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-100 text-gray-500'}`}>
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${step.auto ? 'bg-brand-blue/10 text-brand-blue' : 'bg-gray-100 text-gray-500'}`}>
                               {step.auto ? t('lms.autoStep') : t('lms.manualStep')}
                             </span>
                             {step.overdue && (
@@ -214,7 +218,9 @@ export default function PartnerTraining() {
         <h2 className="font-bold text-gray-900 mb-4">{t('lms.certificationTitle')}</h2>
         {bestCert ? (
           <div className="flex flex-wrap items-center gap-6">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-4xl shadow-md"></div>
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md">
+              <IconTrophy className="w-12 h-12 text-white" />
+            </div>
             <div>
               <div className="text-sm text-gray-500">{t('lms.level')}: <span className="font-semibold text-gray-900">{CERT_LEVELS[bestCert.level]?.[i18n.language] || bestCert.level}</span></div>
               <div className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${CERT_STATUS_COLORS[bestCert.status] || 'bg-gray-100 text-gray-600'}`}>
@@ -225,7 +231,7 @@ export default function PartnerTraining() {
           </div>
         ) : (
           <div className="text-sm text-gray-500 flex items-center gap-2">
-            <span className="text-2xl"></span> {t('lms.noCertification')}
+            <IconAlert className="w-5 h-5 text-gray-300" /> {t('lms.noCertification')}
           </div>
         )}
 
@@ -237,7 +243,7 @@ export default function PartnerTraining() {
             <div className="flex flex-wrap gap-2">
               {next_level.requirements.map((req) => (
                 <span key={req.key} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${req.done ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}>
-                  <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${req.done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'}`}>{req.done ? '' : '·'}</span>
+                  <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${req.done ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'}`}>{req.done ? '✓' : '·'}</span>
                   {req.label}
                 </span>
               ))}
@@ -258,7 +264,7 @@ export default function PartnerTraining() {
               <div key={tr} className="rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-semibold text-gray-800">{t(`lms.${trackKey}`)}</span>
-                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tr === 'ventas' ? 'bg-aconso-100 text-aconso-700' : tr === 'tecnica' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'}`}>{TRACKS[tr]?.[i18n.language] || tr}</span>
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${tr === 'ventas' ? 'bg-aconso-100 text-aconso-700' : tr === 'tecnica' ? 'bg-brand-blue/15 text-brand-blue' : 'bg-amber-100 text-amber-700'}`}>{TRACKS[tr]?.[i18n.language] || tr}</span>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mb-1">
                   <span>{t('lms.completedCount', { completed: st?.completed || 0, total: st?.total || 0 })}</span>
@@ -314,18 +320,18 @@ export default function PartnerTraining() {
                   </div>
                   <div className="flex items-center gap-2">
                     {passed ? (
-                      <span className="badge bg-emerald-500 text-white border border-emerald-600"></span>
+                      <span className="badge bg-emerald-500 text-white border border-emerald-600 gap-1"><IconCheck className="w-3 h-3" /> {t('lms.certified')}</span>
                     ) : (
                       <span className="text-xs font-medium text-amber-600">{t('quiz.failed')}</span>
                     )}
                     {latest.certificate_url && (
                       <a href={latest.certificate_url} target="_blank" rel="noreferrer" className="btn-secondary !py-1.5 text-xs">
-                         {t('lms.downloadCertificate')}
+                        {t('lms.downloadCertificate')}
                       </a>
                     )}
                     {!latest.certificate_url && passed && (
                       <button onClick={() => downloadCertificate(courseId, latest.course_title)} disabled={downloading === courseId} className="btn-secondary !py-1.5 text-xs">
-                        {downloading === courseId ? t('common.loading') : ' ' + t('lms.downloadCertificate')}
+                        {downloading === courseId ? t('common.loading') : t('lms.downloadCertificate')}
                       </button>
                     )}
                   </div>
