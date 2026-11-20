@@ -98,15 +98,15 @@ function LoginForm() {
                   <span className="font-medium text-gray-700">{t('auth.demoAdmin')}</span>
                   <span className="text-gray-400 text-xs">admin@aconso.com</span>
                 </button>
-                <button type="button" onClick={() => { setEmail('flexso@demo.com'); setPassword('admin123'); setError(''); }}
+                <button type="button" onClick={() => { setEmail('l.brandt@hanseatic-hr.de'); setPassword('admin123'); setError(''); }}
                   className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-aconso-400 hover:bg-aconso-50 transition-colors text-sm">
-                  <span className="font-medium text-gray-700">{t('auth.demoFlexso')}</span>
-                  <span className="text-gray-400 text-xs">flexso@demo.com</span>
+                  <span className="font-medium text-gray-700">{t('auth.demoHanseatic')}</span>
+                  <span className="text-gray-400 text-xs">l.brandt@hanseatic-hr.de</span>
                 </button>
-                <button type="button" onClick={() => { setEmail('deloitte@demo.com'); setPassword('admin123'); setError(''); }}
+                <button type="button" onClick={() => { setEmail('m.kessler@alpenblick-consulting.ch'); setPassword('admin123'); setError(''); }}
                   className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 hover:border-aconso-400 hover:bg-aconso-50 transition-colors text-sm">
-                  <span className="font-medium text-gray-700">{t('auth.demoDeloitte')}</span>
-                  <span className="text-gray-400 text-xs">deloitte@demo.com</span>
+                  <span className="font-medium text-gray-700">{t('auth.demoAlpenblick')}</span>
+                  <span className="text-gray-400 text-xs">m.kessler@alpenblick-consulting.ch</span>
                 </button>
               </div>
             </div>
